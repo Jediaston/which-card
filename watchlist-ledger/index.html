@@ -102,11 +102,14 @@
 const KEY = "watchlist-ledger-v1";
 const PRELOADED_TS = "2026-08-17T20:15:00Z";
 const PRELOADED = {
-  tickers: ["TSLA", "MOH", "SPCX"],
+  tickers: ["TSLA", "MOH", "SPCX", "SOXX", "VXUS", "VWELX"],
   quotes: {
     TSLA: { price: 339.30, change: -2.97, changePct: -0.87, note: "close Mon 8/17" },
     MOH: { price: 203.06, change: -9.37, changePct: -4.41, note: "close Mon 8/17 \u00b7 estimate cuts" },
-    SPCX: { price: 146.23, change: 6.23, changePct: 4.45, note: "close Mon 8/17 \u00b7 lockup absorbed" }
+    SPCX: { price: 146.23, change: 6.23, changePct: 4.45, note: "close Mon 8/17 \u00b7 lockup absorbed" },
+    SOXX: { price: 559.12, change: 8.70, changePct: 1.58, note: "close Mon 8/17 \u00b7 iShares, not Vanguard" },
+    VXUS: { price: 87.87, change: 0.17, changePct: 0.19, note: "close Mon 8/17" },
+    VWELX: { price: 47.58, change: -0.09, changePct: -0.19, note: "close Fri 8/14 \u00b7 mutual fund, prices once daily" }
   },
   analyses: {
     TSLA: {
@@ -129,6 +132,27 @@ const PRELOADED = {
       consensus: "Still a clear Buy: sources put 27-31 analysts at Buy/Strong Buy versus 1-2 Sell, with average 12-month targets around $224-240 (roughly 60-93% implied upside) \u2014 though the spread from $62 (bear) to $800 (bull) remains the widest of any major stock. A second insider lockup expires Aug 20, the next real test after the Aug 6 unlock was absorbed without a crash.",
       claude: "Up another 4.5% Monday to $146.23, extending the recovery from the roughly $104 August low \u2014 shares are still well off the June IPO peak above $200 but have now round-tripped most of the post-lockup scare. The Aug 6 unlock of 911.5 million shares (about 1.4x the IPO itself) was the moment everyone expected a crash, and instead the stock rallied 21% over the following week; the next lockup expires Aug 20 and is the next real test of whether that supply gets absorbed again. First earnings as a public company (Aug 4) were genuinely strong \u2014 revenue $7.81B, up 92% year-over-year, AI segment revenue up 247%, Starlink subscribers doubled to 12.0 million, and the loss came in narrower than expected \u2014 but capex hit $18.37B for the quarter ($15.83B of it AI compute), and cash burn remains enormous against $93.5B of cash on hand. The new development since the last update: SpaceX is issuing $60B in equity to acquire Cursor, which Morningstar called roughly value-neutral. This is still purely a story stock \u2014 no profits, enormous capex, and a valuation that only works if the AI/orbital-datacenter bet pays off.",
       asOf: "Aug 17, 2026"
+    },
+    SOXX: {
+      morningstar: "Quick correction first: SOXX is issued by iShares (BlackRock), not Vanguard \u2014 Vanguard doesn't run a dedicated semiconductor-only fund; its closest equivalent is the broader Vanguard Information Technology ETF (VGT), which mixes software and hardware names in with chipmakers. SOXX itself carries a 5-star trailing Morningstar rating (3/5/10-year, vs. 243 tech funds) but a quantitative Neutral Medalist Rating as of Jun 30, 2026, meaning Morningstar's model doesn't call a clear edge over peers going forward. Expense ratio 0.35%, and the top 10 holdings make up about 60% of the fund \u2014 this is a concentrated bet on the chip sector, not a diversified tech holding.",
+      kiplinger: "No dedicated Kiplinger buy/sell call on SOXX specifically, though their broader tech coverage has repeatedly flagged AI-driven chip demand as the dominant theme carrying semiconductor names higher this cycle.",
+      consensus: "As an index-tracking ETF there's no single analyst rating, but the numbers tell the story: SOXX is up roughly 83% year-to-date and 117% over the past year, riding the AI buildout, with a 52-week range of $237-$656 showing just how volatile the ride has been. Top holdings skew toward Nvidia, Broadcom, AMD, and Micron \u2014 so it moves closely with AI capex headlines and any wobble in chip demand.",
+      claude: "Closed Monday at $559.12, up 1.58% on the day and now roughly 2.3x its 52-week low of $237 set almost exactly a year ago \u2014 a genuinely wild ride for a fund holding, not individual names. Because it's concentrated (top 10 holdings \u2248 60% of assets), it swings harder than a broad tech fund like VGT in both directions: great in an AI up-cycle like this one, but a rougher ride if chip demand or AI capex spending cools. Worth remembering this is a BlackRock/iShares product, not Vanguard, in case that matters for account consolidation.",
+      asOf: "Aug 17, 2026"
+    },
+    VXUS: {
+      morningstar: "Morningstar rates this one Gold \u2014 their top tier. Analyst Zachary Evens calls it 'one of the best international stock funds available': a market-cap-weighted portfolio holding nearly every stock in the developed and emerging non-U.S. markets (over 8,800 holdings) at an ultralow 0.05% expense ratio. High Process Pillar, Above Average People, High Parent \u2014 basically a straightforward, low-cost way to own the entire world outside the U.S. in one ticker.",
+      kiplinger: "No single dedicated Kiplinger call found, but broad-market international index funds like this one are a recurring recommendation in their portfolio-diversification coverage, especially for investors overweight in U.S. mega-cap tech.",
+      consensus: "This is a diversification holding, not a momentum trade \u2014 total return has been roughly 15-17% year-to-date and about 25% over the past year, modestly ahead of its category average, largely thanks to the fund's rock-bottom fee. Its results track the broader story: it does well when non-U.S. markets do well, and lags when the dollar or U.S. mega-cap tech dominate, as they have for much of the last decade.",
+      claude: "Closed Monday at $87.87, up 0.19% and sitting near its 52-week high of $88.62 \u2014 international stocks have had a good stretch, helped by resilient economic data outside the U.S. and account for the low expense ratio doing a lot of quiet work here: over 10 years it's beaten its category average by roughly 0.3 percentage points annually, almost entirely due to lower costs rather than better stock-picking (it's an index fund, so there isn't any). The main risk is the usual one for this asset class: a stronger dollar or a U.S. tech-led rally can leave it lagging for long stretches, as it has for parts of the last decade.",
+      asOf: "Aug 17, 2026"
+    },
+    VWELX: {
+      morningstar: "One important flag before anything else: Wellington is a mutual fund (ticker VWELX for Investor Shares), not an ETF, so it prices once a day after market close via NAV \u2014 there's no intraday quote, and this app's live Refresh button (which pulls from Finnhub) generally can't pull NAV data for mutual funds on the free tier. This entry will need to be updated by hand here in chat rather than via Refresh. On the fund itself: Morningstar's Medalist Rating (analyst Stephen Margaria, rated Apr 27, 2026) covers Vanguard's oldest fund, running continuously since 1929 \u2014 the nation's oldest balanced fund, roughly two-thirds stocks and one-third bonds, expense ratio a low 0.24%. Despite the 'balanced' label, its top holdings currently skew mega-cap tech: Nvidia, Alphabet, Microsoft, Apple, and Amazon lead the equity sleeve.",
+      kiplinger: "No recent dedicated Kiplinger coverage found, though Wellington has long been one of their go-to examples of a low-cost, one-fund balanced holding for investors who want stock exposure with a bond cushion and don't want to manage an allocation themselves.",
+      consensus: "Category is 'Moderate Allocation,' and Wellington has a long history of solid, if unspectacular, risk-adjusted returns versus that category \u2014 the appeal is more about a steady, professionally managed 2/3 stock, 1/3 bond mix than chasing outperformance. Minimum initial investment is $3,000 for the Investor share class.",
+      claude: "NAV closed Friday, Aug 14 at $47.58, down 0.19% on the day \u2014 note the date gap versus your other holdings: mutual funds like this only price once daily and don't trade over the weekend, so 'Friday' is genuinely the most current print available, not a stale refresh. As a balanced fund it's inherently less volatile than a pure-equity holding like TSLA or SOXX, which is the whole point \u2014 the one-third bond allocation should cushion it in an equity selloff, at the cost of missing some of the upside during rallies like SOXX's this year.",
+      asOf: "Aug 14, 2026"
     }
   },
   lastUpdated: PRELOADED_TS
@@ -190,20 +214,19 @@ async function loadSaved() {
     const res = await storage.get(KEY);
     if (res && res.value) {
       const saved = JSON.parse(res.value);
-      const savedTs = saved.lastUpdated ? Date.parse(saved.lastUpdated) : 0;
-      if (savedTs >= Date.parse(PRELOADED_TS)) {
-        state = saved;
-      } else {
-        // keep user's ticker list, but overlay newer preloaded data
-        if (saved.tickers && saved.tickers.length) {
-          state.tickers = saved.tickers.slice();
-          PRELOADED.tickers.forEach(function (t) {
-            if (state.tickers.indexOf(t) === -1) state.tickers.push(t);
-          });
+      state = saved;
+      state.tickers = state.tickers || [];
+      state.quotes = state.quotes || {};
+      state.analyses = state.analyses || {};
+      // add any newly introduced preloaded tickers the user doesn't already have,
+      // without ever overwriting a ticker's existing (possibly live-refreshed) data
+      PRELOADED.tickers.forEach(function (t) {
+        if (state.tickers.indexOf(t) === -1) {
+          state.tickers.push(t);
+          if (PRELOADED.quotes[t]) state.quotes[t] = PRELOADED.quotes[t];
         }
-        state.quotes = Object.assign({}, saved.quotes || {}, PRELOADED.quotes);
-        state.analyses = Object.assign({}, saved.analyses || {}, PRELOADED.analyses);
-      }
+        if (PRELOADED.analyses[t] && !state.analyses[t]) state.analyses[t] = PRELOADED.analyses[t];
+      });
     }
   } catch (e) { /* nothing saved yet, or storage unavailable */ }
   render();
