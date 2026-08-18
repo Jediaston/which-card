@@ -1,4 +1,4 @@
-const CACHE = "bh-audit-console-v2";
+const CACHE = "bh-audit-console-v3";
 const CORE_ASSETS = [
   "./",
   "./index.html",
