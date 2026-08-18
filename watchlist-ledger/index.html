@@ -77,17 +77,21 @@
   <div class="controls">
     <input id="tickerInput" placeholder="Add ticker (e.g. AAPL)" aria-label="Add ticker" />
     <button class="btn-add" onclick="addTicker()">Add</button>
+    <button class="btn-refresh" id="refreshBtn" onclick="refreshPrices()">Refresh</button>
   </div>
-  <div class="chatnote">Prices and analysis here were compiled in a Cursor chat, not fetched live &mdash;
-  there's no reliable free, key-free stock API this static page can call on its own. Come back to that
-  chat any time and ask to refresh a ticker; new tickers you add here show a dash until then.</div>
+  <div class="chatnote">Refresh pulls live prices straight from your browser using a free
+  <a href="https://finnhub.io/register" target="_blank" rel="noopener" style="color:inherit">Finnhub</a> API key
+  (first tap will ask you to paste one in &mdash; it's saved only on this device).
+  Analyst write-ups are still compiled by hand; come back to the chat any time to ask for those to be updated.
+  <span id="keyLink"></span></div>
 
   <div class="banner" id="banner"></div>
   <div id="list"></div>
 
-  <p class="foot">Data was compiled in a Cursor chat and is refreshed on request, not live. This is a
-  summary of published analyst views, not financial advice. Your watchlist is saved automatically on
-  this device only (not synced to other devices).</p>
+  <p class="foot">Prices refresh live from Finnhub when you tap Refresh; analyst write-ups are compiled by
+  hand and updated on request in chat, not live. This is a summary of published analyst views, not
+  financial advice. Your watchlist and API key are saved automatically on this device only (not synced
+  to other devices).</p>
 </div>
 
 <script>
@@ -128,6 +132,36 @@ const PRELOADED = {
 
 let state = JSON.parse(JSON.stringify(PRELOADED));
 let openPanels = { TSLA: true, MOH: true, SPCX: true };
+
+const API_KEY_STORAGE = "watchlist-ledger-finnhub-key";
+
+function getApiKey() {
+  try { return window.localStorage.getItem(API_KEY_STORAGE) || ""; } catch (e) { return ""; }
+}
+
+function setApiKey(key) {
+  try {
+    if (key) window.localStorage.setItem(API_KEY_STORAGE, key);
+    else window.localStorage.removeItem(API_KEY_STORAGE);
+  } catch (e) {}
+}
+
+function renderKeyLink() {
+  const el = document.getElementById("keyLink");
+  if (!el) return;
+  const hasKey = !!getApiKey();
+  el.innerHTML = hasKey
+    ? ' &middot; <a href="#" onclick="changeApiKey();return false;" style="color:inherit">Change key</a>'
+    : "";
+}
+
+function changeApiKey() {
+  const current = getApiKey();
+  const next = window.prompt("Paste your Finnhub API key (from finnhub.io, free tier is plenty):", current);
+  if (next === null) return;
+  setApiKey(next.trim());
+  renderKeyLink();
+}
 
 const storage = {
   async get(key) {
@@ -257,10 +291,79 @@ function togglePanel(sym) {
   render();
 }
 
-function showBanner(msg) {
+function showBanner(msg, ok) {
   const b = document.getElementById("banner");
   b.textContent = msg;
+  b.style.background = ok ? "var(--brass-soft)" : "var(--loss-soft)";
+  b.style.color = ok ? "var(--brass)" : "var(--loss)";
   b.style.display = msg ? "block" : "none";
+}
+
+async function fetchQuote(sym, apiKey) {
+  const url = "https://finnhub.io/api/v1/quote?symbol=" + encodeURIComponent(sym) + "&token=" + encodeURIComponent(apiKey);
+  const res = await fetch(url);
+  if (!res.ok) {
+    if (res.status === 401 || res.status === 403) throw new Error("Finnhub rejected that API key.");
+    if (res.status === 429) throw new Error("Finnhub rate limit hit \u2014 wait a minute and try again.");
+    throw new Error("Finnhub returned an error (" + res.status + ").");
+  }
+  const data = await res.json();
+  if (data == null || data.c == null || data.c === 0) throw new Error("No quote found for " + sym + ".");
+  return data;
+}
+
+async function refreshPrices() {
+  if (!state.tickers.length) return;
+  let apiKey = getApiKey();
+  if (!apiKey) {
+    apiKey = window.prompt(
+      "Paste a free Finnhub API key to refresh live prices.\n\nGet one at finnhub.io/register (no card needed) \u2014 it's saved only on this device.",
+      ""
+    );
+    if (!apiKey) return;
+    setApiKey(apiKey.trim());
+    apiKey = apiKey.trim();
+    renderKeyLink();
+  }
+
+  const btn = document.getElementById("refreshBtn");
+  btn.disabled = true;
+  btn.textContent = "Refreshing\u2026";
+  showBanner("");
+
+  const results = await Promise.allSettled(state.tickers.map(sym => fetchQuote(sym, apiKey)));
+  let okCount = 0;
+  let lastError = "";
+  results.forEach((r, i) => {
+    const sym = state.tickers[i];
+    if (r.status === "fulfilled") {
+      const q = r.value;
+      state.quotes[sym] = {
+        price: q.c,
+        change: q.d,
+        changePct: q.dp,
+        note: "live \u00b7 " + new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })
+      };
+      okCount++;
+    } else {
+      lastError = r.reason && r.reason.message ? r.reason.message : "Couldn't fetch " + sym + ".";
+    }
+  });
+
+  btn.disabled = false;
+  btn.textContent = "Refresh";
+
+  if (okCount > 0) {
+    state.lastUpdated = new Date().toISOString();
+    persist();
+    render();
+  }
+  if (lastError) {
+    showBanner((okCount > 0 ? "Some prices updated, but: " : "") + lastError, false);
+  } else if (okCount > 0) {
+    showBanner("Prices updated.", true);
+    setTimeout(() => showBanner(""), 3000);
+  }
 }
 
 document.getElementById("tickerInput").addEventListener("keydown", function (e) {
@@ -268,6 +371,7 @@ document.getElementById("tickerInput").addEventListener("keydown", function (e) 
 });
 
 render();
+renderKeyLink();
 loadSaved();
 
 if ('serviceWorker' in navigator) {
