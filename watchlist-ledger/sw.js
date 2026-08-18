@@ -1,4 +1,4 @@
-const CACHE = "watchlist-ledger-v1";
+const CACHE = "watchlist-ledger-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
