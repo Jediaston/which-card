@@ -1197,6 +1197,25 @@ export const CARDS = [
     notes: "Elevated hotel earn through Citi Travel; not a Hilton cobrand.",
   }),
   c({
+    id: "citi-prestige",
+    name: "Citi Prestige",
+    short: "Prestige",
+    issuer: "Citi",
+    network: "mastercard",
+    kind: "personal",
+    fee: 495,
+    flags: ["no_fx_fee"],
+    aliases: ["prestige", "citi prestige", "citibank prestige", "citibank prestige card", "thankyou prestige"],
+    cpp: 1.8,
+    cur: "TY",
+    color: "#5c4638",
+    base: 1,
+    rates: { dining: 5, flights: 5, hotels: 3, travel: 3, car_rental: 3 },
+    perks: ["lounge"],
+    specialist: ["dining", "flights"],
+    notes: "Closed to new US applicants; still in wallets. 5x air + restaurants, 3x hotels/cruises, 1x else. $250 travel credit, 4th night free (capped), Priority Pass. No FX fee.",
+  }),
+  c({
     id: "citi-costco-anywhere",
     name: "Costco Anywhere Visa",
     short: "Costco Visa",
@@ -2037,6 +2056,22 @@ export const CARDS = [
     notes: "3% on everything with Robinhood Gold. Strong flat-rate; dedicated 5% store cards still win those merchants.",
   }),
   c({
+    id: "x1",
+    name: "X1 Card",
+    short: "X1",
+    issuer: "X1",
+    network: "mastercard",
+    kind: "personal",
+    fee: 0,
+    flags: ["no_fx_fee"],
+    aliases: ["x", "x1", "x card", "x1 card", "x1 credit card"],
+    cpp: 1,
+    cur: "X1",
+    color: "#111111",
+    base: 1.5,
+    notes: "Closed to new applicants. Flat 1.5x on all spend as of Nov 2025 (boosts removed). No FX fee. Virtual cards in the X1 app. X1+ is a $75 variant; this entry is the $0 card.",
+  }),
+  c({
     id: "home-depot-card",
     name: "Home Depot Consumer Card",
     short: "Home Depot",
@@ -2267,10 +2302,22 @@ export function searchCatalog(query, catalog = CARDS) {
     .trim()
     .toLowerCase();
   if (!q) return catalog;
-  return catalog.filter((card) => {
-    const blob = [card.id, card.name, card.short, card.issuer, ...(card.aliases || [])].join(" ").toLowerCase();
-    return blob.includes(q);
-  });
+  const scored = [];
+  for (const card of catalog) {
+    const fields = [card.id, card.name, card.short, card.issuer, ...(card.aliases || [])].map((s) =>
+      String(s).toLowerCase()
+    );
+    if (!fields.some((f) => f.includes(q)) && !fields.join(" ").includes(q)) continue;
+    let rank = 4;
+    if (fields.some((f) => f === q)) rank = 0;
+    else if (fields.some((f) => f.startsWith(q))) rank = 1;
+    else if (fields.some((f) => f.split(/[\s/_-]+/).some((w) => w === q))) rank = 2;
+    else if (fields.some((f) => f.includes(q))) rank = 3;
+    else rank = 4;
+    scored.push({ card, rank });
+  }
+  scored.sort((a, b) => a.rank - b.rank);
+  return scored.map((row) => row.card);
 }
 
 export function aliasCard(query, catalog = CARDS) {

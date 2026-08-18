@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { CARDS, CATEGORIES, RATES_AS_OF, getCard } from "../js/data.js";
+import { CARDS, CATEGORIES, RATES_AS_OF, getCard, searchCatalog } from "../js/data.js";
 
 describe("catalog", () => {
   it("has 100+ researched cards dated August 2026", () => {
@@ -29,6 +29,19 @@ describe("catalog", () => {
       assert.ok(card.rotatingCategories.includes(cat), cat);
     }
     assert.ok(!card.rotatingCategories.includes("office"));
+  });
+
+  it("includes Citi Prestige and X1, searchable as citibank prestige / x", () => {
+    assert.ok(getCard("citi-prestige"));
+    assert.ok(getCard("x1"));
+    assert.equal(getCard("citi-prestige").rates.dining, 5);
+    assert.equal(getCard("x1").base, 1.5);
+    const prestigeHits = searchCatalog("citibank prestige");
+    assert.equal(prestigeHits[0].id, "citi-prestige");
+    const xHits = searchCatalog("x");
+    assert.equal(xHits[0].id, "x1");
+    assert.ok(searchCatalog("x1").some((c) => c.id === "x1"));
+    assert.ok(searchCatalog("prestige").some((c) => c.id === "citi-prestige"));
   });
 
   it("category tiles cover Pay modes", () => {
