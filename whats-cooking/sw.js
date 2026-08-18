@@ -1,4 +1,4 @@
-const CACHE = "whats-cooking-v1";
+const CACHE = "whats-cooking-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -6,6 +6,8 @@ const CORE_ASSETS = [
   "./icons/icon.svg",
   "./icons/icon-192.png",
   "./icons/icon-512.png",
+  "./images/hero-cooking.webp",
+  "./images/hero-cooking.jpg",
 ];
 
 self.addEventListener("install", (event) => {

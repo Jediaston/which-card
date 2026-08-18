@@ -49,19 +49,61 @@
     }
 
     .hero {
-      background: var(--bg);
+      background: linear-gradient(180deg, #e7f6f1 0%, var(--bg) 65%);
       color: var(--text);
-      padding: 3.25rem 1.5rem 3.5rem;
+      padding: 2.75rem 1.5rem 2.5rem;
       text-align: center;
       position: relative;
       overflow: hidden;
       border-bottom: 1px solid var(--border);
     }
 
+    .hero-inner {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 2.5rem;
+      text-align: left;
+    }
+
+    .hero-illustration {
+      flex: 0 0 auto;
+      width: 340px;
+      max-width: 40%;
+    }
+
+    .hero-illustration img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 20px;
+      box-shadow: 0 18px 40px -18px rgba(30, 61, 54, 0.28);
+    }
+
     .hero-content {
       position: relative;
       max-width: 720px;
       margin: 0 auto;
+      flex: 1 1 auto;
+      text-align: center;
+    }
+
+    @media (max-width: 780px) {
+      .hero {
+        padding: 2rem 1.25rem 2.25rem;
+      }
+
+      .hero-inner {
+        flex-direction: column-reverse;
+        gap: 1.25rem;
+        text-align: center;
+      }
+
+      .hero-illustration {
+        width: 100%;
+        max-width: 320px;
+      }
     }
 
     h1 {
@@ -94,6 +136,7 @@
 
     .search-box input {
       flex: 1;
+      min-width: 0;
       border: none;
       outline: none;
       font-size: 1.05rem;
@@ -102,6 +145,23 @@
       font-family: inherit;
       color: var(--text);
       background: transparent;
+    }
+
+    @media (max-width: 480px) {
+      .search-box {
+        flex-wrap: wrap;
+        border-radius: 22px;
+      }
+
+      .search-box input {
+        flex: 1 1 100%;
+        padding: 0.7rem 1rem;
+      }
+
+      .search-box button {
+        flex: 1 1 100%;
+        justify-content: center;
+      }
     }
 
     .search-box input::placeholder {
@@ -566,10 +626,11 @@
 </head>
 <body>
   <header class="hero">
-    <div class="hero-content">
-      <h1>What’s Cooking?</h1>
-      <p class="subtitle">Type a dish → get ingredients as a checklist for shopping or cooking</p>
-      <form class="search-box" id="searchForm">
+    <div class="hero-inner">
+      <div class="hero-content">
+        <h1>What’s Cooking?</h1>
+        <p class="subtitle">Type a dish → get ingredients as a checklist for shopping or cooking</p>
+        <form class="search-box" id="searchForm">
         <input 
           type="text" 
           id="dishInput" 
@@ -595,6 +656,13 @@
         <button type="button" class="fav-chip" data-cuisine="Japanese">🍣 Japanese</button>
         <button type="button" class="fav-chip" data-cuisine="Mexican">🇲🇽 Mexican</button>
         <button type="button" class="fav-chip" data-cuisine="Indian">🇮🇳 Indian</button>
+        </div>
+      </div>
+      <div class="hero-illustration">
+        <picture>
+          <source srcset="./images/hero-cooking.webp" type="image/webp">
+          <img src="./images/hero-cooking.jpg" alt="Two people cooking together in a kitchen, chopping vegetables and stirring a pot" width="1536" height="1024" loading="eager" fetchpriority="high">
+        </picture>
       </div>
     </div>
   </header>
