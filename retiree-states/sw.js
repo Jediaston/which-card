@@ -1,4 +1,4 @@
-const CACHE = "retiree-states-v1";
+const CACHE = "retiree-states-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
