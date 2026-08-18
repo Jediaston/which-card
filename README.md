@@ -32,3 +32,4 @@ localStorage key: `perk-wallet-v2` (still reads `perk-wallet-v1`).
 ## Other apps in this Pages site
 
 - **Where to Retire** — compares states for retirees on taxes, healthcare, climate, and airports. Live at [https://jediaston.github.io/which-card/retiree-states/](https://jediaston.github.io/which-card/retiree-states/). Installable as a home-screen app the same way as Which Card.
+- **BH Clinical Audit Console** — scores a behavioral health claim line against coding rules and against what the note shows clinically. Fully self-contained (no network calls, even parses `.docx` notes client-side), so it works offline once installed. Live at [https://jediaston.github.io/which-card/bh-audit-console/](https://jediaston.github.io/which-card/bh-audit-console/).
