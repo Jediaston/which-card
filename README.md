@@ -1,5 +1,10 @@
 # Which Card
 
+> This repo is still named `which-card` on GitHub (renaming/deleting repos requires GitHub account
+> permissions this environment doesn't have). The user-facing brand for the whole collection is
+> **AI Build** — see [`ai-build/`](./ai-build) for the landing hub that ties all the apps together
+> under that name without needing the underlying repo renamed.
+
 A **which-card-to-swipe** app. Not a balance tracker.
 
 You turn on the cards you own. Official issuer rates are already researched (August 2026). You never type 4x or 5%.

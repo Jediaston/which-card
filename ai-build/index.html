@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Build</title>
+<meta name="description" content="A small collection of tools, built to solve real problems.">
+
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F5F4F1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="AI Build">
+
+<link rel="manifest" href="./manifest.webmanifest?v=1">
+<link rel="icon" href="./icons/icon.svg?v=1" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-192.png?v=1">
+
+<style>
+  :root{
+    --bg:#F5F4F1; --paper:#FFFFFF; --ink:#20242B; --muted:#666C74; --line:#E1DFD9;
+    --accent:#2B3A55; --accent-2:#4A5C82;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:56px 24px 64px}
+  header{margin-bottom:44px}
+  .mark{width:48px;height:48px;border-radius:12px;background:var(--accent);
+        display:flex;align-items:center;justify-content:center;margin-bottom:20px;
+        color:#fff;font-weight:700;font-size:16px;letter-spacing:.02em}
+  h1{font-size:32px;line-height:1.15;letter-spacing:-.02em;margin:0 0 10px;font-weight:650}
+  .sub{margin:0;font-size:16px;color:var(--muted);max-width:34em;line-height:1.6}
+  main{display:flex;flex-direction:column;gap:14px}
+  a.card{display:flex;align-items:center;gap:16px;background:var(--paper);
+         border:1px solid var(--line);border-radius:16px;padding:20px 22px;
+         text-decoration:none;color:inherit;transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease}
+  a.card:hover{transform:translateY(-2px);box-shadow:0 10px 28px -8px rgba(32,36,43,.12);border-color:#D5D2C9}
+  .icon{width:44px;height:44px;border-radius:11px;flex:none;display:flex;align-items:center;
+        justify-content:center;font-size:20px}
+  .icon.card-app{background:#EFE0D8;color:#B04F34}
+  .icon.retire-app{background:#E4EBE4;color:#557A5B}
+  .icon.audit-app{background:#DEE6E4;color:#1D6B66}
+  .body{flex:1;min-width:0}
+  .name{font-size:16.5px;font-weight:600;margin:0 0 3px}
+  .desc{font-size:13.5px;color:var(--muted);margin:0;line-height:1.5}
+  .go{color:#B7BAC0;font-size:18px;flex:none}
+  footer{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
+         font-size:12.5px;line-height:1.7;color:#8B9096}
+  .install-hint{margin-top:6px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="mark">AI</div>
+    <h1>AI Build</h1>
+    <p class="sub">A small collection of tools, built to solve real problems. Each one installs on your phone like an app.</p>
+  </header>
+
+  <main>
+    <a class="card" href="../">
+      <div class="icon card-app">💳</div>
+      <div class="body">
+        <p class="name">Which Card</p>
+        <p class="desc">Tells you which credit card to swipe, by category or store.</p>
+      </div>
+      <div class="go">›</div>
+    </a>
+
+    <a class="card" href="../retiree-states/">
+      <div class="icon retire-app">📍</div>
+      <div class="body">
+        <p class="name">Where to Retire</p>
+        <p class="desc">Compares states on taxes, healthcare, climate, and airports.</p>
+      </div>
+      <div class="go">›</div>
+    </a>
+
+    <a class="card" href="../bh-audit-console/">
+      <div class="icon audit-app">✓</div>
+      <div class="body">
+        <p class="name">BH Clinical Audit Console</p>
+        <p class="desc">Scores a claim line against coding rules and the clinical note.</p>
+      </div>
+      <div class="go">›</div>
+    </a>
+  </main>
+
+  <footer>
+    Tap a tool to open it, or install this page itself — Share → Add to Home Screen —
+    and you'll get an "AI Build" icon that links out to everything above.
+  </footer>
+</div>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
