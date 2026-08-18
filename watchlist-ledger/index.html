@@ -48,6 +48,10 @@
   .pct { font-size: 15px; font-weight: 600; margin-left: 10px; }
   .up { color: var(--gain); } .down { color: var(--loss); }
   .x { border: none; background: transparent; color: var(--ink-soft); font-size: 16px; margin-left: 6px; }
+  .move-wrap { display: flex; flex-direction: column; margin-right: 4px; }
+  .move-btn { border: none; background: transparent; color: var(--ink-soft); font-size: 11px; line-height: 1.5; padding: 4px 6px; cursor: pointer; }
+  .move-btn:disabled { opacity: .2; cursor: default; }
+  .sym-wrap { display: flex; align-items: center; }
   .bar-track { margin-top: 12px; height: 6px; border-radius: 3px; background: var(--bg); overflow: hidden; display: flex; }
   .bar { height: 100%; transition: width .4s ease; }
   .row-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
@@ -273,7 +277,8 @@ function render() {
   }
 
   const maxAbs = Math.max(1, ...withData.map(q => Math.abs(q.changePct || 0)));
-  list.innerHTML = state.tickers.map(sym => {
+  const lastIdx = state.tickers.length - 1;
+  list.innerHTML = state.tickers.map((sym, i) => {
     const q = state.quotes[sym];
     const a = state.analyses[sym];
     const pct = q && q.changePct != null ? q.changePct : null;
@@ -292,8 +297,11 @@ function render() {
         ) + "</div>";
     }
     return '<div class="row">' +
-      '<div class="row-top"><div><span class="sym">' + esc(sym) + "</span>" +
-      (q && q.note ? '<span class="note">' + esc(q.note) + "</span>" : "") + "</div>" +
+      '<div class="row-top"><div class="sym-wrap"><div class="move-wrap">' +
+      '<button class="move-btn" aria-label="Move ' + esc(sym) + ' up" onclick="moveTicker(\'' + esc(sym) + '\',-1)"' + (i === 0 ? " disabled" : "") + '>\u25B2</button>' +
+      '<button class="move-btn" aria-label="Move ' + esc(sym) + ' down" onclick="moveTicker(\'' + esc(sym) + '\',1)"' + (i === lastIdx ? " disabled" : "") + '>\u25BC</button>' +
+      '</div><div><span class="sym">' + esc(sym) + "</span>" +
+      (q && q.note ? '<span class="note">' + esc(q.note) + "</span>" : "") + "</div></div>" +
       '<div><span class="price num">' + (q && q.price != null ? fmtMoney(q.price) : '<span style="font-size:13px;color:var(--ink-soft)">tap Refresh</span>') + "</span>" +
       (pct != null ? '<span class="pct num ' + (up ? "up" : "down") + '">' + (up ? "+" : "") + pct.toFixed(2) + "%</span>" : "") +
       '<button class="x" aria-label="Remove ' + esc(sym) + '" onclick="removeTicker(\'' + esc(sym) + '\')">\u00D7</button></div></div>' +
@@ -313,6 +321,18 @@ function addTicker() {
   inp.value = "";
   if (!sym || state.tickers.indexOf(sym) !== -1) return;
   state.tickers.push(sym);
+  persist();
+  render();
+}
+
+function moveTicker(sym, dir) {
+  const idx = state.tickers.indexOf(sym);
+  if (idx === -1) return;
+  const newIdx = idx + dir;
+  if (newIdx < 0 || newIdx >= state.tickers.length) return;
+  const tmp = state.tickers[idx];
+  state.tickers[idx] = state.tickers[newIdx];
+  state.tickers[newIdx] = tmp;
   persist();
   render();
 }
