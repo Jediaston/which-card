@@ -136,7 +136,7 @@ h1 {
 
 .fields {
   display: grid;
-  grid-template-columns: 1.4fr 0.8fr;
+  grid-template-columns: 1fr;
   gap: 14px;
   margin-bottom: 24px;
 }

@@ -152,13 +152,13 @@ describe("flags and aliases", () => {
 });
 
 describe("markup traps", () => {
-  it("Pay store/amount are plain text, not type=search, not inside a form", () => {
+  it("Pay store is plain text, not type=search, not inside a form; no Amount field", () => {
     const html = readFileSync(new URL("../index.html", import.meta.url), "utf8");
     const app = readFileSync(new URL("../js/app.js", import.meta.url), "utf8");
     assert.doesNotMatch(html, /<form/i);
     assert.doesNotMatch(app, /type=["']search["']/);
     assert.match(app, /id="store" type="text"/);
-    assert.match(app, /id="amount" type="text"/);
+    assert.doesNotMatch(app, /id="amount"/);
     assert.match(app, /class="tiles"/);
     assert.doesNotMatch(app, /<select/);
   });

@@ -1,5 +1,5 @@
 import { CARDS, CATEGORIES, RATES_AS_OF, categoriesForMode, getCard, searchCatalog } from "./data.js";
-import { parseAmount, quarterInfo, rankWallet, resolveMerchant } from "./score.js";
+import { quarterInfo, rankWallet, resolveMerchant } from "./score.js";
 import { createStore } from "./store.js";
 
 const store = createStore();
@@ -11,7 +11,6 @@ const ui = {
   mode: "everyday",
   category: "dining",
   store: "",
-  amount: "",
   catalogQuery: "",
   adding: false,
   redoSetup: false,
@@ -70,7 +69,6 @@ function payRanked(s) {
   return rankWallet(s.owned, {
     category: ui.category,
     merchant: ui.store,
-    amount: parseAmount(ui.amount),
     mode: ui.mode,
     favorites: s.favorites,
     focusMap: s.focus,
@@ -111,12 +109,8 @@ function renderPay() {
     </div>
     <div class="fields">
       <label class="field">
-        <span>Store</span>
+        <span>Store (optional)</span>
         <input id="store" type="text" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" enterkeyhint="go" placeholder="Amazon, Hilton, Staples…" value="${escapeAttr(ui.store)}" />
-      </label>
-      <label class="field">
-        <span>Amount</span>
-        <input id="amount" type="text" inputmode="decimal" autocomplete="off" placeholder="42.00" value="${escapeAttr(ui.amount)}" />
       </label>
     </div>
     <p class="hint" id="pay-hint">${matched}</p>
@@ -142,15 +136,10 @@ function renderPay() {
   );
 
   const storeInput = $("#store");
-  const amountInput = $("#amount");
   storeInput.addEventListener("input", () => {
     ui.store = storeInput.value;
     const hit = resolveMerchant(ui.store);
     if (hit?.category) ui.category = hit.category;
-    refreshPayLive();
-  });
-  amountInput.addEventListener("input", () => {
-    ui.amount = amountInput.value;
     refreshPayLive();
   });
   $$(".tile", $("#view-pay")).forEach((btn) =>
