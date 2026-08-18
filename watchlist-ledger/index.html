@@ -102,14 +102,15 @@
 const KEY = "watchlist-ledger-v1";
 const PRELOADED_TS = "2026-08-17T20:15:00Z";
 const PRELOADED = {
-  tickers: ["TSLA", "MOH", "SPCX", "SOXX", "VXUS", "VWELX"],
+  tickers: ["TSLA", "MOH", "SPCX", "SOXX", "VXUS", "VWELX", "VTI"],
   quotes: {
     TSLA: { price: 339.30, change: -2.97, changePct: -0.87, note: "close Mon 8/17" },
     MOH: { price: 203.06, change: -9.37, changePct: -4.41, note: "close Mon 8/17 \u00b7 estimate cuts" },
     SPCX: { price: 146.23, change: 6.23, changePct: 4.45, note: "close Mon 8/17 \u00b7 lockup absorbed" },
     SOXX: { price: 559.12, change: 8.70, changePct: 1.58, note: "close Mon 8/17 \u00b7 iShares, not Vanguard" },
     VXUS: { price: 87.87, change: 0.17, changePct: 0.19, note: "close Mon 8/17" },
-    VWELX: { price: 47.58, change: -0.09, changePct: -0.19, note: "close Fri 8/14 \u00b7 mutual fund, prices once daily" }
+    VWELX: { price: 47.58, change: -0.09, changePct: -0.19, note: "close Fri 8/14 \u00b7 mutual fund, prices once daily" },
+    VTI: { price: 382.13, change: -1.72, changePct: -0.45, note: "close Mon 8/17" }
   },
   analyses: {
     TSLA: {
@@ -153,6 +154,13 @@ const PRELOADED = {
       consensus: "Category is 'Moderate Allocation,' and Wellington has a long history of solid, if unspectacular, risk-adjusted returns versus that category \u2014 the appeal is more about a steady, professionally managed 2/3 stock, 1/3 bond mix than chasing outperformance. Minimum initial investment is $3,000 for the Investor share class.",
       claude: "NAV closed Friday, Aug 14 at $47.58, down 0.19% on the day \u2014 note the date gap versus your other holdings: mutual funds like this only price once daily and don't trade over the weekend, so 'Friday' is genuinely the most current print available, not a stale refresh. As a balanced fund it's inherently less volatile than a pure-equity holding like TSLA or SOXX, which is the whole point \u2014 the one-third bond allocation should cushion it in an equity selloff, at the cost of missing some of the upside during rallies like SOXX's this year.",
       asOf: "Aug 14, 2026"
+    },
+    VTI: {
+      morningstar: "Morningstar's Brendan McCann calls it 'a one-stop shop for all US stocks': VTI accurately represents the entire investable U.S. equity market (large, mid, and small-cap) in a single low-cost ticker, earning a Medalist Rating (rated Apr 27, 2026). Expense ratio is a razor-thin 0.03%, and at $2.29 trillion in net assets it's one of the largest funds in the world. Category: Large Blend.",
+      kiplinger: "No single dedicated Kiplinger call, but total-market index funds like VTI are a recurring core-holding recommendation in their long-term investing coverage \u2014 the classic 'buy the whole market' building block.",
+      consensus: "This is the broadest, most diversified single U.S. stock holding you can buy \u2014 essentially the entire market in one ticker, including the mega-cap names (Nvidia, Apple, Microsoft, etc.) alongside thousands of smaller companies. YTD total return is roughly 15%, in line with the S&P 500, since large caps dominate the fund's market-cap weighting.",
+      claude: "Closed Monday at $382.13, down 0.45% \u2014 near its 52-week high of $385.12, reflecting the broad market's strong run this year (roughly 15% YTD). Because it's market-cap weighted, its performance is driven mostly by the same mega-cap tech names that move the S&P 500, even though it technically holds thousands of smaller companies too. If you're also holding VXUS for international exposure, VTI + VXUS together is the classic two-fund 'own the whole world' portfolio.",
+      asOf: "Aug 17, 2026"
     }
   },
   lastUpdated: PRELOADED_TS
