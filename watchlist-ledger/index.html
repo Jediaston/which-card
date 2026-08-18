@@ -263,7 +263,7 @@ function render() {
     return '<div class="row">' +
       '<div class="row-top"><div><span class="sym">' + esc(sym) + "</span>" +
       (q && q.note ? '<span class="note">' + esc(q.note) + "</span>" : "") + "</div>" +
-      '<div><span class="price num">' + (q && q.price != null ? fmtMoney(q.price) : "\u2014") + "</span>" +
+      '<div><span class="price num">' + (q && q.price != null ? fmtMoney(q.price) : '<span style="font-size:13px;color:var(--ink-soft)">tap Refresh</span>') + "</span>" +
       (pct != null ? '<span class="pct num ' + (up ? "up" : "down") + '">' + (up ? "+" : "") + pct.toFixed(2) + "%</span>" : "") +
       '<button class="x" aria-label="Remove ' + esc(sym) + '" onclick="removeTicker(\'' + esc(sym) + '\')">\u00D7</button></div></div>' +
       '<div class="bar-track" style="justify-content:' + (up ? "flex-start" : "flex-end") + '">' +
