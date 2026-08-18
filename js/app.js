@@ -198,7 +198,7 @@ function renderCards() {
     <p class="hint">${s.setupComplete && !ui.adding ? "Wallet only — the cards you said you have." : "Turn on cards you own. You never type 4x or 5%."}</p>
     ${ui.adding || !s.setupComplete ? `<input class="search" id="catalog-q" type="text" autocomplete="off" placeholder="Search catalog" value="${escapeAttr(q)}" />` : ""}
     <div class="wallet-list">${list}</div>
-    <div class="help stack" style="margin-top:16px">
+    <div class="help stack" style="margin-top:28px">
       ${
         s.setupComplete
           ? `<button type="button" class="primary" id="toggle-add">${ui.adding ? "Done adding" : "Add more cards"}</button>`
