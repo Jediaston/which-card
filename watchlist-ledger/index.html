@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Watchlist Ledger</title>
+<meta name="description" content="A stock watchlist with analyst notes, saved on your device.">
+
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F4F5F1">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Watchlist">
+
+<link rel="manifest" href="./manifest.webmanifest?v=1">
+<link rel="icon" href="./icons/icon.svg?v=1" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-192.png?v=1">
+
+<style>
+  :root {
+    --bg: #F4F5F1; --panel: #FDFDFB; --ink: #17251F; --ink-soft: #5C6B63;
+    --line: #D8DCD4; --gain: #0E7A4D; --loss: #B3382E; --loss-soft: #F7E7E4;
+    --brass: #8C6F2F; --brass-soft: #F3EDDD;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body { background: var(--bg); color: var(--ink); font-family: Georgia, 'Times New Roman', serif; }
+  .wrap { max-width: 720px; margin: 0 auto; padding: 0 16px 48px; }
+  .num, input, button { font-family: -apple-system, 'Segoe UI', Inter, sans-serif; font-variant-numeric: tabular-nums; }
+  header { padding: 32px 0 18px; border-bottom: 2px solid var(--ink); display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .kicker { font-family: -apple-system, sans-serif; font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ink-soft); margin-bottom: 6px; }
+  h1 { font-size: 32px; font-weight: 600; line-height: 1.05; }
+  .avg { font-size: 21px; font-weight: 600; }
+  .stamp { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--ink-soft); }
+  .controls { display: flex; gap: 8px; padding: 14px 0; flex-wrap: wrap; }
+  input { flex: 1 1 150px; padding: 10px 14px; font-size: 15px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); text-transform: uppercase; outline: none; }
+  button { cursor: pointer; font-weight: 600; border-radius: 6px; font-size: 14px; }
+  .btn-add { padding: 10px 16px; border: 1px solid var(--ink); background: var(--panel); color: var(--ink); }
+  .btn-refresh { padding: 10px 18px; border: none; background: var(--ink); color: var(--bg); }
+  .btn-refresh:disabled { background: var(--ink-soft); cursor: wait; }
+  .chatnote { font-family: -apple-system, sans-serif; font-size: 12.5px; color: var(--ink-soft); background: var(--brass-soft); border-left: 3px solid var(--brass); border-radius: 0 6px 6px 0; padding: 9px 12px; margin-bottom: 14px; line-height: 1.45; }
+  .banner { padding: 10px 14px; background: var(--loss-soft); color: var(--loss); border-radius: 6px; font-size: 14px; font-family: -apple-system, sans-serif; margin-bottom: 12px; display: none; }
+  .row { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 16px 18px 12px; margin-bottom: 10px; }
+  .row-top { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .sym { font-size: 23px; font-weight: 600; }
+  .note { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--ink-soft); margin-left: 8px; }
+  .price { font-size: 23px; font-weight: 600; }
+  .pct { font-size: 15px; font-weight: 600; margin-left: 10px; }
+  .up { color: var(--gain); } .down { color: var(--loss); }
+  .x { border: none; background: transparent; color: var(--ink-soft); font-size: 16px; margin-left: 6px; }
+  .bar-track { margin-top: 12px; height: 6px; border-radius: 3px; background: var(--bg); overflow: hidden; display: flex; }
+  .bar { height: 100%; transition: width .4s ease; }
+  .row-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; }
+  .chg { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--ink-soft); }
+  .btn-an { border: 1px solid var(--brass); background: transparent; color: var(--brass); padding: 5px 12px; font-size: 12px; }
+  .btn-an.open { background: var(--brass-soft); }
+  .panel { margin-top: 13px; border-top: 1px dashed var(--line); padding-top: 13px; display: none; }
+  .src { display: inline-block; font-family: -apple-system, sans-serif; font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; color: var(--brass); background: var(--brass-soft); border-radius: 4px; padding: 3px 7px; margin-bottom: 6px; }
+  .panel p { font-size: 14.5px; line-height: 1.55; margin-bottom: 13px; }
+  .foot { font-family: -apple-system, sans-serif; font-size: 12px; color: var(--ink-soft); margin-top: 18px; line-height: 1.5; }
+  .empty { padding: 44px 0; text-align: center; color: var(--ink-soft); font-family: -apple-system, sans-serif; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <div class="kicker">Watchlist ledger</div>
+      <h1>Your stocks</h1>
+    </div>
+    <div style="text-align:right">
+      <div class="avg" id="avg"></div>
+      <div class="stamp" id="stamp"></div>
+    </div>
+  </header>
+
+  <div class="controls">
+    <input id="tickerInput" placeholder="Add ticker (e.g. AAPL)" aria-label="Add ticker" />
+    <button class="btn-add" onclick="addTicker()">Add</button>
+  </div>
+  <div class="chatnote">Prices and analysis here were compiled in a Cursor chat, not fetched live &mdash;
+  there's no reliable free, key-free stock API this static page can call on its own. Come back to that
+  chat any time and ask to refresh a ticker; new tickers you add here show a dash until then.</div>
+
+  <div class="banner" id="banner"></div>
+  <div id="list"></div>
+
+  <p class="foot">Data was compiled in a Cursor chat and is refreshed on request, not live. This is a
+  summary of published analyst views, not financial advice. Your watchlist is saved automatically on
+  this device only (not synced to other devices).</p>
+</div>
+
+<script>
+const KEY = "watchlist-ledger-v1";
+const PRELOADED_TS = "2026-08-13T20:30:00Z";
+const PRELOADED = {
+  tickers: ["TSLA", "MOH", "SPCX"],
+  quotes: {
+    TSLA: { price: 325.23, change: -2.28, changePct: -0.70, note: "close Wed 8/13" },
+    MOH: { price: 194.54, change: -11.52, changePct: -5.59, note: "close Wed 8/13 \u00b7 Marketplace losses" },
+    SPCX: { price: 141.16, change: -4.99, changePct: -3.41, note: "close Wed 8/13 \u00b7 AI capex concerns" }
+  },
+  analyses: {
+    TSLA: {
+      morningstar: "Morningstar rates Tesla 3 stars (fairly valued) with a narrow moat from intangible assets and cost advantage. After strong Q2 deliveries, its analysts lifted their fair value estimate to $450 per share, putting the stock roughly 15% below fair value at Friday's close — but they suggest waiting for a wider margin of safety before buying.",
+      kiplinger: "Kiplinger tracks Tesla news regularly but hasn't published a dedicated buy/sell call recently. Its coverage has emphasized Tesla's unmatched EV scale as a competitive advantage while noting Wall Street has stayed cautious on the stock.",
+      consensus: "Consensus stays around Hold with targets drifting down \u2014 Jefferies cut to $350 from $400 on Aug 7 while keeping a Hold. The spread stays extreme because the argument is about robotaxi and Optimus, not cars. Merger chatter is now part of the coverage: analysts are being asked whether a SpaceX-Tesla tie-up is plausible, and at least one SpaceX short seller argues it would make things worse.",
+      claude: "Recovering steadily \u2014 $330.88 on Monday, up about 5% since the Aug 7 trough and now well off the post-earnings lows near $320. Q2 (July 22) was the split-personality quarter I expected, but the market punished it harder than I'd have guessed. Record revenue of $28.24B (+26%) and record deliveries of 480,126 \u2014 yet operating income collapsed 57% to $398M, margin fell to 1.4%, EPS came in at $0.33 vs ~$0.51 expected, and free cash flow went negative $1.09B as capex jumped 142% to $5.79B. The stock fell 14.5% the next day, its worst in over a year, from ~$374 to ~$320. Management framed it as entering their 'largest investment period' with 2026 capex above $25B. So the thesis is now explicit: Tesla is spending its car profits to buy an AI/robotics future. Since the crash it has stabilized and drifted back to ~$329. The stock is no longer priced for perfection, but it's also not cheap on current earnings \u2014 you're underwriting Optimus, robotaxi (now in seven metros) and Cybercab, not the auto business. Fresh developments to watch: a filing for a $10.1B solar factory in Texas, record sales driving a Japan expansion, and the odd fact that Tesla now trades partly as a SpaceX proxy \u2014 it bounced 5% on retail buying tied to SpaceX's $16.8B AI chip deal.",
+      asOf: "Aug 11, 2026"
+    },
+    MOH: {
+      morningstar: "Morningstar's Julie Utterback flagged the Q2 report (July 23) as showing a 6% revenue decline on a mid-teens membership drop, offset by a 10% increase in revenue per member. Margins stayed under heavy pressure \u2014 adjusted EPS fell more than 70% to $1.51, though that still beat the $1.39 consensus. Structurally they still credit Molina's discipline on medical and admin costs and note it could be an acquisition target, but they continue to view the shares as trading at a premium to fair value.",
+      kiplinger: "No recent dedicated Kiplinger coverage of Molina was found — their analyst commentary hasn't singled MOH out lately.",
+      consensus: "Still a Hold across 19 analysts, average target ~$209 (about 7% above the current price). Targets have been cut since the July results: Wells Fargo to $220 from $235, RBC to $218 from $248, Barclays to $180 from $184 (Underweight). BofA is the outlier, raising to $260 with a Buy on the EPS beat and guidance.",
+      claude: "Still sliding \u2014 $195.58 midday Tuesday, down 1.6%, and roughly 20% below the July peak. I flagged the medical care ratio as the number that would decide the rally \u2014 and it did. Q2 (July 23) actually beat on both lines ($10.87B revenue vs $10.78B expected, adjusted EPS $1.51 vs $1.39) and management raised full-year guidance to at least $5.25 adjusted per share. But look underneath: net income fell to $60M, adjusted EPS still dropped over 70% year-over-year, membership fell mid-teens, and the medical care ratio rose. A beat against lowered expectations isn't the same as a healthy business. The stock has given back most of the S&P 400 inclusion pop, from ~$230 down to ~$196. That fade tells you index-driven buying was temporary and the market is still pricing margin pressure from Medicaid rates lagging cost trend. The split in the earnings call is the thing to hold onto: Medicaid and Medicare duals performed well while Marketplace lost money on adverse member mix, and management called 2026 the trough year for Medicaid margins with recovery expected in 2027. So the bull case is explicitly a wait-until-next-year story, and the market is currently not paying up for it.",
+      asOf: "Aug 11, 2026"
+    },
+    SPCX: {
+      morningstar: "Morningstar is the loudest bear on the Street: its fair value estimate is just $62-63 per share \u2014 roughly half the current price even after the crash. They rate SpaceX a narrow moat driven by genuine cost advantages in launch and Starlink, but call the shares significantly overvalued, noting their valuation already assumes generous outcomes like a rapidly reusable Starship and space-based data centers \u2014 engineering problems they don't expect solved before 2028. The AI business they call an indeterminate moat. At its peak, SPCX was the single most expensive stock in Morningstar's entire coverage universe.",
+      kiplinger: "No dedicated Kiplinger call on SpaceX was found \u2014 their coverage hasn't singled SPCX out since the IPO.",
+      consensus: "Still a Buy: 27 analysts recommend buying versus 2 selling, with an average target of $233 implying roughly 75% upside \u2014 but the range ($62 to $800) remains the widest on any major stock. Macquarie's $250 'buy any dip' thesis treats SpaceX as an AI compute utility rather than a rocket company.",
+      claude: "The rebound held \u2014 $138.74 Monday, up 4.2%, back above the $135 IPO price and briefly touching $139.50. The two events I flagged both happened, and the outcome was the opposite of what the bears set up for. First earnings (Aug 4) beat clearly: revenue $7.81B vs $6.93B expected, up 92% year-over-year, with the net loss narrowing to $541M versus a $1.9B expected loss. But the stock still fell about 8% after hours because capex exploded more than sixfold to $18.37B in the quarter \u2014 $15.83B of it on AI \u2014 against a $13.22B estimate. Then the real test: on Aug 6, roughly 911 million insider shares unlocked, about 1.45x the size of the entire IPO. The stock climbed anyway, and closed Friday at $133.11, up nearly 16% on the day. That's a meaningful signal \u2014 the supply overhang I was most worried about got absorbed, and shorts holding ~29% of the float are now under real pressure. Balance sheet is fortified too: $93.5B cash versus $36.8B debt. This remains a story stock with no profits and $28.5B of first-half capex, but the bear case just lost its clearest catalyst. The skeptics have shifted their argument accordingly: Steve Eisman now frames SpaceX as attracting believers rather than investors, questioning whether a $1.6T valuation built on heavy AI infrastructure spending is sustainable, and notes rising retail participation as a sign enthusiasm may be thinning. Kevin O'Leary, who sat out the IPO, calls $100-110 the level he'd want. Meanwhile the company keeps escalating: a $16.8B chip factory with its own power plants.",
+      asOf: "Aug 11, 2026"
+    }
+  },
+  lastUpdated: PRELOADED_TS
+};
+
+let state = JSON.parse(JSON.stringify(PRELOADED));
+let openPanels = { TSLA: true, MOH: true, SPCX: true };
+
+const storage = {
+  async get(key) {
+    try {
+      const value = window.localStorage.getItem(key);
+      return value == null ? null : { value };
+    } catch (e) { return null; }
+  },
+  async set(key, value) {
+    try { window.localStorage.setItem(key, value); } catch (e) {}
+  }
+};
+
+async function loadSaved() {
+  try {
+    const res = await storage.get(KEY);
+    if (res && res.value) {
+      const saved = JSON.parse(res.value);
+      const savedTs = saved.lastUpdated ? Date.parse(saved.lastUpdated) : 0;
+      if (savedTs >= Date.parse(PRELOADED_TS)) {
+        state = saved;
+      } else {
+        // keep user's ticker list, but overlay newer preloaded data
+        if (saved.tickers && saved.tickers.length) {
+          state.tickers = saved.tickers.slice();
+          PRELOADED.tickers.forEach(function (t) {
+            if (state.tickers.indexOf(t) === -1) state.tickers.push(t);
+          });
+        }
+        state.quotes = Object.assign({}, saved.quotes || {}, PRELOADED.quotes);
+        state.analyses = Object.assign({}, saved.analyses || {}, PRELOADED.analyses);
+      }
+    }
+  } catch (e) { /* nothing saved yet, or storage unavailable */ }
+  render();
+}
+
+async function persist() {
+  try { await storage.set(KEY, JSON.stringify(state)); } catch (e) {}
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+    return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+  });
+}
+
+function fmtMoney(n) {
+  return "$" + Number(n).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function render() {
+  const list = document.getElementById("list");
+  const withData = state.tickers.map(t => state.quotes[t]).filter(q => q && q.price != null);
+  const avgEl = document.getElementById("avg");
+  if (withData.length) {
+    const avg = withData.reduce((s, q) => s + (q.changePct || 0), 0) / withData.length;
+    avgEl.className = "avg num " + (avg >= 0 ? "up" : "down");
+    avgEl.textContent = (avg >= 0 ? "\u25B2 " : "\u25BC ") + Math.abs(avg).toFixed(2) + "%";
+  } else { avgEl.textContent = ""; }
+  document.getElementById("stamp").textContent = state.lastUpdated
+    ? "Updated " + new Date(state.lastUpdated).toLocaleString([], { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" })
+    : "No prices yet";
+
+  if (!state.tickers.length) {
+    list.innerHTML = '<div class="empty">Add a ticker above to start your watchlist.</div>';
+    return;
+  }
+
+  const maxAbs = Math.max(1, ...withData.map(q => Math.abs(q.changePct || 0)));
+  list.innerHTML = state.tickers.map(sym => {
+    const q = state.quotes[sym];
+    const a = state.analyses[sym];
+    const pct = q && q.changePct != null ? q.changePct : null;
+    const up = pct != null && pct >= 0;
+    const barW = pct != null ? Math.min(100, Math.abs(pct) / maxAbs * 100) : 0;
+    const open = !!openPanels[sym];
+    let panel = "";
+    if (open && a) {
+      panel = '<div class="panel" style="display:block">' +
+        (a.error ? '<p style="color:var(--loss)">' + esc(a.error) + "</p>" :
+          '<div><span class="src">Morningstar</span><p>' + esc(a.morningstar) + "</p></div>" +
+          '<div><span class="src">Kiplinger</span><p>' + esc(a.kiplinger) + "</p></div>" +
+          (a.consensus ? '<div><span class="src">Street consensus</span><p>' + esc(a.consensus) + "</p></div>" : "") +
+          (a.claude ? '<div><span class="src">Analyst notes</span><p>' + esc(a.claude) + "</p></div>" : "") +
+          (a.asOf ? '<div class="chg">Coverage as of ' + esc(a.asOf) + "</div>" : "")
+        ) + "</div>";
+    }
+    return '<div class="row">' +
+      '<div class="row-top"><div><span class="sym">' + esc(sym) + "</span>" +
+      (q && q.note ? '<span class="note">' + esc(q.note) + "</span>" : "") + "</div>" +
+      '<div><span class="price num">' + (q && q.price != null ? fmtMoney(q.price) : "\u2014") + "</span>" +
+      (pct != null ? '<span class="pct num ' + (up ? "up" : "down") + '">' + (up ? "+" : "") + pct.toFixed(2) + "%</span>" : "") +
+      '<button class="x" aria-label="Remove ' + esc(sym) + '" onclick="removeTicker(\'' + esc(sym) + '\')">\u00D7</button></div></div>' +
+      '<div class="bar-track" style="justify-content:' + (up ? "flex-start" : "flex-end") + '">' +
+      '<div class="bar" style="width:' + barW + "%;background:" + (pct == null ? "var(--line)" : up ? "var(--gain)" : "var(--loss)") + '"></div></div>' +
+      '<div class="row-foot">' +
+      (q && q.change != null ? '<div class="chg num">' + (q.change >= 0 ? "+" : "\u2212") + fmtMoney(Math.abs(q.change)).slice(1) + " today</div>" : "<div></div>") +
+      (a ? '<button class="btn-an' + (open ? " open" : "") + '" onclick="togglePanel(\'' + esc(sym) + '\')">' +
+      (open ? "Hide analysis" : "Show analysis") + "</button>" : '<span class="chg">Ask in chat for analysis</span>') +
+      "</div>" + panel + "</div>";
+  }).join("");
+}
+
+function addTicker() {
+  const inp = document.getElementById("tickerInput");
+  const sym = inp.value.trim().toUpperCase().replace(/[^A-Z.\-]/g, "");
+  inp.value = "";
+  if (!sym || state.tickers.indexOf(sym) !== -1) return;
+  state.tickers.push(sym);
+  persist();
+  render();
+}
+
+function removeTicker(sym) {
+  state.tickers = state.tickers.filter(t => t !== sym);
+  delete state.quotes[sym];
+  delete state.analyses[sym];
+  delete openPanels[sym];
+  persist();
+  render();
+}
+
+function togglePanel(sym) {
+  if (!state.analyses[sym]) return;
+  openPanels[sym] = !openPanels[sym];
+  render();
+}
+
+function showBanner(msg) {
+  const b = document.getElementById("banner");
+  b.textContent = msg;
+  b.style.display = msg ? "block" : "none";
+}
+
+document.getElementById("tickerInput").addEventListener("keydown", function (e) {
+  if (e.key === "Enter") addTicker();
+});
+
+render();
+loadSaved();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
