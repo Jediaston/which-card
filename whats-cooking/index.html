@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>What’s Cooking? – Recipes & Grocery Checklist</title>
+  <meta name="description" content="Type a dish and get its ingredients as a shopping or cooking checklist, plus favorite cuisine picks.">
+
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#f0faf6">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="What's Cooking">
+
+  <link rel="manifest" href="./manifest.webmanifest?v=1">
+  <link rel="icon" href="./icons/icon.svg?v=1" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=1">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f0faf6;
+      --card: #ffffff;
+      --primary: #4db6a0;
+      --primary-dark: #3d9a87;
+      --accent: #5ec4ae;
+      --text: #1e3d36;
+      --muted: #5f7d74;
+      --border: #d4ebe4;
+      --shadow: 0 8px 30px -10px rgba(30, 61, 54, 0.07);
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.5;
+    }
+
+    .hero {
+      background: var(--bg);
+      color: var(--text);
+      padding: 3.25rem 1.5rem 3.5rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .hero-content {
+      position: relative;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.9rem, 4.5vw, 2.6rem);
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.025em;
+      color: var(--text);
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      margin-bottom: 1.75rem;
+      font-weight: 400;
+      color: var(--muted);
+    }
+
+    .search-box {
+      display: flex;
+      gap: 0.6rem;
+      max-width: 540px;
+      margin: 0 auto;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.4rem;
+      box-shadow: 0 4px 20px -6px rgba(31, 42, 36, 0.06);
+    }
+
+    .search-box input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 1.05rem;
+      padding: 0.85rem 1.25rem;
+      border-radius: 999px;
+      font-family: inherit;
+      color: var(--text);
+      background: transparent;
+    }
+
+    .search-box input::placeholder {
+      color: var(--muted);
+    }
+
+    .search-box button {
+      background: var(--primary);
+      color: #f8faf8;
+      border: none;
+      border-radius: 999px;
+      padding: 0.85rem 1.75rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.15s;
+      font-family: inherit;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .search-box button:hover {
+      background: var(--primary-dark);
+      transform: translateY(-1px);
+    }
+
+    .search-box button:active {
+      transform: translateY(0);
+    }
+
+    .search-box button:disabled {
+      opacity: 0.7;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: -2rem auto 3rem;
+      padding: 0 1.25rem;
+      position: relative;
+    }
+
+    .status {
+      text-align: center;
+      padding: 2rem;
+      color: var(--muted);
+      font-size: 1.05rem;
+    }
+
+    .status.error {
+      color: #8b3a3a;
+      background: #faf6f6;
+      border-radius: var(--radius);
+      border: 1px solid #eddede;
+    }
+
+    .results {
+      display: grid;
+      gap: 1.75rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 14px 36px -10px rgba(31, 42, 36, 0.1);
+      border-color: #b8e0d4;
+    }
+
+    .card-header {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 0;
+    }
+
+    @media (max-width: 600px) {
+      .card-header {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card-img {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #eaf8f4;
+    }
+
+    @media (max-width: 600px) {
+      .card-img {
+        height: 220px;
+      }
+    }
+
+    .card-meta {
+      padding: 1.5rem 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .card-meta h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 0.4rem;
+      color: var(--text);
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.7rem;
+      border-radius: 999px;
+      background: #e5f7f2;
+      color: #3d9a87;
+    }
+
+    .badge.area {
+      background: #e5f7f2;
+      color: #3d9a87;
+    }
+
+    .badge.category {
+      background: #eaf8f4;
+      color: #4db6a0;
+    }
+
+    .ingredients-section {
+      padding: 0 1.5rem 1.5rem;
+    }
+
+    .ingredients-section h3 {
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--muted);
+      margin-bottom: 0.85rem;
+      font-weight: 600;
+    }
+
+    .ingredients-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: 0.35rem 1rem;
+      list-style: none;
+    }
+
+    .ingredients-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.95rem;
+      padding: 0.45rem 0.5rem;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.15s;
+      user-select: none;
+    }
+
+    .ingredients-list li:hover {
+      background: #eaf8f4;
+    }
+
+    .ingredients-list li.checked {
+      opacity: 0.55;
+    }
+
+    .ingredients-list li.checked .ingredient-name,
+    .ingredients-list li.checked .measure {
+      text-decoration: line-through;
+      color: var(--muted);
+    }
+
+    .ingredients-list input[type="checkbox"] {
+      width: 1.15rem;
+      height: 1.15rem;
+      accent-color: var(--accent);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .measure {
+      font-weight: 600;
+      color: var(--primary);
+      min-width: 4.2rem;
+      flex-shrink: 0;
+    }
+
+    .ingredient-name {
+      color: var(--text);
+      flex: 1;
+    }
+
+    .checklist-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.85rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .checklist-header h3 {
+      margin-bottom: 0;
+    }
+
+    .progress {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: #e5f7f2;
+      padding: 0.2rem 0.65rem;
+      border-radius: 999px;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      padding: 0 1.5rem 1.5rem;
+      border-top: 1px solid var(--border);
+      margin-top: 0.5rem;
+      padding-top: 1.25rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.55rem 1.1rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #f8faf8;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 1.5px solid var(--border);
+    }
+
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .instructions {
+      display: none;
+      padding: 0 1.5rem 1.5rem;
+      font-size: 0.95rem;
+      color: #4a554e;
+      white-space: pre-line;
+      line-height: 1.7;
+    }
+
+    .instructions.open {
+      display: block;
+    }
+
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .footer a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 1.1rem;
+      height: 1.1rem;
+      border: 2px solid rgba(248, 250, 248, 0.35);
+      border-top-color: #f8faf8;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+    }
+
+    .empty-state svg {
+      width: 56px;
+      height: 56px;
+      margin-bottom: 1rem;
+      opacity: 0.4;
+      color: var(--primary);
+    }
+
+    .empty-state h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+    }
+
+    .empty-state p {
+      color: var(--muted);
+    }
+
+    .examples {
+      margin-top: 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .chip {
+      background: #e5f7f2;
+      color: #3d9a87;
+      border: 1px solid #c5e8de;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      font-family: inherit;
+    }
+
+    .chip:hover {
+      background: #d5f0e9;
+      border-color: #a8d9cb;
+    }
+
+    .browse-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.6rem;
+      margin-top: 1.25rem;
+    }
+
+    .fav-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.45rem;
+      margin-top: 0.85rem;
+    }
+
+    .fav-chip {
+      background: #e5f7f2;
+      color: #3d9a87;
+      border: 1px solid #c5e8de;
+      padding: 0.35rem 0.75rem;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .fav-chip:hover {
+      background: #d5f0e9;
+      border-color: #a8d9cb;
+    }
+
+    .browse-btn {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 0.45rem 1rem;
+      border-radius: 999px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s, border-color 0.15s;
+    }
+
+    .browse-btn:hover {
+      background: #eaf8f4;
+      border-color: #b8e0d4;
+    }
+
+    .browse-panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow);
+    }
+
+    .browse-panel h3 {
+      font-size: 0.95rem;
+      margin-bottom: 0.85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .browse-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .browse-chip {
+      background: #e5f7f2;
+      color: #3d9a87;
+      border: 1px solid #c5e8de;
+      padding: 0.4rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 0.15s;
+    }
+
+    .browse-chip:hover {
+      background: #d5f0e9;
+    }
+  </style>
+</head>
+<body>
+  <header class="hero">
+    <div class="hero-content">
+      <h1>What’s Cooking?</h1>
+      <p class="subtitle">Type a dish → get ingredients as a checklist for shopping or cooking</p>
+      <form class="search-box" id="searchForm">
+        <input 
+          type="text" 
+          id="dishInput" 
+          placeholder="e.g. Spaghetti Carbonara, Pad Thai, Tacos..." 
+          autocomplete="off"
+          autofocus
+        >
+        <button type="submit" id="searchBtn">
+          <span id="btnText">Find Ingredients</span>
+        </button>
+      </form>
+      <div class="browse-bar" id="browseBar">
+        <button type="button" class="browse-btn" id="randomBtn">🎲 Random</button>
+        <button type="button" class="browse-btn" id="categoriesBtn">📂 Categories</button>
+        <button type="button" class="browse-btn" id="cuisinesBtn">🌍 All Cuisines</button>
+      </div>
+      <div class="fav-bar" id="favBar">
+        <button type="button" class="fav-chip" data-cuisine="Filipino">🇵🇭 Filipino</button>
+        <button type="button" class="fav-chip" data-cuisine="Thai">🇹🇭 Thai</button>
+        <button type="button" class="fav-chip" data-cuisine="Italian">🇮🇹 Italian</button>
+        <button type="button" class="fav-chip" data-cuisine="Vietnamese">🇻🇳 Vietnamese</button>
+        <button type="button" class="fav-chip" data-cuisine="Taiwanese">🇹🇼 Taiwanese</button>
+        <button type="button" class="fav-chip" data-cuisine="Japanese">🍣 Japanese</button>
+        <button type="button" class="fav-chip" data-cuisine="Mexican">🇲🇽 Mexican</button>
+        <button type="button" class="fav-chip" data-cuisine="Indian">🇮🇳 Indian</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div id="browsePanel" class="browse-panel" style="display:none;"></div>
+    <div id="status" class="status" style="display: none;"></div>
+    <div id="results" class="results"></div>
+  </main>
+
+  <footer class="footer">
+    Powered by <a href="https://www.themealdb.com" target="_blank" rel="noopener">TheMealDB</a> + exotic classics · Favorites & Categories for more
+  </footer>
+
+  <script>
+    const form = document.getElementById('searchForm');
+    const input = document.getElementById('dishInput');
+    const btn = document.getElementById('searchBtn');
+    const btnText = document.getElementById('btnText');
+    const statusEl = document.getElementById('status');
+    const resultsEl = document.getElementById('results');
+
+    // Example chips for empty state
+    const EXAMPLES = ['Adobo', 'Sinigang', 'Tinola', 'Lechon Kawali', 'Bulalo', 'Bicol Express', 'Pinakbet', 'Inasal'];
+
+    // Local exotic / classic dishes for favorite cuisines
+    const LOCAL_RECIPES = [
+      {
+        idMeal: 'local-adobo',
+        strMeal: 'Chicken Adobo',
+        strCategory: 'Chicken',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Combine chicken, soy sauce, vinegar, garlic, bay leaves, and peppercorns in a pot.\n2. Marinate 30 minutes (or longer).\n3. Bring to a boil, then simmer 30–40 minutes until chicken is tender.\n4. Optionally remove chicken and reduce sauce, then return chicken to coat.\n5. Serve with rice.',
+        strIngredient1: 'Chicken thighs', strMeasure1: '1 kg',
+        strIngredient2: 'Soy sauce', strMeasure2: '1/2 cup',
+        strIngredient3: 'White vinegar', strMeasure3: '1/2 cup',
+        strIngredient4: 'Garlic', strMeasure4: '1 head, crushed',
+        strIngredient5: 'Bay leaves', strMeasure5: '3–4',
+        strIngredient6: 'Black peppercorns', strMeasure6: '1 tsp',
+        strIngredient7: 'Water', strMeasure7: '1/2 cup',
+        strIngredient8: 'Brown sugar (optional)', strMeasure8: '1 tbsp',
+        strIngredient9: 'Oil', strMeasure9: 'for frying (optional)',
+        strIngredient10: '', strMeasure10: ''
+      },
+      {
+        idMeal: 'local-sinigang',
+        strMeal: 'Sinigang na Baboy',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Boil pork with water and onion until tender.\n2. Add tomatoes and cook until soft.\n3. Add long beans, radish, and eggplant; simmer.\n4. Add sinigang mix or tamarind, adjust sourness.\n5. Add kangkong and chili last. Season with fish sauce. Serve hot with rice.',
+        strIngredient1: 'Pork belly or ribs', strMeasure1: '1 kg',
+        strIngredient2: 'Onion', strMeasure2: '1 large',
+        strIngredient3: 'Tomatoes', strMeasure3: '2–3',
+        strIngredient4: 'Radish (labanos)', strMeasure4: '1',
+        strIngredient5: 'Long beans (sitaw)', strMeasure5: '1 bunch',
+        strIngredient6: 'Eggplant', strMeasure6: '1–2',
+        strIngredient7: 'Kangkong or spinach', strMeasure7: '1 bunch',
+        strIngredient8: 'Sinigang mix or tamarind', strMeasure8: '1 pack / to taste',
+        strIngredient9: 'Fish sauce (patis)', strMeasure9: 'to taste',
+        strIngredient10: 'Green chili', strMeasure10: '2–3',
+        strIngredient11: 'Water', strMeasure11: '6–8 cups',
+        strIngredient12: '', strMeasure12: ''
+      },
+      {
+        idMeal: 'local-pancit',
+        strMeal: 'Pancit Canton',
+        strCategory: 'Pasta',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Soak or prepare canton noodles per package.\n2. Sauté garlic and onion, then meat and shrimp.\n3. Add vegetables (carrots, cabbage, beans).\n4. Pour soy sauce, oyster sauce, and broth; simmer.\n5. Add noodles and toss until coated. Serve with calamansi and boiled egg.',
+        strIngredient1: 'Canton noodles', strMeasure1: '500 g',
+        strIngredient2: 'Chicken or pork', strMeasure2: '300 g, sliced',
+        strIngredient3: 'Shrimp', strMeasure3: '200 g',
+        strIngredient4: 'Cabbage', strMeasure4: '2 cups, shredded',
+        strIngredient5: 'Carrots', strMeasure5: '1, julienned',
+        strIngredient6: 'Garlic', strMeasure6: '4 cloves',
+        strIngredient7: 'Onion', strMeasure7: '1',
+        strIngredient8: 'Soy sauce', strMeasure8: '3 tbsp',
+        strIngredient9: 'Oyster sauce', strMeasure9: '2 tbsp',
+        strIngredient10: 'Chicken broth', strMeasure10: '2 cups',
+        strIngredient11: 'Calamansi or lemon', strMeasure11: 'for serving',
+        strIngredient12: '', strMeasure12: ''
+      },
+      {
+        idMeal: 'local-lumpia',
+        strMeal: 'Lumpiang Shanghai',
+        strCategory: 'Side',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Mix ground pork, minced onion, carrot, garlic, egg, soy sauce, and seasonings.\n2. Place a spoonful on spring roll wrapper and roll tightly, sealing with water.\n3. Deep-fry until golden and crispy.\n4. Serve with sweet chili sauce.',
+        strIngredient1: 'Ground pork', strMeasure1: '500 g',
+        strIngredient2: 'Carrot', strMeasure2: '1, minced',
+        strIngredient3: 'Onion', strMeasure3: '1, minced',
+        strIngredient4: 'Garlic', strMeasure4: '3 cloves',
+        strIngredient5: 'Egg', strMeasure5: '1',
+        strIngredient6: 'Soy sauce', strMeasure6: '1 tbsp',
+        strIngredient7: 'Spring roll wrappers', strMeasure7: '20–25 pcs',
+        strIngredient8: 'Salt and pepper', strMeasure8: 'to taste',
+        strIngredient9: 'Oil', strMeasure9: 'for deep-frying',
+        strIngredient10: 'Sweet chili sauce', strMeasure10: 'for dipping',
+        strIngredient11: '', strMeasure11: ''
+      },
+      {
+        idMeal: 'local-karekare',
+        strMeal: 'Kare-Kare',
+        strCategory: 'Beef',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Boil oxtail/beef until very tender.\n2. Make peanut sauce: sauté garlic, add ground peanuts or peanut butter, annatto, and broth.\n3. Add tender meat and vegetables (eggplant, string beans, banana blossom).\n4. Simmer until sauce thickens. Serve with bagoong (shrimp paste) and rice.',
+        strIngredient1: 'Oxtail or beef', strMeasure1: '1 kg',
+        strIngredient2: 'Peanut butter or ground peanuts', strMeasure2: '1 cup',
+        strIngredient3: 'Annatto (atsuete)', strMeasure3: '1 tbsp',
+        strIngredient4: 'Garlic', strMeasure4: '6 cloves',
+        strIngredient5: 'Onion', strMeasure5: '1',
+        strIngredient6: 'Eggplant', strMeasure6: '2',
+        strIngredient7: 'String beans', strMeasure7: '1 bunch',
+        strIngredient8: 'Banana blossom (optional)', strMeasure8: '1',
+        strIngredient9: 'Bagoong (shrimp paste)', strMeasure9: 'for serving',
+        strIngredient10: 'Rice', strMeasure10: 'for serving',
+        strIngredient11: '', strMeasure11: ''
+      },
+      {
+        idMeal: 'local-sisig',
+        strMeal: 'Sisig',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Boil pig face/ears/belly until tender, then grill or pan-fry until crispy.\n2. Chop finely.\n3. Sauté onion, chili, and garlic; add chopped meat.\n4. Season with soy sauce, calamansi, and pepper.\n5. Optional: add mayonnaise or egg on top. Serve sizzling.',
+        strIngredient1: 'Pig ears / face / belly', strMeasure1: '500 g',
+        strIngredient2: 'Onion', strMeasure2: '1 large, chopped',
+        strIngredient3: 'Green chili', strMeasure3: '3–4',
+        strIngredient4: 'Garlic', strMeasure4: '4 cloves',
+        strIngredient5: 'Calamansi or lemon', strMeasure5: '3–4',
+        strIngredient6: 'Soy sauce', strMeasure6: '2 tbsp',
+        strIngredient7: 'Mayonnaise (optional)', strMeasure7: '2 tbsp',
+        strIngredient8: 'Egg (optional)', strMeasure8: '1',
+        strIngredient9: 'Black pepper', strMeasure9: 'to taste',
+        strIngredient10: 'Butter or oil', strMeasure10: 'for sizzling',
+        strIngredient11: '', strMeasure11: ''
+      },
+      {
+        idMeal: 'local-pork-adobo',
+        strMeal: 'Pork Adobo',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Combine pork, soy sauce, vinegar, garlic, bay leaves, peppercorns.\n2. Marinate 30+ min. Simmer until tender.\n3. Optionally reduce sauce and crisp the pork. Serve with rice.',
+        strIngredient1: 'Pork belly or shoulder', strMeasure1: '1 kg',
+        strIngredient2: 'Soy sauce', strMeasure2: '1/2 cup',
+        strIngredient3: 'Vinegar', strMeasure3: '1/2 cup',
+        strIngredient4: 'Garlic', strMeasure4: '1 head',
+        strIngredient5: 'Bay leaves', strMeasure5: '3',
+        strIngredient6: 'Peppercorns', strMeasure6: '1 tsp',
+        strIngredient7: 'Brown sugar (optional)', strMeasure7: '1 tbsp',
+        strIngredient8: 'Water', strMeasure8: '1/2 cup',
+        strIngredient9: '', strMeasure9: ''
+      },
+      {
+        idMeal: 'local-tinola',
+        strMeal: 'Tinolang Manok',
+        strCategory: 'Chicken',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Sauté ginger, garlic, onion. Add chicken and brown lightly.\n2. Add water/broth; simmer until almost tender.\n3. Add green papaya or chayote, then chili leaves.\n4. Season with fish sauce. Serve hot.',
+        strIngredient1: 'Chicken', strMeasure1: '1 kg, cut up',
+        strIngredient2: 'Ginger', strMeasure2: '1 thumb, sliced',
+        strIngredient3: 'Garlic', strMeasure3: '4 cloves',
+        strIngredient4: 'Onion', strMeasure4: '1',
+        strIngredient5: 'Green papaya or sayote', strMeasure5: '2 cups',
+        strIngredient6: 'Chili leaves or malunggay', strMeasure6: '1 cup',
+        strIngredient7: 'Fish sauce', strMeasure7: 'to taste',
+        strIngredient8: 'Water or broth', strMeasure8: '6 cups',
+        strIngredient9: '', strMeasure9: ''
+      },
+      {
+        idMeal: 'local-lechonkawali',
+        strMeal: 'Lechon Kawali',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Boil pork belly with salt, peppercorns, bay leaves, garlic until tender.\n2. Drain and dry the skin thoroughly.\n3. Deep-fry until blistered and crispy.\n4. Serve with liver sauce or spicy vinegar.',
+        strIngredient1: 'Pork belly', strMeasure1: '1 kg',
+        strIngredient2: 'Salt', strMeasure2: '2 tbsp',
+        strIngredient3: 'Peppercorns', strMeasure3: '1 tsp',
+        strIngredient4: 'Bay leaves', strMeasure4: '3',
+        strIngredient5: 'Garlic', strMeasure5: '1 head',
+        strIngredient6: 'Oil', strMeasure6: 'for deep-frying',
+        strIngredient7: 'Liver sauce or vinegar', strMeasure7: 'for dipping',
+        strIngredient8: '', strMeasure8: ''
+      },
+      {
+        idMeal: 'local-bulalo',
+        strMeal: 'Bulalo',
+        strCategory: 'Beef',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Simmer beef shanks/bones 2–3 hours until tender and broth is rich.\n2. Add corn, potato, pechay near the end.\n3. Season with fish sauce. Serve with rice.',
+        strIngredient1: 'Beef shanks with marrow', strMeasure1: '1.5 kg',
+        strIngredient2: 'Corn on the cob', strMeasure2: '2–3',
+        strIngredient3: 'Potato', strMeasure3: '2',
+        strIngredient4: 'Pechay or cabbage', strMeasure4: '1 bunch',
+        strIngredient5: 'Onion', strMeasure5: '1',
+        strIngredient6: 'Fish sauce', strMeasure6: 'to taste',
+        strIngredient7: 'Water', strMeasure7: '8–10 cups',
+        strIngredient8: '', strMeasure8: ''
+      },
+      {
+        idMeal: 'local-bicolexpress',
+        strMeal: 'Bicol Express',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Sauté garlic, onion, ginger; brown pork.\n2. Add coconut milk, chili, bagoong.\n3. Simmer until tender and spicy. Serve with rice.',
+        strIngredient1: 'Pork belly', strMeasure1: '500 g',
+        strIngredient2: 'Coconut milk', strMeasure2: '2 cups',
+        strIngredient3: 'Siling labuyo', strMeasure3: '10–15',
+        strIngredient4: 'Bagoong', strMeasure4: '1–2 tbsp',
+        strIngredient5: 'Garlic', strMeasure5: '6 cloves',
+        strIngredient6: 'Onion', strMeasure6: '1',
+        strIngredient7: 'Ginger', strMeasure7: '1 thumb',
+        strIngredient8: '', strMeasure8: ''
+      },
+      {
+        idMeal: 'local-pinakbet',
+        strMeal: 'Pinakbet',
+        strCategory: 'Vegetarian',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Sauté aromatics; add pork/shrimp if using.\n2. Add squash, eggplant, okra, ampalaya, long beans.\n3. Season with bagoong; simmer until tender. Serve with rice.',
+        strIngredient1: 'Kalabasa (squash)', strMeasure1: '2 cups',
+        strIngredient2: 'Eggplant', strMeasure2: '2',
+        strIngredient3: 'Okra', strMeasure3: '10 pcs',
+        strIngredient4: 'Ampalaya', strMeasure4: '1',
+        strIngredient5: 'Long beans', strMeasure5: '1 bunch',
+        strIngredient6: 'Tomato', strMeasure6: '2',
+        strIngredient7: 'Bagoong', strMeasure7: '2–3 tbsp',
+        strIngredient8: 'Pork or shrimp (optional)', strMeasure8: '200 g',
+        strIngredient9: '', strMeasure9: ''
+      },
+      {
+        idMeal: 'local-menudo',
+        strMeal: 'Menudo',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Sauté garlic, onion; add pork and liver.\n2. Add tomato sauce, soy, potato, carrot, bell pepper, raisins.\n3. Simmer until tender.',
+        strIngredient1: 'Pork, cubed', strMeasure1: '500 g',
+        strIngredient2: 'Pork liver', strMeasure2: '150 g',
+        strIngredient3: 'Potato', strMeasure3: '2',
+        strIngredient4: 'Carrot', strMeasure4: '1',
+        strIngredient5: 'Tomato sauce', strMeasure5: '1 cup',
+        strIngredient6: 'Soy sauce', strMeasure6: '2 tbsp',
+        strIngredient7: 'Bell pepper', strMeasure7: '1',
+        strIngredient8: 'Raisins', strMeasure8: '1/4 cup',
+        strIngredient9: '', strMeasure9: ''
+      },
+      {
+        idMeal: 'local-caldereta',
+        strMeal: 'Beef Caldereta',
+        strCategory: 'Beef',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Brown beef; sauté aromatics.\n2. Add tomato sauce, liver spread, broth; simmer until tender.\n3. Add potato, carrot, peppers, olives. Thicken and serve with rice.',
+        strIngredient1: 'Beef, cubed', strMeasure1: '1 kg',
+        strIngredient2: 'Tomato sauce', strMeasure2: '1 cup',
+        strIngredient3: 'Liver spread', strMeasure3: '1/2 cup',
+        strIngredient4: 'Potato', strMeasure4: '2',
+        strIngredient5: 'Carrot', strMeasure5: '1',
+        strIngredient6: 'Bell peppers', strMeasure6: '2',
+        strIngredient7: 'Green olives', strMeasure7: '1/4 cup',
+        strIngredient8: 'Beef broth', strMeasure8: '2 cups',
+        strIngredient9: '', strMeasure9: ''
+      },
+      {
+        idMeal: 'local-dinuguan',
+        strMeal: 'Dinuguan',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Sauté garlic, onion; cook pork.\n2. Add vinegar; simmer.\n3. Stir in pork blood slowly; add chili. Simmer until thick. Serve with puto or rice.',
+        strIngredient1: 'Pork', strMeasure1: '500 g',
+        strIngredient2: 'Pork blood', strMeasure2: '2 cups',
+        strIngredient3: 'Vinegar', strMeasure3: '1/3 cup',
+        strIngredient4: 'Garlic', strMeasure4: '6 cloves',
+        strIngredient5: 'Onion', strMeasure5: '1',
+        strIngredient6: 'Green chili', strMeasure6: '4–6',
+        strIngredient7: '', strMeasure7: ''
+      },
+      {
+        idMeal: 'local-inasal',
+        strMeal: 'Chicken Inasal',
+        strCategory: 'Chicken',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Marinate chicken in calamansi, lemongrass, garlic, ginger, annatto oil.\n2. Grill, basting with butter-annatto mix.\n3. Serve with garlic rice and soy-calamansi dip.',
+        strIngredient1: 'Chicken leg quarters', strMeasure1: '1 kg',
+        strIngredient2: 'Calamansi juice', strMeasure2: '1/4 cup',
+        strIngredient3: 'Lemongrass', strMeasure3: '2 stalks',
+        strIngredient4: 'Garlic', strMeasure4: '1 head',
+        strIngredient5: 'Ginger', strMeasure5: '1 thumb',
+        strIngredient6: 'Annatto oil', strMeasure6: '3 tbsp',
+        strIngredient7: 'Butter', strMeasure7: 'for basting',
+        strIngredient8: '', strMeasure8: ''
+      },
+      {
+        idMeal: 'local-pancitbihon',
+        strMeal: 'Pancit Bihon',
+        strCategory: 'Pasta',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Soak bihon. Sauté garlic, onion, meat, shrimp, vegetables.\n2. Season with soy and oyster sauce; add broth.\n3. Toss noodles until coated. Serve with calamansi.',
+        strIngredient1: 'Bihon (rice vermicelli)', strMeasure1: '400 g',
+        strIngredient2: 'Chicken or pork', strMeasure2: '250 g',
+        strIngredient3: 'Shrimp', strMeasure3: '150 g',
+        strIngredient4: 'Cabbage', strMeasure4: '2 cups',
+        strIngredient5: 'Carrots', strMeasure5: '1',
+        strIngredient6: 'Soy sauce', strMeasure6: '3 tbsp',
+        strIngredient7: 'Oyster sauce', strMeasure7: '2 tbsp',
+        strIngredient8: 'Calamansi', strMeasure8: 'for serving',
+        strIngredient9: '', strMeasure9: ''
+      },
+      {
+        idMeal: 'local-laing',
+        strMeal: 'Laing',
+        strCategory: 'Vegetarian',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Simmer dried taro leaves in coconut milk with ginger, garlic, chili, shrimp/pork, bagoong.\n2. Cook until soft and oily. Do not stir early. Serve with rice.',
+        strIngredient1: 'Dried gabi leaves', strMeasure1: '2–3 cups',
+        strIngredient2: 'Coconut milk', strMeasure2: '2–3 cups',
+        strIngredient3: 'Ginger', strMeasure3: '1 thumb',
+        strIngredient4: 'Garlic', strMeasure4: '5 cloves',
+        strIngredient5: 'Siling labuyo', strMeasure5: '5–10',
+        strIngredient6: 'Dried shrimp or pork', strMeasure6: '1/2 cup',
+        strIngredient7: 'Bagoong', strMeasure7: '1 tbsp',
+        strIngredient8: '', strMeasure8: ''
+      },
+      {
+        idMeal: 'local-nilaga',
+        strMeal: 'Nilagang Baka',
+        strCategory: 'Beef',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Boil beef with onion and peppercorns until tender.\n2. Add potato, cabbage, pechay.\n3. Season with fish sauce. Serve with rice.',
+        strIngredient1: 'Beef brisket or shank', strMeasure1: '1 kg',
+        strIngredient2: 'Potato', strMeasure2: '2',
+        strIngredient3: 'Cabbage', strMeasure3: '1/2 head',
+        strIngredient4: 'Pechay', strMeasure4: '1 bunch',
+        strIngredient5: 'Onion', strMeasure5: '1',
+        strIngredient6: 'Peppercorns', strMeasure6: '1 tsp',
+        strIngredient7: 'Fish sauce', strMeasure7: 'to taste',
+        strIngredient8: '', strMeasure8: ''
+      },
+      {
+        idMeal: 'local-crispypata',
+        strMeal: 'Crispy Pata',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Boil pata with aromatics until tender.\n2. Dry thoroughly; deep-fry until very crispy.\n3. Serve with soy-vinegar dip and atchara.',
+        strIngredient1: 'Pork hock (pata)', strMeasure1: '1 whole',
+        strIngredient2: 'Soy sauce', strMeasure2: '1/4 cup',
+        strIngredient3: 'Bay leaves', strMeasure3: '3',
+        strIngredient4: 'Peppercorns', strMeasure4: '1 tsp',
+        strIngredient5: 'Garlic', strMeasure5: '1 head',
+        strIngredient6: 'Oil', strMeasure6: 'for deep-frying',
+        strIngredient7: '', strMeasure7: ''
+      },
+      {
+        idMeal: 'local-porkbbq',
+        strMeal: 'Filipino Pork BBQ',
+        strCategory: 'Pork',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Marinate sliced pork in soy, banana ketchup, calamansi, garlic, sugar.\n2. Skewer and grill, basting often.\n3. Serve with spicy vinegar.',
+        strIngredient1: 'Pork shoulder, thin sliced', strMeasure1: '1 kg',
+        strIngredient2: 'Soy sauce', strMeasure2: '1/2 cup',
+        strIngredient3: 'Banana ketchup', strMeasure3: '1/2 cup',
+        strIngredient4: 'Calamansi juice', strMeasure4: '1/4 cup',
+        strIngredient5: 'Garlic', strMeasure5: '1 head',
+        strIngredient6: 'Brown sugar', strMeasure6: '1/4 cup',
+        strIngredient7: '', strMeasure7: ''
+      },
+      {
+        idMeal: 'local-ginisangmunggo',
+        strMeal: 'Ginisang Munggo',
+        strCategory: 'Vegetarian',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Boil mung beans until soft.\n2. Sauté aromatics; add pork/shrimp if using.\n3. Combine with munggo and greens; season with fish sauce.',
+        strIngredient1: 'Mung beans', strMeasure1: '1 cup',
+        strIngredient2: 'Garlic', strMeasure2: '4 cloves',
+        strIngredient3: 'Onion', strMeasure3: '1',
+        strIngredient4: 'Tomato', strMeasure4: '1',
+        strIngredient5: 'Pork or shrimp (optional)', strMeasure5: '150 g',
+        strIngredient6: 'Ampalaya or malunggay', strMeasure6: '1 cup',
+        strIngredient7: 'Fish sauce', strMeasure7: 'to taste',
+        strIngredient8: '', strMeasure8: ''
+      },
+      {
+        idMeal: 'local-champorado',
+        strMeal: 'Champorado',
+        strCategory: 'Dessert',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Cook glutinous rice with cocoa/tablea until porridge-like.\n2. Sweeten. Serve with evaporated milk (and optional tuyo).',
+        strIngredient1: 'Glutinous rice', strMeasure1: '1 cup',
+        strIngredient2: 'Cocoa or tablea', strMeasure2: '1/2 cup / 3–4 pcs',
+        strIngredient3: 'Sugar', strMeasure3: 'to taste',
+        strIngredient4: 'Evaporated milk', strMeasure4: 'for serving',
+        strIngredient5: 'Water', strMeasure5: '4–5 cups',
+        strIngredient6: '', strMeasure6: ''
+      },
+      {
+        idMeal: 'local-turon',
+        strMeal: 'Turon',
+        strCategory: 'Dessert',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Roll saba + jackfruit in brown sugar; wrap in lumpia wrapper.\n2. Fry until golden and caramelized.',
+        strIngredient1: 'Saba bananas', strMeasure1: '6–8',
+        strIngredient2: 'Jackfruit strips', strMeasure2: '1/2 cup',
+        strIngredient3: 'Brown sugar', strMeasure3: '1/2 cup',
+        strIngredient4: 'Lumpia wrappers', strMeasure4: '10–12',
+        strIngredient5: 'Oil', strMeasure5: 'for frying',
+        strIngredient6: '', strMeasure6: ''
+      },
+      {
+        idMeal: 'local-halohalo',
+        strMeal: 'Halo-Halo',
+        strCategory: 'Dessert',
+        strArea: 'Filipino',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Layer sweetened beans, fruits, jellies in a glass.\n2. Top with shaved ice, milk, leche flan, and ube ice cream. Mix before eating.',
+        strIngredient1: 'Shaved ice', strMeasure1: 'as needed',
+        strIngredient2: 'Evaporated milk', strMeasure2: '1/2 cup',
+        strIngredient3: 'Sweetened beans & fruits', strMeasure3: 'assorted',
+        strIngredient4: 'Leche flan', strMeasure4: '1 slice',
+        strIngredient5: 'Ube ice cream', strMeasure5: '1 scoop',
+        strIngredient6: '', strMeasure6: ''
+      },
+      // --- Thai ---
+      {
+        idMeal: 'local-tomyum',
+        strMeal: 'Tom Yum Goong',
+        strCategory: 'Seafood',
+        strArea: 'Thai',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Bring stock to a boil with lemongrass, galangal, kaffir lime leaves.\n2. Add shrimp, mushrooms, tomatoes.\n3. Season with fish sauce, lime juice, chili paste.\n4. Finish with cilantro. Serve hot.',
+        strIngredient1: 'Shrimp', strMeasure1: '300 g',
+        strIngredient2: 'Lemongrass', strMeasure2: '2 stalks',
+        strIngredient3: 'Galangal', strMeasure3: '5 slices',
+        strIngredient4: 'Kaffir lime leaves', strMeasure4: '4',
+        strIngredient5: 'Thai chili', strMeasure5: '3–5',
+        strIngredient6: 'Mushrooms', strMeasure6: '1 cup',
+        strIngredient7: 'Tomatoes', strMeasure7: '2',
+        strIngredient8: 'Fish sauce', strMeasure8: '2 tbsp',
+        strIngredient9: 'Lime juice', strMeasure9: '3 tbsp',
+        strIngredient10: 'Nam prik pao (chili paste)', strMeasure10: '1 tbsp',
+        strIngredient11: 'Cilantro', strMeasure11: 'handful',
+        strIngredient12: 'Chicken or shrimp stock', strMeasure12: '4 cups',
+        strIngredient13: '', strMeasure13: ''
+      },
+      {
+        idMeal: 'local-green-curry',
+        strMeal: 'Green Curry (Gaeng Keow Wan)',
+        strCategory: 'Chicken',
+        strArea: 'Thai',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Fry green curry paste in coconut cream until fragrant.\n2. Add chicken and remaining coconut milk.\n3. Add eggplant, bamboo shoots, Thai basil.\n4. Season with fish sauce and palm sugar. Serve with rice.',
+        strIngredient1: 'Chicken thigh', strMeasure1: '400 g',
+        strIngredient2: 'Green curry paste', strMeasure2: '3 tbsp',
+        strIngredient3: 'Coconut milk', strMeasure3: '400 ml',
+        strIngredient4: 'Thai eggplant', strMeasure4: '1 cup',
+        strIngredient5: 'Bamboo shoots', strMeasure5: '1/2 cup',
+        strIngredient6: 'Thai basil', strMeasure6: 'handful',
+        strIngredient7: 'Fish sauce', strMeasure7: '1–2 tbsp',
+        strIngredient8: 'Palm sugar', strMeasure8: '1 tsp',
+        strIngredient9: 'Kaffir lime leaves', strMeasure9: '3',
+        strIngredient10: '', strMeasure10: ''
+      },
+      // --- Vietnamese ---
+      {
+        idMeal: 'local-pho',
+        strMeal: 'Phở Bò',
+        strCategory: 'Beef',
+        strArea: 'Vietnamese',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Char onion and ginger; simmer with beef bones, star anise, cinnamon, cloves for hours.\n2. Strain broth, season with fish sauce and sugar.\n3. Cook rice noodles; top with rare beef slices.\n4. Serve with bean sprouts, Thai basil, lime, chili.',
+        strIngredient1: 'Beef bones', strMeasure1: '1.5 kg',
+        strIngredient2: 'Beef sirloin (thin sliced)', strMeasure2: '300 g',
+        strIngredient3: 'Rice noodles (bánh phở)', strMeasure3: '400 g',
+        strIngredient4: 'Onion', strMeasure4: '2',
+        strIngredient5: 'Ginger', strMeasure5: '1 large piece',
+        strIngredient6: 'Star anise', strMeasure6: '4',
+        strIngredient7: 'Cinnamon stick', strMeasure7: '1',
+        strIngredient8: 'Fish sauce', strMeasure8: '3 tbsp',
+        strIngredient9: 'Bean sprouts', strMeasure9: '2 cups',
+        strIngredient10: 'Thai basil', strMeasure10: 'handful',
+        strIngredient11: 'Lime', strMeasure11: '2',
+        strIngredient12: 'Bird\'s eye chili', strMeasure12: 'to taste',
+        strIngredient13: '', strMeasure13: ''
+      },
+      {
+        idMeal: 'local-banhxeo',
+        strMeal: 'Bánh Xèo',
+        strCategory: 'Seafood',
+        strArea: 'Vietnamese',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Make batter from rice flour, turmeric, coconut milk, water.\n2. Pour thin layer in hot oiled pan; add shrimp, pork, bean sprouts.\n3. Fold when crispy. Serve with lettuce, herbs, and nước chấm.',
+        strIngredient1: 'Rice flour', strMeasure1: '1 cup',
+        strIngredient2: 'Turmeric', strMeasure2: '1/2 tsp',
+        strIngredient3: 'Coconut milk', strMeasure3: '1/2 cup',
+        strIngredient4: 'Shrimp', strMeasure4: '200 g',
+        strIngredient5: 'Pork belly', strMeasure5: '150 g',
+        strIngredient6: 'Bean sprouts', strMeasure6: '2 cups',
+        strIngredient7: 'Lettuce & herbs', strMeasure7: 'for wrapping',
+        strIngredient8: 'Fish sauce', strMeasure8: 'for dipping',
+        strIngredient9: 'Lime & chili', strMeasure9: 'for dipping',
+        strIngredient10: '', strMeasure10: ''
+      },
+      // --- Taiwanese ---
+      {
+        idMeal: 'local-beefnoodle',
+        strMeal: 'Taiwanese Beef Noodle Soup',
+        strCategory: 'Beef',
+        strArea: 'Taiwanese',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Brown beef shank; sauté garlic, ginger, doubanjiang.\n2. Add soy sauce, rock sugar, star anise, spices, water; braise until tender.\n3. Cook wheat noodles; serve in broth with beef, bok choy, pickled mustard greens.',
+        strIngredient1: 'Beef shank', strMeasure1: '800 g',
+        strIngredient2: 'Wheat noodles', strMeasure2: '400 g',
+        strIngredient3: 'Doubanjiang (chili bean paste)', strMeasure3: '2 tbsp',
+        strIngredient4: 'Soy sauce', strMeasure4: '1/4 cup',
+        strIngredient5: 'Rock sugar', strMeasure5: '1 tbsp',
+        strIngredient6: 'Star anise', strMeasure6: '2',
+        strIngredient7: 'Garlic', strMeasure7: '6 cloves',
+        strIngredient8: 'Ginger', strMeasure8: '5 slices',
+        strIngredient9: 'Bok choy', strMeasure9: '4',
+        strIngredient10: 'Pickled mustard greens', strMeasure10: 'for serving',
+        strIngredient11: '', strMeasure11: ''
+      },
+      {
+        idMeal: 'local-xiaolongbao',
+        strMeal: 'Xiao Long Bao (Soup Dumplings)',
+        strCategory: 'Pork',
+        strArea: 'Taiwanese',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Make aspic from pork stock + gelatin; chill.\n2. Mix minced pork with seasonings and diced aspic.\n3. Wrap in thin dumpling skin, pleat top.\n4. Steam 8–10 min. Serve with black vinegar and ginger.',
+        strIngredient1: 'Ground pork', strMeasure1: '400 g',
+        strIngredient2: 'Pork aspic / gelatin stock', strMeasure2: '1 cup diced',
+        strIngredient3: 'Dumpling wrappers', strMeasure3: '30–40',
+        strIngredient4: 'Ginger', strMeasure4: '1 tbsp minced',
+        strIngredient5: 'Soy sauce', strMeasure5: '1 tbsp',
+        strIngredient6: 'Sesame oil', strMeasure6: '1 tsp',
+        strIngredient7: 'Shaoxing wine', strMeasure7: '1 tbsp',
+        strIngredient8: 'Black vinegar', strMeasure8: 'for dipping',
+        strIngredient9: 'Julienned ginger', strMeasure9: 'for dipping',
+        strIngredient10: '', strMeasure10: ''
+      },
+      // --- Japanese ---
+      {
+        idMeal: 'local-sashimi',
+        strMeal: 'Assorted Sashimi',
+        strCategory: 'Seafood',
+        strArea: 'Japanese',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Use only sashimi-grade fish.\n2. Slice salmon, tuna, yellowtail against the grain.\n3. Arrange on ice or platter with shiso, daikon, wasabi.\n4. Serve with soy sauce and pickled ginger.',
+        strIngredient1: 'Sashimi-grade salmon', strMeasure1: '150 g',
+        strIngredient2: 'Sashimi-grade tuna', strMeasure2: '150 g',
+        strIngredient3: 'Yellowtail (hamachi)', strMeasure3: '100 g',
+        strIngredient4: 'Wasabi', strMeasure4: 'to taste',
+        strIngredient5: 'Soy sauce', strMeasure5: 'for dipping',
+        strIngredient6: 'Pickled ginger', strMeasure6: 'for serving',
+        strIngredient7: 'Shiso leaves', strMeasure7: 'optional',
+        strIngredient8: 'Daikon radish', strMeasure8: 'for garnish',
+        strIngredient9: '', strMeasure9: ''
+      },
+      {
+        idMeal: 'local-tonkotsu',
+        strMeal: 'Tonkotsu Ramen',
+        strCategory: 'Pork',
+        strArea: 'Japanese',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Boil pork bones for many hours until broth is milky and rich.\n2. Season tare (soy/salt).\n3. Cook ramen noodles; add chashu, soft egg, green onion, nori.\n4. Pour hot broth over. Optional: garlic oil, black pepper.',
+        strIngredient1: 'Pork bones', strMeasure1: '2 kg',
+        strIngredient2: 'Ramen noodles', strMeasure2: '4 portions',
+        strIngredient3: 'Chashu pork', strMeasure3: '8 slices',
+        strIngredient4: 'Soft-boiled eggs', strMeasure4: '4',
+        strIngredient5: 'Green onion', strMeasure5: '4 stalks',
+        strIngredient6: 'Nori sheets', strMeasure6: '4',
+        strIngredient7: 'Soy sauce tare', strMeasure7: 'to taste',
+        strIngredient8: 'Garlic oil (optional)', strMeasure8: 'to taste',
+        strIngredient9: '', strMeasure9: ''
+      },
+      // --- Mexican ---
+      {
+        idMeal: 'local-mole',
+        strMeal: 'Mole Poblano',
+        strCategory: 'Chicken',
+        strArea: 'Mexican',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Toast dried chiles, nuts, seeds, spices.\n2. Blend with fried tomato, onion, garlic, plantain, chocolate.\n3. Simmer sauce; thin with stock.\n4. Poach or roast chicken; serve smothered in mole with sesame seeds and rice.',
+        strIngredient1: 'Chicken pieces', strMeasure1: '1 whole or 1.5 kg',
+        strIngredient2: 'Dried ancho/pasilla/mulato chiles', strMeasure2: '8–10 total',
+        strIngredient3: 'Mexican chocolate', strMeasure3: '50 g',
+        strIngredient4: 'Sesame seeds', strMeasure4: '3 tbsp',
+        strIngredient5: 'Almonds / peanuts', strMeasure5: '1/4 cup',
+        strIngredient6: 'Tomato', strMeasure6: '2',
+        strIngredient7: 'Onion', strMeasure7: '1',
+        strIngredient8: 'Garlic', strMeasure8: '4 cloves',
+        strIngredient9: 'Cinnamon & spices', strMeasure9: 'to taste',
+        strIngredient10: 'Chicken stock', strMeasure10: '3–4 cups',
+        strIngredient11: '', strMeasure11: ''
+      },
+      {
+        idMeal: 'local-cochinita',
+        strMeal: 'Cochinita Pibil',
+        strCategory: 'Pork',
+        strArea: 'Mexican',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Marinate pork in achiote, sour orange (or orange+vinegar), garlic, spices.\n2. Wrap in banana leaves; slow-roast or braise until falling apart.\n3. Serve in tacos with pickled red onion and habanero salsa.',
+        strIngredient1: 'Pork shoulder', strMeasure1: '1.5 kg',
+        strIngredient2: 'Achiote paste', strMeasure2: '100 g',
+        strIngredient3: 'Sour orange juice', strMeasure3: '1 cup',
+        strIngredient4: 'Garlic', strMeasure4: '1 head',
+        strIngredient5: 'Banana leaves', strMeasure5: 'for wrapping',
+        strIngredient6: 'Red onion', strMeasure6: '2, pickled',
+        strIngredient7: 'Habanero', strMeasure7: 'to taste',
+        strIngredient8: 'Corn tortillas', strMeasure8: 'for serving',
+        strIngredient9: 'Oregano & cumin', strMeasure9: '1 tsp each',
+        strIngredient10: '', strMeasure10: ''
+      },
+      // --- Indian ---
+      {
+        idMeal: 'local-butterchicken',
+        strMeal: 'Butter Chicken (Murgh Makhani)',
+        strCategory: 'Chicken',
+        strArea: 'Indian',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Marinate chicken in yogurt, lemon, spices; grill or pan-sear.\n2. Make sauce: butter, tomato puree, cream, garam masala, kasuri methi.\n3. Simmer chicken in sauce. Finish with cream and butter. Serve with naan or rice.',
+        strIngredient1: 'Chicken thigh', strMeasure1: '700 g',
+        strIngredient2: 'Yogurt', strMeasure2: '1/2 cup',
+        strIngredient3: 'Tomato puree', strMeasure3: '400 g',
+        strIngredient4: 'Butter', strMeasure4: '4 tbsp',
+        strIngredient5: 'Heavy cream', strMeasure5: '1/2 cup',
+        strIngredient6: 'Garam masala', strMeasure6: '2 tsp',
+        strIngredient7: 'Kasuri methi (dried fenugreek)', strMeasure7: '1 tbsp',
+        strIngredient8: 'Ginger-garlic paste', strMeasure8: '2 tbsp',
+        strIngredient9: 'Kashmiri chili powder', strMeasure9: '1 tsp',
+        strIngredient10: 'Naan or rice', strMeasure10: 'for serving',
+        strIngredient11: '', strMeasure11: ''
+      },
+      {
+        idMeal: 'local-biryani',
+        strMeal: 'Chicken Biryani',
+        strCategory: 'Chicken',
+        strArea: 'Indian',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Marinate chicken with yogurt and spices.\n2. Parboil basmati rice with whole spices.\n3. Layer rice and chicken; dum-cook sealed pot with saffron milk.\n4. Rest and serve with raita.',
+        strIngredient1: 'Chicken', strMeasure1: '800 g',
+        strIngredient2: 'Basmati rice', strMeasure2: '3 cups',
+        strIngredient3: 'Yogurt', strMeasure3: '1 cup',
+        strIngredient4: 'Fried onions', strMeasure4: '1 cup',
+        strIngredient5: 'Saffron', strMeasure5: 'pinch + warm milk',
+        strIngredient6: 'Garam masala', strMeasure6: '2 tsp',
+        strIngredient7: 'Mint & cilantro', strMeasure7: 'handful each',
+        strIngredient8: 'Whole spices (cardamom, cinnamon, cloves)', strMeasure8: 'to taste',
+        strIngredient9: 'Ghee', strMeasure9: '3 tbsp',
+        strIngredient10: '', strMeasure10: ''
+      },
+      // --- Italian exotic ---
+      {
+        idMeal: 'local-ossobuco',
+        strMeal: 'Osso Buco',
+        strCategory: 'Beef',
+        strArea: 'Italian',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Dredge veal shanks in flour; brown in butter/oil.\n2. Sauté soffritto (onion, carrot, celery); deglaze with white wine.\n3. Add broth, tomato, herbs; braise until falling off the bone.\n4. Serve with gremolata and risotto alla milanese.',
+        strIngredient1: 'Veal shanks', strMeasure1: '4 pieces',
+        strIngredient2: 'Onion, carrot, celery', strMeasure2: '1 each',
+        strIngredient3: 'White wine', strMeasure3: '1 cup',
+        strIngredient4: 'Beef or veal stock', strMeasure4: '2 cups',
+        strIngredient5: 'Tomato paste', strMeasure5: '1 tbsp',
+        strIngredient6: 'Garlic', strMeasure6: '3 cloves',
+        strIngredient7: 'Lemon zest + parsley (gremolata)', strMeasure7: 'for serving',
+        strIngredient8: 'Flour', strMeasure8: 'for dredging',
+        strIngredient9: 'Butter & olive oil', strMeasure9: 'for browning',
+        strIngredient10: '', strMeasure10: ''
+      },
+      {
+        idMeal: 'local-cacioepepe',
+        strMeal: 'Cacio e Pepe',
+        strCategory: 'Pasta',
+        strArea: 'Italian',
+        strMealThumb: 'https://www.themealdb.com/images/media/meals/1520084413.jpg',
+        strYoutube: '',
+        strInstructions: '1. Cook spaghetti in well-salted water; reserve starchy water.\n2. Toast lots of black pepper in pan.\n3. Toss pasta with pepper, grated Pecorino, and pasta water until creamy emulsion forms.\n4. Serve immediately with more cheese and pepper.',
+        strIngredient1: 'Spaghetti or tonnarelli', strMeasure1: '400 g',
+        strIngredient2: 'Pecorino Romano', strMeasure2: '150 g, finely grated',
+        strIngredient3: 'Black pepper', strMeasure3: '2–3 tsp, freshly cracked',
+        strIngredient4: 'Salt', strMeasure4: 'for pasta water',
+        strIngredient5: '', strMeasure5: ''
+      }
+    ];
+
+    const LOCAL_FILIPINO = LOCAL_RECIPES.filter(m => m.strArea === 'Filipino');
+
+    function setLoading(isLoading) {
+      btn.disabled = isLoading;
+      if (isLoading) {
+        btnText.innerHTML = '<span class="spinner"></span> Searching...';
+      } else {
+        btnText.textContent = 'Find Ingredients';
+      }
+    }
+
+    function showStatus(msg, isError = false) {
+      statusEl.style.display = 'block';
+      statusEl.className = 'status' + (isError ? ' error' : '');
+      statusEl.textContent = msg;
+    }
+
+    function hideStatus() {
+      statusEl.style.display = 'none';
+    }
+
+    function extractIngredients(meal) {
+      const items = [];
+      for (let i = 1; i <= 20; i++) {
+        const ingredient = meal[`strIngredient${i}`];
+        const measure = meal[`strMeasure${i}`];
+        if (ingredient && ingredient.trim()) {
+          items.push({
+            name: ingredient.trim(),
+            measure: (measure || '').trim() || '—'
+          });
+        }
+      }
+      return items;
+    }
+
+    function createCard(meal) {
+      const ingredients = extractIngredients(meal);
+      const card = document.createElement('article');
+      card.className = 'card';
+
+      const youtubeBtn = meal.strYoutube 
+        ? `<a class="btn btn-primary" href="${meal.strYoutube}" target="_blank" rel="noopener">▶ Watch Video</a>` 
+        : '';
+
+      card.innerHTML = `
+        <div class="card-header">
+          <img class="card-img" src="${meal.strMealThumb}" alt="${meal.strMeal}" loading="lazy">
+          <div class="card-meta">
+            <h2>${meal.strMeal}</h2>
+            <div class="badges">
+              ${meal.strCategory ? `<span class="badge category">${meal.strCategory}</span>` : ''}
+              ${meal.strArea ? `<span class="badge area">${meal.strArea}</span>` : ''}
+            </div>
+          </div>
+        </div>
+        <div class="ingredients-section">
+          <div class="checklist-header">
+            <h3>Grocery / Cooking Checklist</h3>
+            <span class="progress" data-progress>0 / ${ingredients.length} checked</span>
+          </div>
+          <ul class="ingredients-list">
+            ${ingredients.map((i, idx) => `
+              <li data-idx="${idx}">
+                <input type="checkbox" id="ing-${meal.idMeal}-${idx}" aria-label="Check ${i.name}">
+                <span class="measure">${i.measure}</span>
+                <span class="ingredient-name">${i.name}</span>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+        <div class="actions">
+          <button class="btn btn-outline toggle-instructions">Show Instructions</button>
+          <button class="btn btn-outline clear-checks">Clear Checks</button>
+          ${youtubeBtn}
+        </div>
+        <div class="instructions">${meal.strInstructions || 'No instructions available.'}</div>
+      `;
+
+      const list = card.querySelector('.ingredients-list');
+      const progressEl = card.querySelector('[data-progress]');
+      const clearBtn = card.querySelector('.clear-checks');
+
+      function updateProgress() {
+        const checks = list.querySelectorAll('input[type="checkbox"]');
+        const checked = [...checks].filter(c => c.checked).length;
+        progressEl.textContent = `${checked} / ${checks.length} checked`;
+      }
+
+      list.querySelectorAll('li').forEach(li => {
+        const checkbox = li.querySelector('input');
+        const toggle = () => {
+          checkbox.checked = !checkbox.checked;
+          li.classList.toggle('checked', checkbox.checked);
+          updateProgress();
+        };
+        li.addEventListener('click', (e) => {
+          if (e.target !== checkbox) toggle();
+        });
+        checkbox.addEventListener('change', () => {
+          li.classList.toggle('checked', checkbox.checked);
+          updateProgress();
+        });
+      });
+
+      clearBtn.addEventListener('click', () => {
+        list.querySelectorAll('input[type="checkbox"]').forEach(c => {
+          c.checked = false;
+          c.closest('li').classList.remove('checked');
+        });
+        updateProgress();
+      });
+
+      const toggleBtn = card.querySelector('.toggle-instructions');
+      const instructionsEl = card.querySelector('.instructions');
+      toggleBtn.addEventListener('click', () => {
+        const isOpen = instructionsEl.classList.toggle('open');
+        toggleBtn.textContent = isOpen ? 'Hide Instructions' : 'Show Instructions';
+      });
+
+      return card;
+    }
+
+    function showEmptyState() {
+      resultsEl.innerHTML = `
+        <div class="empty-state">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />
+          </svg>
+          <h3>Ready to shop or cook?</h3>
+          <p>Search by name, or tap a favorite cuisine below. Popular starters:</p>
+          <div class="examples">
+            ${EXAMPLES.map(ex => `<button class="chip" data-dish="${ex}">${ex}</button>`).join('')}
+          </div>
+        </div>
+      `;
+      resultsEl.querySelectorAll('.chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+          input.value = chip.dataset.dish;
+          form.dispatchEvent(new Event('submit'));
+        });
+      });
+    }
+
+    function findLocalMatches(q) {
+      const lower = q.toLowerCase();
+      return LOCAL_RECIPES.filter(m =>
+        m.strMeal.toLowerCase().includes(lower) ||
+        lower.split(/\s+/).some(w => w.length > 2 && m.strMeal.toLowerCase().includes(w))
+      );
+    }
+
+    function localByCuisine(cuisine) {
+      return LOCAL_RECIPES.filter(m => m.strArea === cuisine);
+    }
+
+    async function searchDish(query) {
+      const q = query.trim();
+      if (!q) return;
+
+      setLoading(true);
+      hideStatus();
+      resultsEl.innerHTML = '';
+
+      try {
+        const res = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(q)}`);
+        if (!res.ok) throw new Error('Network error');
+        const data = await res.json();
+        let meals = data.meals || [];
+
+        // Merge local Filipino matches
+        const localHits = findLocalMatches(q);
+        const existingNames = new Set(meals.map(m => m.strMeal.toLowerCase()));
+        localHits.forEach(m => {
+          if (!existingNames.has(m.strMeal.toLowerCase())) meals.push(m);
+        });
+
+        if (meals.length === 0) {
+          showStatus(`No recipes found for “${q}”. Try Filipino button, Categories, Cuisines, or a more common name.`);
+          showEmptyState();
+          return;
+        }
+
+        const lowerQ = q.toLowerCase();
+        meals.sort((a, b) => {
+          const aExact = a.strMeal.toLowerCase() === lowerQ ? -1 : 0;
+          const bExact = b.strMeal.toLowerCase() === lowerQ ? -1 : 0;
+          return aExact - bExact;
+        });
+
+        meals.forEach(meal => resultsEl.appendChild(createCard(meal)));
+        showStatus(`Found ${meals.length} recipe${meals.length > 1 ? 's' : ''} for “${q}”`);
+      } catch (err) {
+        console.error(err);
+        // Still try local on network error
+        const localHits = findLocalMatches(q);
+        if (localHits.length) {
+          localHits.forEach(m => resultsEl.appendChild(createCard(m)));
+          showStatus(`Showing local Filipino recipes for “${q}”`);
+        } else {
+          showStatus('Something went wrong. Please check your connection and try again.', true);
+          showEmptyState();
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    const browsePanel = document.getElementById('browsePanel');
+    const randomBtn = document.getElementById('randomBtn');
+    const categoriesBtn = document.getElementById('categoriesBtn');
+    const cuisinesBtn = document.getElementById('cuisinesBtn');
+    const favBar = document.getElementById('favBar');
+
+    function hideBrowsePanel() {
+      browsePanel.style.display = 'none';
+      browsePanel.innerHTML = '';
+    }
+
+    async function loadFilterMeals(type, value) {
+      setLoading(true);
+      hideStatus();
+      hideBrowsePanel();
+      resultsEl.innerHTML = '';
+      try {
+        const param = type === 'category' ? 'c' : 'a';
+        const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?${param}=${encodeURIComponent(value)}`);
+        const data = await res.json();
+        if (!data.meals || data.meals.length === 0) {
+          showStatus(`No meals found for ${value}.`);
+          showEmptyState();
+          return;
+        }
+        // filter returns limited info — fetch full details for the first 12
+        const limited = data.meals.slice(0, 12);
+        const details = await Promise.all(
+          limited.map(m => fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${m.idMeal}`).then(r => r.json()))
+        );
+        details.forEach(d => {
+          if (d.meals && d.meals[0]) resultsEl.appendChild(createCard(d.meals[0]));
+        });
+        showStatus(`Showing ${details.length} of ${data.meals.length} ${value} recipes`);
+      } catch (err) {
+        console.error(err);
+        showStatus('Something went wrong loading that list.', true);
+        showEmptyState();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function showList(type) {
+      setLoading(true);
+      hideStatus();
+      resultsEl.innerHTML = '';
+      try {
+        const endpoint = type === 'categories' ? 'c' : 'a';
+        const res = await fetch(`https://www.themealdb.com/api/json/v1/1/list.php?${endpoint}=list`);
+        const data = await res.json();
+        const items = data.meals || [];
+        const title = type === 'categories' ? 'Categories' : 'Cuisines / Areas';
+        const key = type === 'categories' ? 'strCategory' : 'strArea';
+        browsePanel.innerHTML = `
+          <h3>${title}</h3>
+          <div class="browse-grid">
+            ${items.map(item => `
+              <button class="browse-chip" data-type="${type === 'categories' ? 'category' : 'area'}" data-value="${item[key]}">${item[key]}</button>
+            `).join('')}
+          </div>
+        `;
+        browsePanel.style.display = 'block';
+        browsePanel.querySelectorAll('.browse-chip').forEach(chip => {
+          chip.addEventListener('click', () => {
+            loadFilterMeals(chip.dataset.type, chip.dataset.value);
+          });
+        });
+      } catch (err) {
+        console.error(err);
+        showStatus('Could not load the list.', true);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function loadRandom() {
+      setLoading(true);
+      hideStatus();
+      hideBrowsePanel();
+      resultsEl.innerHTML = '';
+      try {
+        const res = await fetch('https://www.themealdb.com/api/json/v1/1/random.php');
+        const data = await res.json();
+        if (data.meals && data.meals[0]) {
+          resultsEl.appendChild(createCard(data.meals[0]));
+          showStatus(`Random recipe: ${data.meals[0].strMeal}`);
+        }
+      } catch (err) {
+        console.error(err);
+        showStatus('Could not load a random recipe.', true);
+        showEmptyState();
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    async function loadCuisineFavorite(cuisine) {
+      setLoading(true);
+      hideStatus();
+      hideBrowsePanel();
+      resultsEl.innerHTML = '';
+      try {
+        // Always show local exotic/classics first
+        const locals = localByCuisine(cuisine);
+        locals.forEach(m => resultsEl.appendChild(createCard(m)));
+        const localNames = new Set(locals.map(m => m.strMeal.toLowerCase()));
+
+        // Then TheMealDB area filter
+        let area = cuisine;
+        let meals = [];
+        const res = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?a=${encodeURIComponent(area)}`);
+        const data = await res.json();
+        if (data.meals && data.meals.length) {
+          meals = data.meals;
+        } else if (cuisine === 'Indian') {
+          const sres = await fetch('https://www.themealdb.com/api/json/v1/1/search.php?s=curry');
+          const sdata = await sres.json();
+          meals = (sdata.meals || []).filter(m => (m.strArea || '').toLowerCase().includes('india'));
+          if (!meals.length) meals = sdata.meals || [];
+        } else if (cuisine === 'Taiwanese') {
+          const cres = await fetch('https://www.themealdb.com/api/json/v1/1/filter.php?a=Chinese');
+          const cdata = await cres.json();
+          meals = (cdata.meals || []).slice(0, 8);
+        }
+
+        if (meals.length) {
+          const limited = meals.slice(0, 10);
+          const details = await Promise.all(
+            limited.map(m => fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${m.idMeal}`).then(r => r.json()))
+          );
+          details.forEach(d => {
+            if (d.meals && d.meals[0] && !localNames.has(d.meals[0].strMeal.toLowerCase())) {
+              resultsEl.appendChild(createCard(d.meals[0]));
+            }
+          });
+        }
+
+        const count = resultsEl.querySelectorAll('.card').length;
+        if (count === 0) {
+          showStatus(`No recipes found for ${cuisine}. Try searching a dish name.`);
+          showEmptyState();
+        } else {
+          showStatus(`${cuisine} recipes (${count}) — including exotic classics`);
+        }
+      } catch (err) {
+        console.error(err);
+        const locals = localByCuisine(cuisine);
+        if (locals.length) {
+          locals.forEach(m => resultsEl.appendChild(createCard(m)));
+          showStatus(`Showing local ${cuisine} classics`);
+        } else {
+          showStatus(`Could not load ${cuisine} recipes.`, true);
+          showEmptyState();
+        }
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    randomBtn.addEventListener('click', loadRandom);
+    categoriesBtn.addEventListener('click', () => showList('categories'));
+    cuisinesBtn.addEventListener('click', () => showList('cuisines'));
+    favBar.querySelectorAll('.fav-chip').forEach(chip => {
+      chip.addEventListener('click', () => loadCuisineFavorite(chip.dataset.cuisine));
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      hideBrowsePanel();
+      searchDish(input.value);
+    });
+
+    // Initial empty state
+    showEmptyState();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
