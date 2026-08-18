@@ -28,3 +28,7 @@ rewards + perks + merchant + dedicated + specialist + personal + favorite − fe
 Business Gold uses `rotatingCategories` with default focus **electronics + ads**. Dining is 1x on that card unless dining is one of the two chosen categories.
 
 localStorage key: `perk-wallet-v2` (still reads `perk-wallet-v1`).
+
+## Other apps in this Pages site
+
+- **Where to Retire** — compares states for retirees on taxes, healthcare, climate, and airports. Live at [https://jediaston.github.io/which-card/retiree-states/](https://jediaston.github.io/which-card/retiree-states/). Installable as a home-screen app the same way as Which Card.

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Where to Retire</title>
+  <meta name="description" content="Compare states for retirees: taxes, healthcare, climate & airports.">
+
+  <meta name="color-scheme" content="light">
+  <meta name="theme-color" content="#FAF8F5">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Retire">
+
+  <link rel="manifest" href="./manifest.webmanifest?v=1">
+  <link rel="icon" href="./icons/icon.svg?v=1" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=1">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            earth: {
+              50: '#FAF8F5',
+              100: '#F5F0E8',
+              200: '#E8DFD0',
+              300: '#D4C4A8',
+              400: '#B8A07A',
+              500: '#9A7B4F',
+              600: '#7A5F3A',
+              700: '#5C472C',
+              800: '#3F3020',
+              900: '#2A2015'
+            },
+            sage: {
+              50: '#F4F7F4',
+              100: '#E4EBE4',
+              500: '#6B8F71',
+              600: '#557A5B',
+              700: '#426148'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
+    body { font-family: 'DM Sans', system-ui, sans-serif; background: #FAF8F5; }
+    .card { transition: all 0.2s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -6px rgba(90, 60, 30, 0.12); }
+  </style>
+</head>
+<body class="text-earth-800 min-h-screen">
+
+  <!-- Header -->
+  <header class="border-b border-earth-200 bg-white/80 backdrop-blur sticky top-0 z-20">
+    <div class="max-w-5xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-semibold tracking-tight text-earth-900">Where to Retire</h1>
+        <p class="text-sm text-earth-500 mt-0.5">Taxes, healthcare, climate & airports — ranked for 2026</p>
+      </div>
+      <div class="flex items-center gap-3">
+        <input id="search" type="text" placeholder="Search states..." 
+          class="px-4 py-2 text-sm rounded-full border border-earth-200 bg-earth-50 focus:outline-none focus:ring-2 focus:ring-sage-500/30 focus:border-sage-500 w-44 placeholder:text-earth-400">
+        <select id="sort" class="px-4 py-2 text-sm rounded-full border border-earth-200 bg-earth-50 focus:outline-none focus:ring-2 focus:ring-sage-500/30">
+          <option value="score">Best overall</option>
+          <option value="tax">Best for taxes</option>
+          <option value="health">Best healthcare</option>
+          <option value="warm">Warmest winters</option>
+        </select>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-6 py-10">
+
+    <!-- Intro -->
+    <section class="mb-12 max-w-xl">
+      <p class="text-lg text-earth-700 leading-relaxed">
+        Ranked by what matters most for retirees: no state income tax, no estate tax, 
+        low property taxes, good healthcare, milder winters, and solid airport access.
+      </p>
+    </section>
+
+    <!-- Top 5 -->
+    <section class="mb-14">
+      <h2 class="text-xs font-semibold uppercase tracking-wider text-earth-500 mb-5">Top picks</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="topCards"></div>
+    </section>
+
+    <!-- Full list -->
+    <section>
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-earth-500">All states</h2>
+        <p class="text-xs text-earth-400" id="count"></p>
+      </div>
+      <div class="space-y-4" id="list"></div>
+    </section>
+
+    <p class="mt-16 text-xs text-earth-400 max-w-lg leading-relaxed">
+      Scores weigh income & estate tax treatment, property & sales burden, healthcare quality, 
+      winter mildness, and airport access. 2026 data from Tax Foundation, WalletHub, NOAA and state sources. Not tax advice.
+    </p>
+  </main>
+
+<script>
+const states = [
+  {name:"Wyoming", abbr:"WY", score:98, tax:"Excellent", income:"None", estate:"None", prop:"0.56%", sales:"5.4%", ss:"Not taxed", health:"Good", weather:"Cold & dry, sunny summers", warm:2, airport:"Jackson Hole, Casper", why:"Lowest overall tax burden. No income or estate tax."},
+  {name:"South Dakota", abbr:"SD", score:96, tax:"Excellent", income:"None", estate:"None", prop:"1.08%", sales:"6.4%", ss:"Not taxed", health:"Very Good", weather:"Cold winters, pleasant summers", warm:2, airport:"Sioux Falls (easy access)", why:"No income or estate tax. Strong healthcare for its size."},
+  {name:"Florida", abbr:"FL", score:94, tax:"Excellent", income:"None", estate:"None", prop:"0.89%", sales:"7.0%", ss:"Not taxed", health:"Good", weather:"Warm year-round (humid + storms)", warm:5, airport:"Miami, Orlando, Tampa, Fort Lauderdale", why:"No income tax, large retiree community, many airports."},
+  {name:"Nevada", abbr:"NV", score:93, tax:"Excellent", income:"None", estate:"None", prop:"0.53%", sales:"8.2%", ss:"Not taxed", health:"Average", weather:"Mild winters, hot dry summers", warm:4, airport:"Las Vegas", why:"No income or estate tax. Very low property tax."},
+  {name:"Alaska", abbr:"AK", score:91, tax:"Excellent", income:"None", estate:"None", prop:"1.04%", sales:"1.8%", ss:"Not taxed", health:"Below average", weather:"Long, very cold winters", warm:1, airport:"Anchorage", why:"No income, sales or estate tax. Permanent Fund Dividend."},
+  {name:"Tennessee", abbr:"TN", score:90, tax:"Excellent", income:"None", estate:"None", prop:"0.64%", sales:"9.6%", ss:"Not taxed", health:"Below average", weather:"Mild winters, hot humid summers", warm:4, airport:"Nashville", why:"No income tax. Low property tax. Higher sales tax is the trade-off."},
+  {name:"Texas", abbr:"TX", score:88, tax:"Very Good", income:"None", estate:"None", prop:"1.68%", sales:"8.2%", ss:"Not taxed", health:"Average", weather:"Mild winters, very hot summers", warm:4, airport:"Dallas, Houston, Austin", why:"No income tax. High property taxes are the main downside."},
+  {name:"New Hampshire", abbr:"NH", score:87, tax:"Very Good", income:"None*", estate:"None", prop:"1.77%", sales:"0%", ss:"Not taxed", health:"Excellent", weather:"Cold snowy winters", warm:1, airport:"Manchester + Boston", why:"No income or sales tax. Outstanding healthcare."},
+  {name:"Pennsylvania", abbr:"PA", score:84, tax:"Very Good", income:"3.07% (most retirement income exempt)", estate:"Inheritance tax", prop:"1.43%", sales:"6.3%", ss:"Not taxed", health:"Good", weather:"Four seasons, cold winters", warm:2, airport:"Philadelphia, Pittsburgh", why:"Strong retirement income exemptions despite the flat tax."},
+  {name:"Mississippi", abbr:"MS", score:83, tax:"Very Good", income:"Low + full retirement exemption", estate:"None", prop:"0.65%", sales:"7.1%", ss:"Not taxed", health:"Poor", weather:"Mild winters, hot humid", warm:4, airport:"Jackson", why:"Generous retirement exemptions and low property tax."},
+  {name:"Illinois", abbr:"IL", score:82, tax:"Good", income:"4.95% flat (retirement fully exempt)", estate:"Estate tax ($4M)", prop:"1.92%", sales:"8.9%", ss:"Not taxed", health:"Average", weather:"Cold winters, hot summers", warm:2, airport:"Chicago O'Hare & Midway", why:"Full retirement income exemption makes a big difference."},
+  {name:"Arizona", abbr:"AZ", score:80, tax:"Good", income:"2.5% flat", estate:"None", prop:"0.62%", sales:"8.5%", ss:"Not taxed", health:"Average", weather:"Mild winters, very hot dry summers", warm:5, airport:"Phoenix", why:"Low flat tax plus excellent winter weather."},
+  {name:"Georgia", abbr:"GA", score:79, tax:"Good", income:"~5.2%", estate:"None", prop:"0.83%", sales:"7.5%", ss:"Not taxed", health:"Average", weather:"Mild winters, hot humid", warm:4, airport:"Atlanta (major hub)", why:"Solid all-around with excellent airport access."},
+  {name:"North Carolina", abbr:"NC", score:77, tax:"Good", income:"3.99% flat", estate:"None", prop:"0.73%", sales:"7.0%", ss:"Not taxed", health:"Good", weather:"Mild four seasons", warm:3, airport:"Charlotte, Raleigh", why:"Reasonable taxes, pleasant climate, good healthcare."},
+  {name:"Delaware", abbr:"DE", score:75, tax:"Good", income:"Up to 6.6%", estate:"None", prop:"0.47%", sales:"0%", ss:"Not taxed", health:"Good", weather:"Mild four seasons", warm:3, airport:"Near Philadelphia", why:"No sales tax and very low property tax."},
+  {name:"South Carolina", abbr:"SC", score:74, tax:"Good", income:"0–6%", estate:"None", prop:"0.53%", sales:"7.4%", ss:"Not taxed", health:"Average", weather:"Mild winters, hot humid", warm:4, airport:"Charleston, Greenville", why:"Low property tax and mild winters."},
+  {name:"Colorado", abbr:"CO", score:72, tax:"Average", income:"4.4% flat", estate:"None", prop:"0.55%", sales:"7.9%", ss:"Partial", health:"Excellent", weather:"Cold winters, mild dry summers", warm:2, airport:"Denver", why:"Excellent healthcare and outdoor lifestyle."},
+  {name:"Virginia", abbr:"VA", score:70, tax:"Average", income:"Up to 5.75%", estate:"None", prop:"0.80%", sales:"5.8%", ss:"Not taxed", health:"Good", weather:"Mild four seasons", warm:3, airport:"Dulles, Reagan, Norfolk", why:"Balanced taxes and strong healthcare access."},
+  {name:"Washington", abbr:"WA", score:68, tax:"Average", income:"None (has capital gains tax)", estate:"High estate tax", prop:"0.84%", sales:"9.5%", ss:"Not taxed", health:"Excellent", weather:"Mild wet winters", warm:3, airport:"Seattle", why:"No income tax, but estate tax and high sales tax hurt the score."},
+  {name:"Idaho", abbr:"ID", score:66, tax:"Average", income:"5.8%", estate:"None", prop:"0.58%", sales:"6.0%", ss:"Not taxed", health:"Good", weather:"Cold winters, mild summers", warm:2, airport:"Boise", why:"Low property tax and growing appeal."},
+  {name:"Hawaii", abbr:"HI", score:55, tax:"Average", income:"Up to 11%", estate:"Yes", prop:"0.29%", sales:"4.5%", ss:"Not taxed", health:"Excellent", weather:"Perfect tropical year-round", warm:5, airport:"Honolulu", why:"Best weather and healthcare in the country, high income tax."},
+  {name:"Massachusetts", abbr:"MA", score:52, tax:"Average", income:"5%+", estate:"Yes (low threshold)", prop:"1.14%", sales:"6.25%", ss:"Not taxed", health:"Excellent", weather:"Cold winters", warm:1, airport:"Boston", why:"World-class healthcare, higher costs overall."},
+  {name:"Minnesota", abbr:"MN", score:50, tax:"Poor", income:"Up to 9.85%", estate:"Yes", prop:"1.05%", sales:"8.1%", ss:"Taxed", health:"Excellent", weather:"Very cold winters", warm:1, airport:"Minneapolis", why:"Top-tier healthcare offset by high taxes."},
+  {name:"Oregon", abbr:"OR", score:48, tax:"Poor", income:"Up to 9.9%", estate:"Yes ($1M threshold)", prop:"0.87%", sales:"0%", ss:"Not taxed", health:"Good", weather:"Mild wet winters", warm:3, airport:"Portland", why:"No sales tax, but high income tax and low estate threshold."},
+  {name:"Connecticut", abbr:"CT", score:45, tax:"Poor", income:"Up to 6.99%", estate:"Yes", prop:"1.78%", sales:"6.35%", ss:"Partial", health:"Excellent", weather:"Cold winters", warm:1, airport:"Hartford + NYC airports", why:"High property and estate taxes."},
+  {name:"California", abbr:"CA", score:42, tax:"Poor", income:"Up to 13.3%", estate:"None", prop:"0.71%", sales:"8.8%", ss:"Not taxed", health:"Good", weather:"Mild coastal / hot inland", warm:4, airport:"LAX, SFO, SAN + many", why:"Highest income tax in the U.S. Great climate and airports."},
+  {name:"New York", abbr:"NY", score:40, tax:"Poor", income:"Up to 10.9%", estate:"Yes (cliff)", prop:"1.46%", sales:"8.5%", ss:"Not taxed", health:"Good", weather:"Cold winters", warm:1, airport:"JFK, LGA, Newark, Buffalo", why:"High income + estate tax. Excellent airports."},
+  {name:"New Jersey", abbr:"NJ", score:38, tax:"Poor", income:"Up to 10.75%", estate:"Inheritance", prop:"2.23%", sales:"6.6%", ss:"Not taxed", health:"Good", weather:"Cold winters", warm:1, airport:"Newark, Philadelphia", why:"Highest property taxes plus high income tax."}
+];
+
+function render() {
+  const q = document.getElementById('search').value.toLowerCase();
+  const sort = document.getElementById('sort').value;
+  let data = [...states];
+
+  if (q) data = data.filter(s => s.name.toLowerCase().includes(q) || s.abbr.toLowerCase().includes(q));
+
+  if (sort === 'score') data.sort((a,b) => b.score - a.score);
+  else if (sort === 'tax') data.sort((a,b) => {
+    const order = {Excellent:4, 'Very Good':3, Good:2, Average:1, Poor:0};
+    return (order[b.tax]||0) - (order[a.tax]||0) || b.score - a.score;
+  });
+  else if (sort === 'health') data.sort((a,b) => {
+    const order = {Excellent:5, 'Very Good':4, Good:3, Average:2, 'Below average':1, Poor:0};
+    return (order[b.health]||0) - (order[a.health]||0) || b.score - a.score;
+  });
+  else if (sort === 'warm') data.sort((a,b) => b.warm - a.warm || b.score - a.score);
+
+  const top = [...states].sort((a,b)=>b.score-a.score).slice(0,5);
+  document.getElementById('topCards').innerHTML = top.map((s,i) => `
+    <div class="card bg-white rounded-2xl border border-earth-200 p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span class="text-xs font-medium text-earth-400">#${i+1}</span>
+        <span class="text-lg font-semibold text-sage-600">${s.score}</span>
+      </div>
+      <h3 class="font-semibold text-earth-900 text-lg">${s.name}</h3>
+      <p class="text-xs text-earth-500 mt-1 mb-3">${s.tax} taxes · ${s.health} healthcare</p>
+      <p class="text-sm text-earth-600 leading-snug">${s.why}</p>
+    </div>
+  `).join('');
+
+  document.getElementById('count').textContent = data.length + ' states';
+  document.getElementById('list').innerHTML = data.map((s,i) => `
+    <div class="card bg-white rounded-2xl border border-earth-200 p-6">
+      <div class="flex flex-wrap items-start justify-between gap-4 mb-5">
+        <div class="flex items-start gap-3">
+          <span class="w-9 h-9 rounded-full bg-earth-100 text-earth-600 text-sm font-medium flex items-center justify-center shrink-0 mt-0.5">${i+1}</span>
+          <div>
+            <h3 class="font-semibold text-earth-900 text-xl">${s.name} <span class="text-earth-400 font-normal text-base">${s.abbr}</span></h3>
+            <p class="text-sm text-earth-600 mt-1 max-w-md leading-relaxed">${s.why}</p>
+          </div>
+        </div>
+        <div class="text-right shrink-0">
+          <div class="text-3xl font-semibold text-sage-600">${s.score}</div>
+          <div class="text-xs text-earth-400 mt-0.5">overall score</div>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-4 text-sm border-t border-earth-100 pt-5">
+        <div>
+          <p class="text-xs text-earth-400 mb-1">Income tax</p>
+          <p class="font-medium text-earth-800">${s.income}</p>
+        </div>
+        <div>
+          <p class="text-xs text-earth-400 mb-1">Estate / Inheritance</p>
+          <p class="font-medium text-earth-800">${s.estate}</p>
+        </div>
+        <div>
+          <p class="text-xs text-earth-400 mb-1">Property · Sales</p>
+          <p class="font-medium text-earth-800">${s.prop} · ${s.sales}</p>
+        </div>
+        <div>
+          <p class="text-xs text-earth-400 mb-1">Social Security</p>
+          <p class="font-medium text-earth-800">${s.ss}</p>
+        </div>
+        <div>
+          <p class="text-xs text-earth-400 mb-1">Healthcare</p>
+          <p class="font-medium text-earth-800">${s.health}</p>
+        </div>
+        <div>
+          <p class="text-xs text-earth-400 mb-1">Weather</p>
+          <p class="font-medium text-earth-800">${s.weather}</p>
+        </div>
+        <div class="md:col-span-2">
+          <p class="text-xs text-earth-400 mb-1">Airports</p>
+          <p class="font-medium text-earth-800">${s.airport}</p>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+document.getElementById('search').addEventListener('input', render);
+document.getElementById('sort').addEventListener('change', render);
+render();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
