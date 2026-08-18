@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>AI Build — Downloads</title>
+<meta name="description" content="Save a copy of each AI Build app's shortcut page — download individually or as one zip.">
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F5F4F1">
+<style>
+  :root{
+    --bg:#F5F4F1; --paper:#FFFFFF; --ink:#20242B; --muted:#666C74; --line:#E1DFD9; --accent:#2B3A55;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
+       -webkit-font-smoothing:antialiased}
+  .wrap{max-width:640px;margin:0 auto;padding:48px 24px 64px}
+  a.back{font-size:13px;color:var(--muted);text-decoration:none}
+  h1{font-size:28px;margin:18px 0 8px;letter-spacing:-.02em;font-weight:650}
+  .sub{color:var(--muted);font-size:15px;line-height:1.6;margin:0 0 28px}
+  .zip-card{display:block;background:var(--accent);color:#fff;text-decoration:none;border-radius:16px;
+             padding:20px 22px;margin-bottom:28px}
+  .zip-card .t{font-weight:650;font-size:16px;margin-bottom:3px}
+  .zip-card .d{font-size:13px;opacity:.85}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .row{display:flex;align-items:center;gap:14px;background:var(--paper);border:1px solid var(--line);
+       border-radius:14px;padding:14px 16px}
+  .row img{width:36px;height:36px;border-radius:9px;flex:none}
+  .row .info{flex:1;min-width:0}
+  .row .name{font-weight:600;font-size:15px;margin:0}
+  .row a.dl{flex:none;font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;
+            border:1px solid var(--line);border-radius:999px;padding:7px 14px;white-space:nowrap}
+  .row a.dl:active{background:#eee}
+  .hint{margin-top:32px;font-size:12.5px;color:#8B9096;line-height:1.7}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="../">← Back to AI Build</a>
+  <h1>Save these apps</h1>
+  <p class="sub">Each link below is a small standalone HTML file — a shortcut card with the app's icon, name, and a button that opens the live app. Save them to Files, iCloud Drive, or your NAS so you always have your own copy.</p>
+
+  <a class="zip-card" href="./ai-build-shortcuts.zip" download>
+    <div class="t">⬇ Download all 7 as one .zip</div>
+    <div class="d">Easiest option — one file, then unzip on your phone or NAS</div>
+  </a>
+
+  <div class="list">
+    <div class="row">
+      <img src="https://jediaston.github.io/which-card/icons/icon-192.png" alt="">
+      <div class="info"><p class="name">Which Card</p></div>
+      <a class="dl" href="./which-card.html" download="which-card.html">Download</a>
+    </div>
+    <div class="row">
+      <img src="https://jediaston.github.io/which-card/retiree-states/icons/icon-192.png" alt="">
+      <div class="info"><p class="name">Where to Retire</p></div>
+      <a class="dl" href="./retiree-states.html" download="retiree-states.html">Download</a>
+    </div>
+    <div class="row">
+      <img src="https://jediaston.github.io/which-card/bh-audit-console/icons/icon-192.png" alt="">
+      <div class="info"><p class="name">BH Clinical Audit Console</p></div>
+      <a class="dl" href="./bh-audit-console.html" download="bh-audit-console.html">Download</a>
+    </div>
+    <div class="row">
+      <img src="https://jediaston.github.io/which-card/watchlist-ledger/icons/icon-192.png" alt="">
+      <div class="info"><p class="name">Watchlist Ledger</p></div>
+      <a class="dl" href="./watchlist-ledger.html" download="watchlist-ledger.html">Download</a>
+    </div>
+    <div class="row">
+      <img src="https://jediaston.github.io/which-card/chart-assist/icons/icon-192.png" alt="">
+      <div class="info"><p class="name">Chart Assist</p></div>
+      <a class="dl" href="./chart-assist.html" download="chart-assist.html">Download</a>
+    </div>
+    <div class="row">
+      <img src="https://jediaston.github.io/which-card/whats-cooking/icons/icon-192.png" alt="">
+      <div class="info"><p class="name">What's Cooking?</p></div>
+      <a class="dl" href="./whats-cooking.html" download="whats-cooking.html">Download</a>
+    </div>
+    <div class="row">
+      <div class="info"><p class="name">AI Build (hub page)</p></div>
+      <a class="dl" href="./ai-build.html" download="ai-build.html">Download</a>
+    </div>
+  </div>
+
+  <p class="hint">On iPhone: tap "Download all as .zip" — it lands in Files → Downloads, and tapping it there unzips automatically into a folder. To save just one, tap its Download button, or tap-and-hold a link and choose "Download Linked File." From Files you can move any of them into iCloud Drive, or into a folder synced to your NAS.</p>
+</div>
+</body>
+</html>
