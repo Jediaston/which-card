@@ -1,0 +1,14 @@
+{
+  "name": "which-card",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Which card to swipe — a perk picker, not a balance tracker.",
+  "scripts": {
+    "test": "node --test",
+    "start": "python3 -m http.server 4173"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
