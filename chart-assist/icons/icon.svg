@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <rect width="512" height="512" rx="112" fill="#F6F3EA"/>
+  <rect x="24" y="24" width="464" height="464" rx="96" fill="none" stroke="#E1D9C6" stroke-width="8"/>
+  <rect x="106" y="106" width="300" height="300" rx="56" fill="#1F3854"/>
+  <text x="256" y="292" font-family="Georgia, 'Source Serif 4', serif" font-size="132" font-weight="700" fill="#FFFFFF" text-anchor="middle">CA</text>
+  <rect x="146" y="352" width="220" height="14" rx="7" fill="#2C7A67"/>
+</svg>

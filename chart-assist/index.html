@@ -1,0 +1,571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Chart Assist — Nursing Note Builder</title>
+<meta name="description" content="Drafts clear, thorough nursing notes from checklists — falls, UTI, skin, CHF, and more.">
+
+<meta name="color-scheme" content="light">
+<meta name="theme-color" content="#F6F3EA">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Chart Assist">
+
+<link rel="manifest" href="./manifest.webmanifest?v=1">
+<link rel="icon" href="./icons/icon.svg?v=1" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-192.png?v=1">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F3EA; --surface:#FFFFFF; --ink:#212B33; --muted:#6B7A82;
+    --navy:#1F3854; --navy-soft:#3C5878; --teal:#2C7A67; --teal-light:#E4F1EC;
+    --amber:#B8752E; --amber-light:#F6EBDA; --rule-red:#C1584F;
+    --border:#E1D9C6; --border-soft:#EDE7D8;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;}
+  .font-display{font-family:'Source Serif 4',Georgia,serif;}
+  .font-mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;}
+  input,textarea,button{font-family:inherit;}
+  input:focus,button:focus,textarea:focus{outline:none;box-shadow:0 0 0 2px rgba(44,122,103,.35);}
+  ::placeholder{color:#9AA6AC;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 16px;}
+  .bar{border-bottom:1px solid var(--border);background:var(--surface);}
+  .brandrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:16px 0;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand-mark{width:38px;height:38px;border-radius:10px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0;}
+  .brand h1{font-size:21px;margin:0;color:var(--navy);line-height:1.15;}
+  .brand p{font-size:12px;margin:2px 0 0;color:var(--muted);}
+  .badge{font-size:12px;font-weight:500;border-radius:999px;padding:5px 12px;background:var(--amber-light);color:var(--amber);}
+  .tsrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;}
+  .tsrow label{font-size:12px;font-weight:500;color:var(--muted);}
+  .tsrow input{border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px;color:var(--ink);}
+  .btn-ghost{border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:500;color:var(--navy);background:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+  .btn-ghost:hover{background:var(--paper);}
+  .note-hint{font-size:12px;color:var(--muted);margin-left:auto;}
+  .layout{display:flex;gap:24px;padding:24px 0;align-items:flex-start;}
+  @media (max-width:1023px){.layout{flex-direction:column;}}
+  nav.diag{display:flex;gap:8px;overflow-x:auto;flex-shrink:0;padding-bottom:4px;}
+  @media (min-width:1024px){nav.diag{flex-direction:column;width:224px;overflow:visible;}}
+  .diag-btn{display:flex;align-items:center;gap:10px;font-size:14px;border-radius:8px;padding:10px 12px;flex-shrink:0;text-align:left;background:transparent;border:none;border-left:3px solid transparent;cursor:pointer;color:var(--ink);font-weight:500;white-space:nowrap;}
+  @media (min-width:1024px){.diag-btn{white-space:normal;}}
+  .diag-btn.active{background:var(--teal-light);color:var(--navy);font-weight:600;border-left:3px solid var(--teal);}
+  .abbr{width:34px;height:22px;border-radius:5px;background:var(--navy-soft);color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .diag-btn.active .abbr{background:var(--teal);}
+  .builder{flex:1;min-width:0;display:flex;flex-direction:column;gap:20px;}
+  .builder h2{font-size:24px;margin:0;color:var(--navy);}
+  .builder .sub{font-size:13px;color:var(--muted);margin:2px 0 0;}
+  .presets{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+  .presets .label{font-size:12px;font-weight:500;color:var(--amber);display:inline-flex;align-items:center;gap:5px;}
+  .preset-btn{font-size:12px;font-weight:500;border-radius:999px;border:1px solid var(--amber);color:var(--amber);background:var(--amber-light);padding:5px 12px;cursor:pointer;}
+  .clear-btn{font-size:12px;font-weight:500;color:var(--muted);background:none;border:none;cursor:pointer;margin-left:auto;display:inline-flex;align-items:center;gap:5px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:20px;}
+  .section h4{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy-soft);margin:0 0 8px;display:flex;align-items:center;justify-content:space-between;}
+  .count{font-size:11px;font-weight:700;background:var(--teal);color:#fff;border-radius:999px;padding:1px 8px;}
+  .chips{display:grid;grid-template-columns:1fr;gap:8px;}
+  @media (min-width:640px){.chips{grid-template-columns:1fr 1fr;}}
+  .chip{display:flex;align-items:flex-start;gap:8px;text-align:left;font-size:13.5px;border-radius:6px;border:1px solid var(--border);background:#fff;padding:8px 10px;cursor:pointer;color:var(--ink);}
+  .chip.active{border-color:var(--teal);background:var(--teal-light);color:var(--navy);font-weight:600;}
+  .box{width:14px;height:14px;margin-top:2px;border-radius:4px;border:1.5px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .chip.active .box{border-color:var(--teal);background:var(--teal);}
+  .box svg{display:none;width:9px;height:9px;}
+  .chip.active .box svg{display:block;}
+  .grid-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (min-width:640px){.grid-fields.vitals{grid-template-columns:repeat(3,1fr);}}
+  .field label{display:flex;flex-direction:column;gap:4px;}
+  .field span{font-size:11px;font-weight:500;color:var(--muted);}
+  .field input{border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px;color:var(--ink);background:#fff;width:100%;}
+  textarea.narrative{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13.5px;color:var(--ink);resize:vertical;}
+  aside.notepanel{flex-shrink:0;width:100%;}
+  @media (min-width:1024px){aside.notepanel{width:384px;position:sticky;top:16px;}}
+  .note-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .note-head .lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy-soft);}
+  .note-head .wc{font-size:12px;color:var(--muted);}
+  .notebox{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(31,56,84,.06);}
+  .paper{padding-left:28px;margin-left:14px;border-left:2px solid var(--rule-red);
+    background-image:repeating-linear-gradient(var(--surface),var(--surface) 27px,var(--border-soft) 28px);}
+  .paper textarea{width:100%;border:none;background:transparent;font-size:12.5px;line-height:28px;padding:12px;resize:vertical;color:var(--ink);}
+  .notefoot{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--border);}
+  .copy-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600;border-radius:6px;padding:8px 12px;background:var(--navy);color:#fff;border:none;cursor:pointer;}
+  .regen-btn{font-size:12px;font-weight:500;border-radius:6px;padding:7px 10px;border:1px solid var(--border);color:var(--muted);background:#fff;cursor:pointer;}
+  .edited-note{font-size:12px;color:var(--muted);margin-top:8px;}
+</style>
+</head>
+<body>
+<div class="bar">
+  <div class="wrap brandrow">
+    <div class="brand">
+      <div class="brand-mark">CA</div>
+      <div>
+        <h1 class="font-display">Chart Assist</h1>
+        <p>Charts like a seasoned nurse — clear, thorough, and kind</p>
+      </div>
+    </div>
+    <span class="badge">Drafting aid — verify against facility policy before charting</span>
+  </div>
+</div>
+
+<div class="bar">
+  <div class="wrap tsrow">
+    <label for="header-date">Note date/time:</label>
+    <input type="date" id="header-date" data-action="header-date" />
+    <input type="time" id="header-time" data-action="header-time" />
+    <button class="btn-ghost" data-action="set-now" type="button">⏱ Now</button>
+    <span class="note-hint">No resident name, room, or staff identifiers are collected by this tool.</span>
+  </div>
+</div>
+
+<div class="wrap layout">
+  <nav class="diag" id="diag-nav"></nav>
+  <div class="builder" id="builder"></div>
+  <aside class="notepanel" id="notepanel"></aside>
+</div>
+
+<script>
+// ---------------------------------------------------------------------
+// Data model
+// ---------------------------------------------------------------------
+const checklist = (key, heading, options) => ({ type: "checklist", key, heading, options });
+const vitalsSec = (key, heading, fields) => ({ type: "vitals", key, heading, fields });
+const fieldsSec = (key, heading, items) => ({ type: "fields", key, heading, items });
+
+const DIAGNOSES = [
+  { id:"general", label:"General / Other", abbr:"GEN", subtitle:"Any change in condition not covered below",
+    sections:[
+      checklist("symptoms","Symptoms / findings present",["Pain","Fever/chills","Nausea/vomiting","Shortness of breath","Change in mental status","Change in mobility","Skin change","Behavioral change","Bowel/bladder change","No new symptoms noted"]),
+      vitalsSec("vitals","Vital signs",["BP","HR","RR","Temp","SpO2","Glucose"]),
+      fieldsSec("details","Details",[{key:"reason",label:"Reason for note"}]),
+      checklist("interventions","Interventions provided",["Vital signs monitored","Comfort measures provided","Repositioned / assisted","Medication administered (see MAR)","Safety measures reinforced","Care plan reviewed"]),
+      checklist("notify","Notifications",["Physician/NP notified","New orders received","Family/POA notified","Charge nurse informed"]),
+      checklist("plan","Plan / follow-up",["Continue to monitor","Reassess next shift","Care plan updated"]),
+    ],
+    presets:[{label:"Stable, no acute change", values:{symptoms:["No new symptoms noted"], interventions:["Vital signs monitored","Care plan reviewed"]}}],
+  },
+  { id:"falls", label:"Falls", abbr:"FALL", subtitle:"Witnessed or unwitnessed fall / found on floor",
+    sections:[
+      checklist("circumstances","Circumstances",["Witnessed fall","Unwitnessed / found on floor","Occurred during transfer","Occurred during ambulation","Occurred getting out of bed/chair","Assistive device in use","Bed/chair alarm sounding","Non-skid footwear worn","Floor wet/cluttered"]),
+      checklist("symptoms","Symptoms / findings present",["No apparent injury","Pain","Bruising / ecchymosis","Swelling","Laceration / skin tear","Deformity / suspected fracture","Decreased range of motion","New confusion / altered mental status","Dizziness / lightheadedness","Hypotension"]),
+      vitalsSec("vitals","Vital signs",["BP","HR","RR","Temp","SpO2","Glucose"]),
+      checklist("neuro","Neuro checks",["Alert & oriented x3","Alert & disoriented","Lethargic","Unresponsive","Pupils equal & reactive","Grip strength equal bilaterally","Gait steady","Neuro checks initiated"]),
+      fieldsSec("details","Details",[{key:"location",label:"Location of fall"},{key:"injury",label:"Injury location"}]),
+      checklist("interventions","Interventions provided",["Assisted to bed/chair","Assessed for injury","Ice applied","Wound care provided","Repositioned for comfort","Fall mat placed","Bed/chair alarm activated","1:1 supervision initiated","Hip protector applied"]),
+      checklist("notify","Notifications",["Physician/NP notified","New orders received","Family/POA notified","Charge nurse informed","X-ray/imaging ordered"]),
+      checklist("plan","Plan / follow-up",["Fall risk care plan updated","Environmental safety round completed","PT/OT referral initiated","Neuro checks per protocol continued","Incident report completed"]),
+    ],
+    presets:[{label:"Unwitnessed fall, no injury", values:{circumstances:["Unwitnessed / found on floor"], symptoms:["No apparent injury"], neuro:["Alert & oriented x3","Pupils equal & reactive","Gait steady"], interventions:["Assisted to bed/chair","Assessed for injury","Neuro checks initiated"], notify:["Physician/NP notified","Family/POA notified"], plan:["Fall risk care plan updated","Incident report completed"]}}],
+  },
+  { id:"uti", label:"Urinary Tract Infection", abbr:"UTI", subtitle:"Suspected or confirmed UTI",
+    sections:[
+      checklist("symptoms","Symptoms / findings present",["Dysuria / burning on urination","Urinary frequency","Urinary urgency","Cloudy urine","Malodorous urine","Hematuria","Suprapubic / flank pain","Fever/chills","New-onset confusion","Nausea/vomiting","New or worsening incontinence","Decreased appetite"]),
+      vitalsSec("vitals","Vital signs",["BP","HR","RR","Temp","SpO2"]),
+      fieldsSec("details","Details",[{key:"urineColor",label:"Urine color"},{key:"urineOutput",label:"Urine output"}]),
+      checklist("interventions","Interventions provided",["Urine specimen obtained — clean catch","Urine specimen obtained — catheter","Fluids encouraged","Medication administered per order","Comfort measures provided","Perineal care provided","Toileting schedule reinforced"]),
+      checklist("notify","Notifications",["Physician/NP notified","UA / culture ordered","Antibiotic ordered","Family/POA notified"]),
+      checklist("plan","Plan / follow-up",["Monitor I&O","Recheck temperature per protocol","Follow up on culture results","Care plan updated"]),
+    ],
+    presets:[{label:"Classic UTI symptoms", values:{symptoms:["Dysuria / burning on urination","Urinary frequency","Cloudy urine","Malodorous urine"], interventions:["Urine specimen obtained — clean catch","Fluids encouraged"], notify:["Physician/NP notified","UA / culture ordered"], plan:["Monitor I&O","Follow up on culture results"]}}],
+  },
+  { id:"pressure", label:"Pressure Injury", abbr:"SKIN", subtitle:"New or worsening skin integrity concern",
+    sections:[
+      checklist("findings","Findings present",["Non-blanchable redness","Open area / wound","Blister — intact","Blister — ruptured","Drainage — serous","Drainage — purulent","Drainage — sanguineous","Odor present","Warmth at site","Induration","Pain at site"]),
+      fieldsSec("details","Location & staging",[{key:"location",label:"Location"},{key:"stage",label:"Stage (I–IV / Unstageable / DTI)"},{key:"size",label:"Size (L x W x D cm)"}]),
+      checklist("interventions","Interventions provided",["Repositioning schedule reviewed","Pressure-relief surface in use","Offloading device applied","Wound cleansed per protocol","Dressing applied","Photo documentation obtained","Nutrition/hydration reviewed","Incontinence care reinforced"]),
+      checklist("notify","Notifications",["Wound care nurse notified","Physician/NP notified","Dietitian consult ordered","Family/POA notified"]),
+      checklist("plan","Plan / follow-up",["Care plan updated","Wound rounds scheduled","Turning schedule reinforced","Support surface reassessed"]),
+    ],
+    presets:[{label:"Stage 2 with drainage", values:{findings:["Open area / wound","Drainage — serous","Pain at site"], interventions:["Wound cleansed per protocol","Dressing applied","Photo documentation obtained"], notify:["Wound care nurse notified"], plan:["Wound rounds scheduled","Turning schedule reinforced"]}}],
+  },
+  { id:"dehydration", label:"Dehydration", abbr:"FLD", subtitle:"Suspected or confirmed fluid volume deficit",
+    sections:[
+      checklist("symptoms","Symptoms / findings present",["Dry mucous membranes","Poor skin turgor","Sunken eyes","Dark / concentrated urine","Decreased urine output","Dizziness / lightheadedness","Generalized weakness","New or worsening confusion","Hypotension","Tachycardia","Decreased oral intake noted"]),
+      vitalsSec("vitals","Vital signs & weight",["BP","HR","RR","Temp","SpO2","Weight"]),
+      fieldsSec("details","Intake & output",[{key:"intake",label:"24-hr intake"},{key:"output",label:"24-hr output"}]),
+      checklist("interventions","Interventions provided",["Fluids offered / encouraged","Preferred fluids identified","IV fluids initiated per order","Labs drawn per order","Diet/consistency reviewed","Assistance with meals/fluids provided"]),
+      checklist("notify","Notifications",["Physician/NP notified","Labs ordered","IV fluids ordered","Family/POA notified"]),
+      checklist("plan","Plan / follow-up",["Strict I&O initiated","Daily weights ordered","Encourage fluids between meals","Care plan updated"]),
+    ],
+    presets:[{label:"Mild dehydration, PO tolerated", values:{symptoms:["Dry mucous membranes","Decreased oral intake noted"], interventions:["Fluids offered / encouraged","Preferred fluids identified"], plan:["Strict I&O initiated","Encourage fluids between meals"]}}],
+  },
+  { id:"chf", label:"CHF Exacerbation", abbr:"CHF", subtitle:"Signs/symptoms of fluid overload or worsening heart failure",
+    sections:[
+      checklist("symptoms","Symptoms / findings present",["Dyspnea at rest","Dyspnea on exertion","Orthopnea","Increased edema","Weight gain since baseline","Crackles / rales","New or worsening cough","Frothy / pink-tinged sputum","Jugular vein distension","Fatigue / weakness","Decreased SpO2"]),
+      vitalsSec("vitals","Vital signs & weight",["BP","HR","RR","Temp","SpO2","Weight"]),
+      fieldsSec("details","Edema detail",[{key:"edemaLoc",label:"Edema location"},{key:"edemaGrade",label:"Edema grade (1+–4+)"}]),
+      checklist("interventions","Interventions provided",["Oxygen administered","Head of bed elevated","Diuretic administered per order","Strict I&O initiated","Daily weights ordered","Sodium/fluid restriction reviewed","Positioned for comfort"]),
+      checklist("notify","Notifications",["Physician/NP notified","STAT labs ordered","Cardiology consult requested","Family/POA notified"]),
+      checklist("plan","Plan / follow-up",["Continuous/scheduled SpO2 monitoring","Daily weight trend review","Reassess respiratory status","Care plan updated"]),
+    ],
+    presets:[{label:"Fluid overload, new edema", values:{symptoms:["Increased edema","Weight gain since baseline","Dyspnea on exertion"], interventions:["Head of bed elevated","Diuretic administered per order","Strict I&O initiated"], notify:["Physician/NP notified"], plan:["Daily weight trend review"]}}],
+  },
+  { id:"respiratory", label:"Respiratory Infection", abbr:"RESP", subtitle:"Suspected or confirmed pneumonia / lower respiratory infection",
+    sections:[
+      checklist("symptoms","Symptoms / findings present",["Cough — productive","Cough — non-productive","Fever/chills","Shortness of breath","Tachypnea","Decreased SpO2","Crackles / rhonchi","Wheezes","Diminished breath sounds","Chest pain / tightness","New confusion / fatigue"]),
+      vitalsSec("vitals","Vital signs",["BP","HR","RR","Temp","SpO2"]),
+      fieldsSec("details","Details",[{key:"sputum",label:"Sputum color"},{key:"lungLoc",label:"Lung sounds — location"}]),
+      checklist("interventions","Interventions provided",["Oxygen administered","Suctioning performed","Nebulizer/inhaler administered","Head of bed elevated","Fluids encouraged","Isolation precautions initiated","Incentive spirometry encouraged"]),
+      checklist("notify","Notifications",["Physician/NP notified","Chest X-ray ordered","Sputum culture ordered","Antibiotic ordered"]),
+      checklist("plan","Plan / follow-up",["SpO2 monitoring per protocol","Reassess respiratory status","Follow up on culture/imaging results","Care plan updated"]),
+    ],
+    presets:[{label:"Productive cough, low O2", values:{symptoms:["Cough — productive","Decreased SpO2","Crackles / rhonchi"], interventions:["Oxygen administered","Head of bed elevated"], notify:["Physician/NP notified","Chest X-ray ordered"], plan:["SpO2 monitoring per protocol"]}}],
+  },
+  { id:"diabetes", label:"Diabetes / Glycemic Event", abbr:"DM", subtitle:"Hypoglycemic or hyperglycemic episode",
+    sections:[
+      checklist("event","Event type",["Hypoglycemia","Hyperglycemia"]),
+      checklist("symptomsHypo","Symptoms — hypoglycemia",["Shakiness / tremor","Diaphoresis","Pallor","Confusion / irritability","Weakness","Tachycardia","Change in level of consciousness","Hunger"]),
+      checklist("symptomsHyper","Symptoms — hyperglycemia",["Polyuria","Polydipsia","Blurred vision","Fatigue","Nausea","Fruity breath odor","Confusion","Dry mucous membranes"]),
+      vitalsSec("vitals","Vital signs",["BP","HR","RR","Temp","SpO2"]),
+      fieldsSec("details","Glucose readings",[{key:"initial",label:"Initial glucose"},{key:"recheck",label:"Recheck glucose"}]),
+      checklist("interventions","Interventions provided",["Hypoglycemia protocol initiated (15g fast-acting carb)","Recheck glucose in 15 min","Insulin administered per sliding scale","Meal/snack provided","IV dextrose administered per order","Remained with resident until stable"]),
+      checklist("notify","Notifications",["Physician/NP notified","Sliding scale/insulin order clarified","Family/POA notified"]),
+      checklist("plan","Plan / follow-up",["Glucose monitoring frequency increased","Diabetic diet reviewed","Care plan updated","Physician follow-up on regimen"]),
+    ],
+    presets:[{label:"Hypoglycemic episode", values:{event:["Hypoglycemia"], symptomsHypo:["Shakiness / tremor","Diaphoresis","Weakness"], interventions:["Hypoglycemia protocol initiated (15g fast-acting carb)","Recheck glucose in 15 min"], notify:["Physician/NP notified"], plan:["Glucose monitoring frequency increased"]}}],
+  },
+  { id:"dementia", label:"Dementia / Behavioral", abbr:"BEH", subtitle:"New or escalating behavioral / psychiatric symptom",
+    sections:[
+      checklist("behaviors","Behavior(s) observed",["Agitation","Verbal aggression","Physical aggression","Wandering / exit-seeking","Resisting care","Hallucinations","Delusions","Sundowning pattern","Withdrawal / apathy","Repetitive vocalizations / actions","Sleep disturbance"]),
+      checklist("triggers","Possible triggers assessed",["Pain","Infection / UTI symptoms","Constipation","Recent medication change","Environmental change / overstimulation","Hunger / thirst","Unmet toileting need","Unfamiliar staff / caregiver","Sensory deficit","No clear trigger identified"]),
+      fieldsSec("details","Onset & duration",[{key:"onset",label:"Onset time"},{key:"duration",label:"Duration"}]),
+      checklist("interventions","Interventions provided",["Redirection attempted","Environment modified","Calming technique used","1:1 supervision provided","PRN medication administered","Comfort/basic needs addressed","Distraction / preferred activity offered"]),
+      checklist("notify","Notifications",["Physician/NP notified","Behavior care plan/psych consult discussed","Family/POA notified"]),
+      checklist("plan","Plan / follow-up",["Behavior log / ABC log updated","Care plan reviewed/updated","Continue monitoring for pattern","Non-pharmacological approaches prioritized"]),
+    ],
+    presets:[{label:"Sundowning agitation", values:{behaviors:["Agitation","Sundowning pattern"], triggers:["Environmental change / overstimulation"], interventions:["Redirection attempted","Environment modified","Calming technique used"], plan:["Behavior log / ABC log updated","Continue monitoring for pattern"]}}],
+  },
+  { id:"pain", label:"Pain", abbr:"PAIN", subtitle:"New, worsening, or breakthrough pain",
+    sections:[
+      checklist("characteristics","Pain characteristics",["Sharp","Dull / aching","Burning","Throbbing","Cramping","Radiating","Constant","Intermittent","New onset","Chronic pain worsening"]),
+      fieldsSec("details","Location & score",[{key:"location",label:"Location"},{key:"preScore",label:"Pre-intervention score (0–10)"},{key:"postScore",label:"Post-intervention score"}]),
+      checklist("associated","Associated signs (esp. non-verbal residents)",["Guarding","Grimacing","Moaning / vocalizing","Restlessness","Diaphoresis","Change in vital signs","Change in appetite","Change in participation in activities"]),
+      checklist("interventions","Interventions provided",["Medication administered per order","Repositioning provided","Heat / cold application","Distraction / relaxation technique","Splinting / support device applied"]),
+      checklist("notify","Notifications",["Physician/NP notified — pain uncontrolled","Family/POA notified"]),
+      checklist("plan","Plan / follow-up",["Care plan updated","Continue scheduled reassessment","Non-pharmacological plan reinforced"]),
+    ],
+    presets:[{label:"Breakthrough pain, resolved with meds", values:{characteristics:["Dull / aching","Intermittent"], associated:["Grimacing"], interventions:["Medication administered per order","Repositioning provided"], plan:["Continue scheduled reassessment"]}}],
+  },
+  { id:"constipation", label:"Constipation / Bowel", abbr:"GI", subtitle:"No bowel movement, straining, or altered bowel pattern",
+    sections:[
+      checklist("symptoms","Symptoms / findings present",["No BM in several days","Abdominal distension","Abdominal pain / tenderness","Hard / dry stool","Straining with BM","Nausea/vomiting","Decreased appetite","Suspected fecal impaction","Loose stool / diarrhea","Fecal incontinence"]),
+      fieldsSec("details","History",[{key:"lastBM",label:"Last BM date"},{key:"bowelSounds",label:"Bowel sounds"}]),
+      checklist("interventions","Interventions provided",["Laxative / stool softener administered","Suppository administered","Enema administered","Digital disimpaction performed per order","Increased fluids encouraged","Increased fiber offered","Ambulation / activity encouraged","Abdominal massage provided"]),
+      checklist("notify","Notifications",["Physician/NP notified","New order for bowel regimen received","Family/POA notified"]),
+      checklist("plan","Plan / follow-up",["Bowel program reviewed/updated","Monitor and record next BM","Care plan updated","Reassess in 24 hours if no BM"]),
+    ],
+    presets:[{label:"No BM x 3 days", values:{symptoms:["Abdominal distension","Hard / dry stool"], interventions:["Laxative / stool softener administered","Increased fluids encouraged"], plan:["Monitor and record next BM"]}}],
+  },
+];
+
+// ---------------------------------------------------------------------
+// Note composition — written the way a seasoned charge nurse would chart
+// it: plain, precise, and attentive. No patient-identifying fields.
+// ---------------------------------------------------------------------
+const LEAD_IN = {
+  circumstances:"Fall occurred under the following circumstances:",
+  symptoms:"On assessment, resident was noted to have",
+  symptomsHypo:"Resident showed signs of hypoglycemia, including",
+  symptomsHyper:"Resident showed signs of hyperglycemia, including",
+  findings:"Skin/wound assessment revealed",
+  neuro:"Neuro checks completed; resident found to be",
+  behaviors:"Resident was observed to be",
+  triggers:"Assessed for possible triggers; considered",
+  associated:"Nonverbal signs of discomfort noted included",
+  characteristics:"Resident described the pain as",
+  event:"Charting this as an episode of",
+  interventions:"In response, provided the following care:",
+  notify:"Kept the care team in the loop:",
+  plan:"Moving forward, plan of care includes",
+};
+const CLOSERS = {
+  notify:"Will continue to keep the physician and family updated as things develop.",
+  plan:"Resident tolerated the assessment well; will continue to monitor closely and follow up per the plan above.",
+};
+
+function sentenceFromList(leadIn, items){
+  if(!items.length) return null;
+  const list = items.length > 1 ? items.slice(0,-1).join(", ") + ", and " + items[items.length-1] : items[0];
+  return `${leadIn} ${list}.`;
+}
+
+function composeNote(diag, data, header, narrative){
+  const d = data || {};
+  const paragraphs = [];
+  const when = [header.date, header.time].filter(Boolean).join(" at ");
+  paragraphs.push(`Charted${when ? " " + when : ""} — ${diag.subtitle.toLowerCase()}.`);
+
+  const bodySentences = [];
+  let sawNotify = false, sawPlan = false;
+  diag.sections.forEach(section=>{
+    if(section.type === "checklist"){
+      const sel = d[section.key] || [];
+      const leadIn = LEAD_IN[section.key] || `${section.heading}:`;
+      const s = sentenceFromList(leadIn, sel);
+      if(s){
+        bodySentences.push(s);
+        if(section.key === "notify" && sel.length) sawNotify = true;
+        if(section.key === "plan" && sel.length) sawPlan = true;
+      }
+    } else if(section.type === "vitals"){
+      const v = d[section.key] || {};
+      const parts = section.fields.filter(f=>v[f] && String(v[f]).trim()).map(f=>`${f} ${v[f]}`);
+      if(parts.length) bodySentences.push(`Vitals: ${parts.join(", ")}.`);
+    } else if(section.type === "fields"){
+      const v = d[section.key] || {};
+      const parts = section.items.filter(f=>v[f.key] && String(v[f.key]).trim()).map(f=>`${f.label.toLowerCase()} ${v[f.key]}`);
+      if(parts.length) bodySentences.push(`Also noted: ${parts.join("; ")}.`);
+    }
+  });
+
+  if(bodySentences.length) paragraphs.push(bodySentences.join(" "));
+  else paragraphs.push("Nothing charted yet — select findings on the left and this will draft alongside you.");
+
+  if(narrative && narrative.trim()) paragraphs.push(narrative.trim());
+
+  if(bodySentences.length){
+    paragraphs.push(sawPlan ? CLOSERS.plan : sawNotify ? CLOSERS.notify : "Resident tolerated the assessment well; will continue to monitor.");
+  }
+
+  return paragraphs.join("\n\n");
+}
+
+// ---------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------
+const state = {
+  header:{ date:"", time:"" },
+  activeId: DIAGNOSES[0].id,
+  data:{},
+  narrative:{},
+  manualNote:{},
+  copied:false,
+};
+
+function esc(s){
+  return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+function activeDiag(){ return DIAGNOSES.find(d=>d.id===state.activeId); }
+function diagData(){ return state.data[state.activeId] || {}; }
+
+function toggleOption(sectionKey, option){
+  const cur = state.data[state.activeId] || {};
+  const list = cur[sectionKey] || [];
+  const next = list.includes(option) ? list.filter(o=>o!==option) : [...list, option];
+  state.data[state.activeId] = {...cur, [sectionKey]: next};
+  render();
+}
+function setFieldValue(sectionKey, fieldKey, value){
+  const cur = state.data[state.activeId] || {};
+  const obj = cur[sectionKey] || {};
+  state.data[state.activeId] = {...cur, [sectionKey]: {...obj, [fieldKey]: value}};
+  render();
+}
+function applyPreset(preset){
+  const cur = state.data[state.activeId] || {};
+  state.data[state.activeId] = {...cur, ...preset.values};
+  state.manualNote[state.activeId] = undefined;
+  render();
+}
+function resetDiagnosis(){
+  state.data[state.activeId] = {};
+  state.narrative[state.activeId] = "";
+  state.manualNote[state.activeId] = undefined;
+  render();
+}
+function setNow(){
+  const now = new Date();
+  state.header.date = now.toISOString().slice(0,10);
+  state.header.time = now.toTimeString().slice(0,5);
+  render();
+}
+async function copyNote(){
+  const text = getDisplayedNote();
+  try{
+    await navigator.clipboard.writeText(text);
+  }catch(e){
+    const ta = document.createElement("textarea");
+    ta.value = text; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e2){}
+    document.body.removeChild(ta);
+  }
+  state.copied = true;
+  render();
+  setTimeout(()=>{ state.copied = false; render(); }, 1500);
+}
+function getComposed(){
+  return composeNote(activeDiag(), diagData(), state.header, state.narrative[state.activeId] || "");
+}
+function getDisplayedNote(){
+  const m = state.manualNote[state.activeId];
+  return m !== undefined ? m : getComposed();
+}
+
+// ---------------------------------------------------------------------
+// Render
+// ---------------------------------------------------------------------
+function renderNav(){
+  const nav = document.getElementById("diag-nav");
+  nav.innerHTML = DIAGNOSES.map(d=>{
+    const active = d.id === state.activeId;
+    return `<button type="button" class="diag-btn${active?" active":""}" data-action="select-diag" data-id="${d.id}">
+      <span class="abbr">${d.abbr}</span><span>${esc(d.label)}</span>
+    </button>`;
+  }).join("");
+}
+
+function checkIcon(){
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+}
+
+function renderBuilder(){
+  const diag = activeDiag();
+  const d = diagData();
+  const el = document.getElementById("builder");
+
+  let presetsHtml = "";
+  if(diag.presets && diag.presets.length){
+    presetsHtml = `<div class="presets">
+      <span class="label">✦ Quick pick:</span>
+      ${diag.presets.map((p,i)=>`<button type="button" class="preset-btn" data-action="apply-preset" data-preset="${i}">${esc(p.label)}</button>`).join("")}
+      <button type="button" class="clear-btn" data-action="reset-diag">↺ Clear this note</button>
+    </div>`;
+  }
+
+  const sectionsHtml = diag.sections.map(section=>{
+    if(section.type === "checklist"){
+      const sel = d[section.key] || [];
+      const chips = section.options.map(opt=>{
+        const active = sel.includes(opt);
+        return `<button type="button" class="chip${active?" active":""}" data-action="toggle-option" data-section="${section.key}" data-option="${esc(opt)}">
+          <span class="box">${checkIcon()}</span><span>${esc(opt)}</span>
+        </button>`;
+      }).join("");
+      return `<div class="section"><h4>${esc(section.heading)}${sel.length?`<span class="count">${sel.length}</span>`:""}</h4><div class="chips">${chips}</div></div>`;
+    }
+    if(section.type === "vitals"){
+      const v = d[section.key] || {};
+      const inputs = section.fields.map(f=>{
+        const id = `field-${state.activeId}-${section.key}-${f}`;
+        return `<div class="field"><label for="${id}"><span>${esc(f)}</span>
+          <input type="text" id="${id}" value="${esc(v[f])}" data-action="field-input" data-section="${section.key}" data-field="${esc(f)}" /></label></div>`;
+      }).join("");
+      return `<div class="section"><h4>${esc(section.heading)}</h4><div class="grid-fields vitals">${inputs}</div></div>`;
+    }
+    if(section.type === "fields"){
+      const v = d[section.key] || {};
+      const inputs = section.items.map(f=>{
+        const id = `field-${state.activeId}-${section.key}-${f.key}`;
+        return `<div class="field"><label for="${id}"><span>${esc(f.label)}</span>
+          <input type="text" id="${id}" value="${esc(v[f.key])}" data-action="field-input" data-section="${section.key}" data-field="${esc(f.key)}" /></label></div>`;
+      }).join("");
+      return `<div class="section"><h4>${esc(section.heading)}</h4><div class="grid-fields">${inputs}</div></div>`;
+    }
+    return "";
+  }).join("");
+
+  const narrId = `narrative-${state.activeId}`;
+
+  el.innerHTML = `
+    <div>
+      <h2 class="font-display">${esc(diag.label)}</h2>
+      <p class="sub">${esc(diag.subtitle)}</p>
+    </div>
+    ${presetsHtml}
+    <div class="card">
+      ${sectionsHtml}
+      <div class="section">
+        <h4>Additional narrative (optional)</h4>
+        <textarea class="narrative" id="${narrId}" rows="3" placeholder="Add anything not captured above…" data-action="narrative-input">${esc(state.narrative[state.activeId] || "")}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function renderNote(){
+  const el = document.getElementById("notepanel");
+  const displayed = getDisplayedNote();
+  const composed = getComposed();
+  const isEdited = state.manualNote[state.activeId] !== undefined && state.manualNote[state.activeId] !== composed;
+  const wordCount = displayed.trim() ? displayed.trim().split(/\s+/).length : 0;
+  const noteId = `manual-note-${state.activeId}`;
+
+  el.innerHTML = `
+    <div class="note-head">
+      <span class="lbl">Suggested note</span>
+      <span class="wc">${wordCount} words</span>
+    </div>
+    <div class="notebox">
+      <div class="paper">
+        <textarea id="${noteId}" class="font-mono" rows="16" data-action="manual-note">${esc(displayed)}</textarea>
+      </div>
+      <div class="notefoot">
+        <button type="button" class="copy-btn" data-action="copy-note">${state.copied ? "✓ Copied" : "⧉ Copy note"}</button>
+        ${isEdited ? `<button type="button" class="regen-btn" data-action="regenerate">Regenerate</button>` : ""}
+      </div>
+    </div>
+    ${isEdited ? `<p class="edited-note">Edited by hand — checklist changes won't update this text until you regenerate.</p>` : ""}
+  `;
+}
+
+function render(){
+  const active = document.activeElement;
+  const activeId = active && active.id;
+  const selStart = active && typeof active.selectionStart === "number" ? active.selectionStart : null;
+  const selEnd = active && typeof active.selectionEnd === "number" ? active.selectionEnd : null;
+
+  renderNav();
+  renderBuilder();
+  renderNote();
+
+  if(activeId){
+    const el = document.getElementById(activeId);
+    if(el){
+      el.focus();
+      if(selStart !== null && el.setSelectionRange){
+        try{ el.setSelectionRange(selStart, selEnd); }catch(e){}
+      }
+    }
+  }
+}
+
+// ---------------------------------------------------------------------
+// Event delegation
+// ---------------------------------------------------------------------
+document.addEventListener("click", (e)=>{
+  const t = e.target.closest("[data-action]");
+  if(!t) return;
+  const action = t.dataset.action;
+  if(action === "select-diag"){ state.activeId = t.dataset.id; render(); }
+  else if(action === "toggle-option"){ toggleOption(t.dataset.section, t.dataset.option); }
+  else if(action === "apply-preset"){ applyPreset(activeDiag().presets[Number(t.dataset.preset)]); }
+  else if(action === "reset-diag"){ resetDiagnosis(); }
+  else if(action === "set-now"){ setNow(); }
+  else if(action === "copy-note"){ copyNote(); }
+  else if(action === "regenerate"){ state.manualNote[state.activeId] = undefined; render(); }
+});
+
+document.addEventListener("input", (e)=>{
+  const t = e.target;
+  const action = t.dataset.action;
+  if(!action) return;
+  if(action === "header-date"){ state.header.date = t.value; }
+  else if(action === "header-time"){ state.header.time = t.value; }
+  else if(action === "field-input"){ setFieldValue(t.dataset.section, t.dataset.field, t.value); return; }
+  else if(action === "narrative-input"){ state.narrative[state.activeId] = t.value; return; }
+  else if(action === "manual-note"){ state.manualNote[state.activeId] = t.value; return; }
+  render();
+});
+
+render();
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+</script>
+</body>
+</html>
