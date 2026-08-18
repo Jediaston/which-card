@@ -189,7 +189,7 @@ function renderCards() {
               <span>${escapeHtml(card.issuer)} · ${card.network} · $${card.annualFee}/yr${card.flags.includes("no_fx_fee") ? " · no FX fee" : ""}</span>
             </div>
             <button type="button" class="icon-btn ${fav ? "is-on" : ""}" data-fav="${card.id}" aria-label="Favorite">★</button>
-            <button type="button" class="text-btn" data-own="${card.id}">${on ? "Remove" : "I have this"}</button>
+            <button type="button" class="toggle-btn ${on ? "is-on" : ""}" data-own="${card.id}">${on ? "Remove" : "I have this"}</button>
             ${focusUi}
           </article>`;
         })
@@ -360,7 +360,7 @@ function renderSetup() {
                 <b>${escapeHtml(card.name)}</b>
                 <span>${escapeHtml(card.issuer)} · ${card.short}</span>
               </div>
-              <button type="button" class="primary" data-own="${card.id}">${on ? "On" : "Add"}</button>
+              <button type="button" class="toggle-btn ${on ? "is-on" : ""}" data-own="${card.id}">${on ? "On" : "Add"}</button>
             </article>`;
           })
           .join("")}

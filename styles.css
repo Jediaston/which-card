@@ -336,6 +336,7 @@ h1 {
 
 .icon-btn,
 .text-btn,
+.toggle-btn,
 .primary {
   border: 1px solid var(--line);
   background: var(--paper);
@@ -352,6 +353,18 @@ h1 {
   border-color: var(--clay);
   background: var(--clay-soft);
   color: var(--clay);
+}
+
+.toggle-btn {
+  color: var(--ink);
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.toggle-btn.is-on {
+  background: var(--clay);
+  border-color: var(--clay);
+  color: var(--on-clay);
 }
 
 .primary {
