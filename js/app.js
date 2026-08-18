@@ -54,7 +54,7 @@ function resultsHtml(s, ranked) {
     .map(
       (row, i) => `
           <article class="card-row ${i === 0 ? "is-win" : ""} ${row.blocked ? "blocked" : ""}">
-            <div class="swatch" style="background:${row.card.color}"></div>
+            ${cardMark(row.card)}
             <div class="who">
               <strong>${i === 0 ? "Use " : ""}${escapeHtml(row.card.name)}</strong>
               <small>${escapeHtml(row.reason || "")}${s.favorites.includes(row.card.id) ? " · favorite" : ""}</small>
@@ -183,6 +183,7 @@ function renderCards() {
                 .join("")}<small style="color:var(--muted)">Pick ${card.focusCount || 2}. Default is electronics + ads.</small></div>`
             : "";
           return `<article class="wallet-item">
+            ${cardMark(card)}
             <div>
               <b>${escapeHtml(card.name)}</b>
               <span>${escapeHtml(card.issuer)} · ${card.network} · $${card.annualFee}/yr${card.flags.includes("no_fx_fee") ? " · no FX fee" : ""}</span>
@@ -353,9 +354,12 @@ function renderSetup() {
         ${ordered
           .map((card) => {
             const on = s.owned.includes(card.id);
-            return `<article class="wallet-item">
-              <div><b>${escapeHtml(card.name)}</b><span>${escapeHtml(card.issuer)} · ${card.short}</span></div>
-              <span></span>
+            return `<article class="wallet-item ${on ? "is-picked" : ""}">
+              ${cardMark(card)}
+              <div>
+                <b>${escapeHtml(card.name)}</b>
+                <span>${escapeHtml(card.issuer)} · ${card.short}</span>
+              </div>
               <button type="button" class="primary" data-own="${card.id}">${on ? "On" : "Add"}</button>
             </article>`;
           })
@@ -426,6 +430,15 @@ function escapeHtml(value) {
 
 function escapeAttr(value) {
   return escapeHtml(value).replaceAll('"', "&quot;");
+}
+
+function cardColor(card) {
+  const raw = String(card?.color || "#6e6a64");
+  return /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(raw) ? raw : "#6e6a64";
+}
+
+function cardMark(card) {
+  return `<span class="card-mark" style="background:${cardColor(card)}" aria-hidden="true"></span>`;
 }
 
 function persistOnHide() {
