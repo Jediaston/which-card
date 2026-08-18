@@ -1,4 +1,4 @@
-const CACHE = "chart-assist-v1";
+const CACHE = "chart-assist-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
@@ -34,7 +34,10 @@ self.addEventListener("fetch", (event) => {
   event.respondWith(
     (async () => {
       try {
-        const response = await fetch(event.request);
+        // Bypass the browser's HTTP cache (GitHub Pages sets a 10-minute
+        // max-age) so updates go live immediately instead of waiting for
+        // that cache window to expire.
+        const response = await fetch(event.request, { cache: "no-store" });
         const cache = await caches.open(CACHE);
         cache.put(event.request, response.clone());
         return response;
