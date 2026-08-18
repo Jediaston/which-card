@@ -1,7 +1,10 @@
-/** localStorage: perk-wallet-v2, with v1 fallback. */
+/** Wallet persistence: localStorage, IndexedDB, and a cookie backup. */
 
 export const STORAGE_KEY = "perk-wallet-v2";
 export const LEGACY_KEY = "perk-wallet-v1";
+const COOKIE_KEY = "perk-wallet-v2";
+const IDB_NAME = "which-card-db";
+const IDB_STORE = "kv";
 
 export function defaultState() {
   return {
@@ -12,6 +15,7 @@ export function defaultState() {
     focus: {},
     activated: {},
     lastMode: "everyday",
+    updatedAt: 0,
   };
 }
 
@@ -55,6 +59,7 @@ export function migrate(raw) {
       focus: raw.focus && typeof raw.focus === "object" ? raw.focus : {},
       activated: raw.activated && typeof raw.activated === "object" ? raw.activated : {},
       setupComplete: Boolean(raw.setupComplete),
+      updatedAt: Number(raw.updatedAt) || 0,
     };
   }
 
@@ -75,36 +80,196 @@ export function migrate(raw) {
     focus: raw.focus && typeof raw.focus === "object" ? raw.focus : {},
     activated: raw.activated && typeof raw.activated === "object" ? raw.activated : {},
     lastMode: raw.lastMode || "everyday",
+    updatedAt: Number(raw.updatedAt) || 0,
   };
 }
 
-export function createStore(storage) {
-  const store = storage || (typeof globalThis !== "undefined" ? globalThis.localStorage : memoryStorage());
+export function richerState(a, b) {
+  const left = a ? migrate(a) : defaultState();
+  const right = b ? migrate(b) : defaultState();
+  const leftScore = left.owned.length + (left.setupComplete ? 1 : 0);
+  const rightScore = right.owned.length + (right.setupComplete ? 1 : 0);
+  if (rightScore > leftScore) return right;
+  if (leftScore > rightScore) return left;
+  return (right.updatedAt || 0) > (left.updatedAt || 0) ? right : left;
+}
 
-  function read() {
-    const v2 = parseJson(store.getItem(STORAGE_KEY));
-    if (v2) return migrate(v2);
-    const v1 = parseJson(store.getItem(LEGACY_KEY));
-    if (v1) {
-      const migrated = migrate({ ...v1, version: 1 });
-      write(migrated);
-      return migrated;
+function safeLocalStorage() {
+  try {
+    const ls = globalThis.localStorage;
+    if (!ls) return memoryStorage();
+    const probe = "__which_card_probe__";
+    ls.setItem(probe, "1");
+    ls.removeItem(probe);
+    return ls;
+  } catch {
+    return memoryStorage();
+  }
+}
+
+function readCookie() {
+  if (typeof document === "undefined" || !document.cookie) return null;
+  const match = document.cookie.match(/(?:^|; )perk-wallet-v2=([^;]*)/);
+  if (!match) return null;
+  try {
+    return JSON.parse(decodeURIComponent(match[1]));
+  } catch {
+    return null;
+  }
+}
+
+function writeCookie(state) {
+  if (typeof document === "undefined") return;
+  try {
+    const value = encodeURIComponent(JSON.stringify(state));
+    if (value.length > 3500) return;
+    document.cookie = `${COOKIE_KEY}=${value}; max-age=31536000; samesite=lax; path=/`;
+  } catch {
+    /* ignore quota / cookie-disabled */
+  }
+}
+
+function clearCookie() {
+  if (typeof document === "undefined") return;
+  document.cookie = `${COOKIE_KEY}=; max-age=0; samesite=lax; path=/`;
+}
+
+function openIdb() {
+  return new Promise((resolve) => {
+    if (typeof indexedDB === "undefined") return resolve(null);
+    try {
+      const req = indexedDB.open(IDB_NAME, 1);
+      req.onupgradeneeded = () => {
+        const db = req.result;
+        if (!db.objectStoreNames.contains(IDB_STORE)) db.createObjectStore(IDB_STORE);
+      };
+      req.onsuccess = () => resolve(req.result);
+      req.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
     }
-    return defaultState();
+  });
+}
+
+function idbGet(key) {
+  return openIdb().then(
+    (db) =>
+      new Promise((resolve) => {
+        if (!db) return resolve(null);
+        try {
+          const tx = db.transaction(IDB_STORE, "readonly");
+          const req = tx.objectStore(IDB_STORE).get(key);
+          req.onsuccess = () => resolve(req.result ?? null);
+          req.onerror = () => resolve(null);
+        } catch {
+          resolve(null);
+        }
+      })
+  );
+}
+
+function idbSet(key, value) {
+  return openIdb().then(
+    (db) =>
+      new Promise((resolve) => {
+        if (!db) return resolve();
+        try {
+          const tx = db.transaction(IDB_STORE, "readwrite");
+          tx.objectStore(IDB_STORE).put(value, key);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch {
+          resolve();
+        }
+      })
+  );
+}
+
+function idbDel(key) {
+  return openIdb().then(
+    (db) =>
+      new Promise((resolve) => {
+        if (!db) return resolve();
+        try {
+          const tx = db.transaction(IDB_STORE, "readwrite");
+          tx.objectStore(IDB_STORE).delete(key);
+          tx.oncomplete = () => resolve();
+          tx.onerror = () => resolve();
+        } catch {
+          resolve();
+        }
+      })
+  );
+}
+
+export function createStore(storage) {
+  const extras = !storage;
+  const store = storage || safeLocalStorage();
+
+  function readLocal() {
+    try {
+      const v2 = parseJson(store.getItem(STORAGE_KEY));
+      if (v2) return migrate(v2);
+      const v1 = parseJson(store.getItem(LEGACY_KEY));
+      if (v1) {
+        const migrated = migrate({ ...v1, version: 1 });
+        try {
+          store.setItem(STORAGE_KEY, JSON.stringify(migrated));
+        } catch {
+          /* ignore */
+        }
+        return migrated;
+      }
+    } catch {
+      /* fall through */
+    }
+    return extras ? migrate(readCookie()) : defaultState();
   }
 
   function write(state) {
-    const next = { ...defaultState(), ...state, version: 2 };
-    store.setItem(STORAGE_KEY, JSON.stringify(next));
+    const next = migrate({ ...defaultState(), ...state, version: 2, updatedAt: Date.now() });
+    const json = JSON.stringify(next);
+    try {
+      store.setItem(STORAGE_KEY, json);
+    } catch {
+      /* private mode / quota */
+    }
+    if (extras) {
+      writeCookie(next);
+      idbSet(STORAGE_KEY, next);
+    }
     return next;
   }
+
+  function read() {
+    return readLocal();
+  }
+
+  const ready = extras
+    ? idbGet(STORAGE_KEY)
+        .then((idb) => {
+          const merged = richerState(readLocal(), idb);
+          if (merged.owned.length || merged.setupComplete) write(merged);
+          return merged;
+        })
+        .catch(() => readLocal())
+    : Promise.resolve(readLocal());
 
   return {
     load: read,
     save: write,
+    ready,
     reset() {
-      store.removeItem(STORAGE_KEY);
-      store.removeItem(LEGACY_KEY);
+      try {
+        store.removeItem(STORAGE_KEY);
+        store.removeItem(LEGACY_KEY);
+      } catch {
+        /* ignore */
+      }
+      if (extras) {
+        clearCookie();
+        idbDel(STORAGE_KEY);
+      }
       return defaultState();
     },
     exportBackup() {

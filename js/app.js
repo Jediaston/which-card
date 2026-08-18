@@ -14,6 +14,7 @@ const ui = {
   amount: "",
   catalogQuery: "",
   adding: false,
+  redoSetup: false,
 };
 
 function state() {
@@ -315,6 +316,7 @@ function renderHelp() {
     location.reload();
   });
   $("#redo-setup").addEventListener("click", () => {
+    ui.redoSetup = true;
     save({ setupComplete: false });
     maybeSetup();
   });
@@ -330,15 +332,25 @@ function renderSetup() {
   const s = state();
   const q = ui.catalogQuery;
   const hits = searchCatalog(q);
+  const selected = [];
+  const rest = [];
+  for (const card of hits) {
+    (s.owned.includes(card.id) ? selected : rest).push(card);
+  }
+  const ordered = [...selected, ...rest];
   $("#setup").hidden = false;
   $("#setup").innerHTML = `
     <div class="setup-card">
       <p class="eyebrow">First run</p>
       <h2>Which cards do you have?</h2>
-      <p class="hint">Toggle the ones in your wallet. Rates are already researched — do not type 4x or 5%.</p>
+      <p class="hint">${
+        selected.length
+          ? `${selected.length} saved in this phone’s wallet. Toggle more, then continue.`
+          : "Toggle the ones in your wallet. Rates are already researched — do not type 4x or 5%."
+      }</p>
       <input class="search" id="setup-q" type="text" autocomplete="off" placeholder="Search Gold, Flex, RedCard…" value="${escapeAttr(q)}" />
       <div class="catalog">
-        ${hits
+        ${ordered
           .map((card) => {
             const on = s.owned.includes(card.id);
             return `<article class="wallet-item">
@@ -373,6 +385,7 @@ function renderSetup() {
   );
   $("#finish-setup").addEventListener("click", () => {
     if (!state().owned.length) return;
+    ui.redoSetup = false;
     save({ setupComplete: true });
     ui.catalogQuery = "";
     ui.adding = false;
@@ -383,6 +396,12 @@ function renderSetup() {
 
 function maybeSetup() {
   const s = state();
+  if (!s.setupComplete && s.owned.length && !ui.redoSetup) {
+    save({ setupComplete: true });
+    $("#setup").hidden = true;
+    $("#setup").innerHTML = "";
+    return;
+  }
   if (!s.setupComplete) {
     ui.catalogQuery = "";
     renderSetup();
@@ -409,21 +428,37 @@ function escapeAttr(value) {
   return escapeHtml(value).replaceAll('"', "&quot;");
 }
 
-$$(".tab").forEach((btn) => btn.addEventListener("click", () => setTab(btn.dataset.tab)));
+function persistOnHide() {
+  const s = state();
+  if (s.owned.length && !s.setupComplete && !ui.redoSetup) save({ setupComplete: true });
+  else if (s.owned.length) save(s);
+}
 
-ui.mode = state().lastMode || "everyday";
-maybeSetup();
-render();
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "hidden") persistOnHide();
+});
+window.addEventListener("pagehide", persistOnHide);
 
-if ("serviceWorker" in navigator) {
+function registerSW() {
+  if (!("serviceWorker" in navigator)) return;
   let refreshing = false;
   navigator.serviceWorker.addEventListener("controllerchange", () => {
     if (refreshing) return;
     refreshing = true;
+    persistOnHide();
     location.reload();
   });
-  navigator.serviceWorker.addEventListener("message", (event) => {
-    if (event.data === "reload") location.reload();
-  });
-  navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" }).then((reg) => reg.update());
+  navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" });
 }
+
+async function boot() {
+  if (store.ready) await store.ready;
+  ui.mode = state().lastMode || "everyday";
+  maybeSetup();
+  render();
+  registerSW();
+}
+
+$$(".tab").forEach((btn) => btn.addEventListener("click", () => setTab(btn.dataset.tab)));
+
+boot();

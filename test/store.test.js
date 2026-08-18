@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { LEGACY_KEY, STORAGE_KEY, createStore, memoryStorage } from "../js/store.js";
+import { LEGACY_KEY, STORAGE_KEY, createStore, memoryStorage, richerState } from "../js/store.js";
 
 describe("store", () => {
   it("uses perk-wallet-v2", () => {
@@ -43,5 +43,24 @@ describe("store", () => {
     assert.equal(s.load().owned.length, 0);
     s.importBackup(backup);
     assert.deepEqual(s.load().owned, ["amex-gold"]);
+  });
+
+  it("keeps a richer wallet when merging copies", () => {
+    const empty = { version: 2, setupComplete: false, owned: [] };
+    const saved = { version: 2, setupComplete: true, owned: ["amex-gold", "bilt"], updatedAt: 9 };
+    const merged = richerState(empty, saved);
+    assert.deepEqual(merged.owned, ["amex-gold", "bilt"]);
+    assert.equal(merged.setupComplete, true);
+  });
+
+  it("round-trips through custom storage after a blank load", () => {
+    const mem = memoryStorage();
+    const first = createStore(mem);
+    first.save({ owned: ["target-redcard", "bilt"], setupComplete: true });
+    const again = createStore(mem);
+    const loaded = again.load();
+    assert.ok(loaded.owned.includes("bilt"));
+    assert.ok(loaded.owned.includes("target-redcard"));
+    assert.equal(loaded.setupComplete, true);
   });
 });

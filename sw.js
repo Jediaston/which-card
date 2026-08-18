@@ -1,4 +1,4 @@
-const CACHE = "which-card-v4";
+const CACHE = "which-card-v5";
 const ASSETS = [
   "./",
   "./index.html",
@@ -24,17 +24,8 @@ self.addEventListener("activate", (event) => {
   event.waitUntil(
     (async () => {
       const keys = await caches.keys();
-      await Promise.all(keys.map((k) => caches.delete(k)));
-      await caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).catch(() => {});
+      await Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k)));
       await self.clients.claim();
-      const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
-      await Promise.all(
-        windows.map((client) => {
-          if ("navigate" in client) return client.navigate(client.url);
-          client.postMessage("reload");
-          return undefined;
-        })
-      );
     })()
   );
 });
