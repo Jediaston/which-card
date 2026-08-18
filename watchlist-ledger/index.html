@@ -80,7 +80,8 @@
     <button class="btn-refresh" id="refreshBtn" onclick="refreshPrices()">Refresh</button>
   </div>
   <div class="controls">
-    <input id="apiKeyInput" placeholder="Finnhub API key" aria-label="Finnhub API key" style="text-transform:none" />
+    <input id="apiKeyInput" type="password" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="Finnhub API key" aria-label="Finnhub API key" style="text-transform:none" />
+    <button class="btn-add" id="toggleKeyBtn" onclick="toggleKeyVisibility()" aria-label="Show or hide API key">Show</button>
     <button class="btn-add" onclick="saveApiKey()">Save key</button>
   </div>
   <div class="chatnote">Refresh pulls live prices straight from your browser using a free
@@ -161,6 +162,15 @@ function saveApiKey() {
   setApiKey(el.value.trim());
   showBanner(el.value.trim() ? "API key saved on this device." : "API key cleared.", true);
   setTimeout(() => showBanner(""), 2500);
+}
+
+function toggleKeyVisibility() {
+  const el = document.getElementById("apiKeyInput");
+  const btn = document.getElementById("toggleKeyBtn");
+  if (!el || !btn) return;
+  const showing = el.type === "text";
+  el.type = showing ? "password" : "text";
+  btn.textContent = showing ? "Show" : "Hide";
 }
 
 const storage = {
