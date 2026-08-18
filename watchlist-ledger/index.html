@@ -79,11 +79,14 @@
     <button class="btn-add" onclick="addTicker()">Add</button>
     <button class="btn-refresh" id="refreshBtn" onclick="refreshPrices()">Refresh</button>
   </div>
+  <div class="controls">
+    <input id="apiKeyInput" placeholder="Finnhub API key" aria-label="Finnhub API key" style="text-transform:none" />
+    <button class="btn-add" onclick="saveApiKey()">Save key</button>
+  </div>
   <div class="chatnote">Refresh pulls live prices straight from your browser using a free
   <a href="https://finnhub.io/register" target="_blank" rel="noopener" style="color:inherit">Finnhub</a> API key
-  (first tap will ask you to paste one in &mdash; it's saved only on this device).
-  Analyst write-ups are still compiled by hand; come back to the chat any time to ask for those to be updated.
-  <span id="keyLink"></span></div>
+  &mdash; paste yours in the box above and tap Save key once; it's saved only on this device, not sent anywhere else.
+  Analyst write-ups are still compiled by hand; come back to the chat any time to ask for those to be updated.</div>
 
   <div class="banner" id="banner"></div>
   <div id="list"></div>
@@ -146,21 +149,18 @@ function setApiKey(key) {
   } catch (e) {}
 }
 
-function renderKeyLink() {
-  const el = document.getElementById("keyLink");
+function renderKeyField() {
+  const el = document.getElementById("apiKeyInput");
   if (!el) return;
-  const hasKey = !!getApiKey();
-  el.innerHTML = hasKey
-    ? ' &middot; <a href="#" onclick="changeApiKey();return false;" style="color:inherit">Change key</a>'
-    : "";
+  el.value = getApiKey();
 }
 
-function changeApiKey() {
-  const current = getApiKey();
-  const next = window.prompt("Paste your Finnhub API key (from finnhub.io, free tier is plenty):", current);
-  if (next === null) return;
-  setApiKey(next.trim());
-  renderKeyLink();
+function saveApiKey() {
+  const el = document.getElementById("apiKeyInput");
+  if (!el) return;
+  setApiKey(el.value.trim());
+  showBanner(el.value.trim() ? "API key saved on this device." : "API key cleared.", true);
+  setTimeout(() => showBanner(""), 2500);
 }
 
 const storage = {
@@ -314,16 +314,12 @@ async function fetchQuote(sym, apiKey) {
 
 async function refreshPrices() {
   if (!state.tickers.length) return;
-  let apiKey = getApiKey();
+  const apiKey = getApiKey();
   if (!apiKey) {
-    apiKey = window.prompt(
-      "Paste a free Finnhub API key to refresh live prices.\n\nGet one at finnhub.io/register (no card needed) \u2014 it's saved only on this device.",
-      ""
-    );
-    if (!apiKey) return;
-    setApiKey(apiKey.trim());
-    apiKey = apiKey.trim();
-    renderKeyLink();
+    showBanner("Paste a free Finnhub API key above (finnhub.io/register) and tap Save key first.", false);
+    const el = document.getElementById("apiKeyInput");
+    if (el) el.focus();
+    return;
   }
 
   const btn = document.getElementById("refreshBtn");
@@ -371,7 +367,7 @@ document.getElementById("tickerInput").addEventListener("keydown", function (e) 
 });
 
 render();
-renderKeyLink();
+renderKeyField();
 loadSaved();
 
 if ('serviceWorker' in navigator) {
