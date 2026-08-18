@@ -1,4 +1,4 @@
-const CACHE = "ai-build-hub-v3";
+const CACHE = "chart-assist-v1";
 const CORE_ASSETS = [
   "./",
   "./index.html",
