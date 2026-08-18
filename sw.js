@@ -1,4 +1,4 @@
-const CACHE = "which-card-v10";
+const CACHE = "which-card-v11";
 const ASSETS = [
   "./",
   "./index.html",
@@ -37,7 +37,10 @@ self.addEventListener("fetch", (event) => {
   if (url.pathname.endsWith("/sw.js")) return;
 
   event.respondWith(
-    fetch(req)
+    // Bypass the browser's HTTP cache (GitHub Pages sets a 10-minute
+    // max-age) so updates go live immediately instead of waiting for
+    // that cache window to expire.
+    fetch(req, { cache: "no-store" })
       .then((res) => {
         if (res && res.ok && res.type !== "opaque") {
           const copy = res.clone();
