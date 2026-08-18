@@ -47,7 +47,9 @@
   .price { font-size: 23px; font-weight: 600; }
   .pct { font-size: 15px; font-weight: 600; margin-left: 10px; }
   .up { color: var(--gain); } .down { color: var(--loss); }
-  .x { border: none; background: transparent; color: var(--ink-soft); font-size: 16px; margin-left: 6px; }
+  .x { border: 1px solid var(--line); background: var(--panel); color: var(--ink-soft); font-size: 15px; line-height: 1; margin-left: 8px; width: 30px; height: 30px; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; padding: 0; transition: background .15s, color .15s, border-color .15s; }
+  .x:hover { background: var(--loss-soft); color: var(--loss); border-color: var(--loss); }
+  .x.confirm { background: var(--loss); color: #fff; border-color: var(--loss); font-size: 11px; font-weight: 600; width: auto; padding: 0 10px; }
   .move-wrap { display: flex; flex-direction: column; margin-right: 4px; }
   .move-btn { border: none; background: transparent; color: var(--ink-soft); font-size: 11px; line-height: 1.5; padding: 4px 6px; cursor: pointer; }
   .move-btn:disabled { opacity: .2; cursor: default; }
@@ -304,7 +306,7 @@ function render() {
       (q && q.note ? '<span class="note">' + esc(q.note) + "</span>" : "") + "</div></div>" +
       '<div><span class="price num">' + (q && q.price != null ? fmtMoney(q.price) : '<span style="font-size:13px;color:var(--ink-soft)">tap Refresh</span>') + "</span>" +
       (pct != null ? '<span class="pct num ' + (up ? "up" : "down") + '">' + (up ? "+" : "") + pct.toFixed(2) + "%</span>" : "") +
-      '<button class="x" aria-label="Remove ' + esc(sym) + '" onclick="removeTicker(\'' + esc(sym) + '\')">\u00D7</button></div></div>' +
+      '<button class="x" aria-label="Remove ' + esc(sym) + '" onclick="confirmRemove(this,\'' + esc(sym) + '\')">\uD83D\uDDD1</button></div></div>' +
       '<div class="bar-track" style="justify-content:' + (up ? "flex-start" : "flex-end") + '">' +
       '<div class="bar" style="width:' + barW + "%;background:" + (pct == null ? "var(--line)" : up ? "var(--gain)" : "var(--loss)") + '"></div></div>' +
       '<div class="row-foot">' +
@@ -344,6 +346,24 @@ function removeTicker(sym) {
   delete openPanels[sym];
   persist();
   render();
+}
+
+function confirmRemove(btn, sym) {
+  if (btn.dataset.confirm === "1") {
+    removeTicker(sym);
+    return;
+  }
+  btn.dataset.confirm = "1";
+  btn.classList.add("confirm");
+  btn.textContent = "Confirm?";
+  btn.setAttribute("aria-label", "Tap again to confirm removing " + sym);
+  clearTimeout(btn._resetTimer);
+  btn._resetTimer = setTimeout(function () {
+    btn.dataset.confirm = "";
+    btn.classList.remove("confirm");
+    btn.textContent = "\uD83D\uDDD1";
+    btn.setAttribute("aria-label", "Remove " + sym);
+  }, 2500);
 }
 
 function togglePanel(sym) {
