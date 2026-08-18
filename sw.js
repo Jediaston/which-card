@@ -1,4 +1,4 @@
-const CACHE = "which-card-v3";
+const CACHE = "which-card-v4";
 const ASSETS = [
   "./",
   "./index.html",
@@ -14,36 +14,47 @@ const ASSETS = [
 ];
 
 self.addEventListener("install", (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).catch(() => {})
   );
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches
-      .keys()
-      .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
-      .then(() => self.clients.claim())
+    (async () => {
+      const keys = await caches.keys();
+      await Promise.all(keys.map((k) => caches.delete(k)));
+      await caches.open(CACHE).then((cache) => cache.addAll(ASSETS)).catch(() => {});
+      await self.clients.claim();
+      const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
+      await Promise.all(
+        windows.map((client) => {
+          if ("navigate" in client) return client.navigate(client.url);
+          client.postMessage("reload");
+          return undefined;
+        })
+      );
+    })()
   );
 });
 
 self.addEventListener("fetch", (event) => {
   const req = event.request;
   if (req.method !== "GET") return;
+  const url = new URL(req.url);
+  if (url.pathname.endsWith("/sw.js")) return;
+
   event.respondWith(
-    caches.match(req).then((cached) => {
-      const fetched = fetch(req)
-        .then((res) => {
-          if (res && res.ok && res.type !== "opaque") {
-            const copy = res.clone();
-            caches.open(CACHE).then((cache) => cache.put(req, copy));
-          }
-          return res;
-        })
-        .catch(() => cached);
-      return cached || fetched;
-    })
+    fetch(req)
+      .then((res) => {
+        if (res && res.ok && res.type !== "opaque") {
+          const copy = res.clone();
+          caches.open(CACHE).then((cache) => cache.put(req, copy));
+        }
+        return res;
+      })
+      .catch(() => caches.match(req))
   );
 });
 

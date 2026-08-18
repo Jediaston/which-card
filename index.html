@@ -4,15 +4,52 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#f3f1eb" />
+    <meta name="color-scheme" content="light" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="default" />
     <meta name="apple-mobile-web-app-title" content="Which Card" />
     <title>Which Card</title>
     <meta name="description" content="Which card to swipe. Perks, not balances." />
     <link rel="manifest" href="./manifest.webmanifest" />
-    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
-    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
-    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" href="./icons/icon.svg?v=4" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png?v=4" />
+    <link rel="stylesheet" href="./styles.css?v=4" />
+    <style>
+      html,
+      body {
+        background: #f3f1eb;
+        color: #3c3935;
+        color-scheme: light;
+      }
+    </style>
+    <script>
+      (function () {
+        var ver = "v4";
+        try {
+          if (localStorage.getItem("which-card-asset-ver") === ver) return;
+          localStorage.setItem("which-card-asset-ver", ver);
+        } catch (e) {
+          return;
+        }
+        var jobs = [];
+        if (navigator.serviceWorker) {
+          jobs.push(
+            navigator.serviceWorker.getRegistrations().then(function (regs) {
+              return Promise.all(regs.map(function (reg) { return reg.unregister(); }));
+            })
+          );
+        }
+        if (window.caches) {
+          jobs.push(
+            caches.keys().then(function (keys) {
+              return Promise.all(keys.map(function (key) { return caches.delete(key); }));
+            })
+          );
+        }
+        if (!jobs.length) return;
+        Promise.all(jobs).then(function () { location.reload(); }).catch(function () {});
+      })();
+    </script>
   </head>
   <body>
     <div id="app" class="app">
@@ -36,6 +73,6 @@
 
     <div id="setup" class="setup" hidden></div>
 
-    <script type="module" src="./js/app.js"></script>
+    <script type="module" src="./js/app.js?v=4"></script>
   </body>
 </html>
