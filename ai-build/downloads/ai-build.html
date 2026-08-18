@@ -8,14 +8,6 @@
 
 <meta name="color-scheme" content="light">
 <meta name="theme-color" content="#F5F4F1">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="AI Build">
-
-<link rel="manifest" href="./manifest.webmanifest?v=1">
-<link rel="icon" href="./icons/icon.svg?v=1" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./icons/icon-192.png?v=1">
 
 <style>
   :root{
@@ -52,7 +44,6 @@
   .go{color:#B7BAC0;font-size:18px;flex:none}
   footer{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
          font-size:12.5px;line-height:1.7;color:#8B9096}
-  .install-hint{margin-top:6px}
 </style>
 </head>
 <body>
@@ -64,7 +55,7 @@
   </header>
 
   <main>
-    <a class="card" href="../">
+    <a class="card" href="https://jediaston.github.io/which-card/">
       <div class="icon card-app">💳</div>
       <div class="body">
         <p class="name">Which Card</p>
@@ -73,7 +64,7 @@
       <div class="go">›</div>
     </a>
 
-    <a class="card" href="../retiree-states/">
+    <a class="card" href="https://jediaston.github.io/which-card/retiree-states/">
       <div class="icon retire-app">📍</div>
       <div class="body">
         <p class="name">Where to Retire</p>
@@ -82,7 +73,7 @@
       <div class="go">›</div>
     </a>
 
-    <a class="card" href="../bh-audit-console/">
+    <a class="card" href="https://jediaston.github.io/which-card/bh-audit-console/">
       <div class="icon audit-app">✓</div>
       <div class="body">
         <p class="name">BH Clinical Audit Console</p>
@@ -91,7 +82,7 @@
       <div class="go">›</div>
     </a>
 
-    <a class="card" href="../watchlist-ledger/">
+    <a class="card" href="https://jediaston.github.io/which-card/watchlist-ledger/">
       <div class="icon ledger-app">📈</div>
       <div class="body">
         <p class="name">Watchlist Ledger</p>
@@ -100,7 +91,7 @@
       <div class="go">›</div>
     </a>
 
-    <a class="card" href="../chart-assist/">
+    <a class="card" href="https://jediaston.github.io/which-card/chart-assist/">
       <div class="icon chart-app">CA</div>
       <div class="body">
         <p class="name">Chart Assist</p>
@@ -109,7 +100,7 @@
       <div class="go">›</div>
     </a>
 
-    <a class="card" href="../whats-cooking/">
+    <a class="card" href="https://jediaston.github.io/which-card/whats-cooking/">
       <div class="icon cooking-app">🍲</div>
       <div class="body">
         <p class="name">What's Cooking?</p>
@@ -120,27 +111,9 @@
   </main>
 
   <footer>
-    Tap a tool to open it, or install this page itself — Share → Add to Home Screen —
-    and you'll get an "AI Build" icon that links out to everything above.
-    <p class="install-hint"><a href="./qr/">Get QR codes to share these apps →</a></p>
-    <p class="install-hint"><a href="./downloads/">Save shortcut files to Files or NAS →</a></p>
+    Tap a tool to open it, or open <a href="https://jediaston.github.io/which-card/ai-build/">the live AI Build page</a> and install it — Share → Add to Home Screen —
+    for an "AI Build" icon that links out to everything above.
   </footer>
 </div>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    let refreshing = false;
-    navigator.serviceWorker.addEventListener('controllerchange', () => {
-      if (refreshing) return;
-      refreshing = true;
-      location.reload();
-    });
-    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
-      reg.update().catch(() => {});
-    }).catch(() => {});
-  });
-}
-</script>
 </body>
 </html>
