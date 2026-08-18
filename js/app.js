@@ -53,7 +53,7 @@ function resultsHtml(s, ranked) {
     .slice(0, 8)
     .map(
       (row, i) => `
-          <article class="card-row ${i === 0 ? "is-win" : ""} ${row.blocked ? "blocked" : ""}">
+          <article class="card-row ${i === 0 ? "is-win" : ""} ${row.blocked ? "blocked" : ""}" style="border-left-color:${cardColor(row.card)}">
             ${cardMark(row.card)}
             <div class="who">
               <strong>${i === 0 ? "Use " : ""}${escapeHtml(row.card.name)}</strong>
@@ -182,7 +182,7 @@ function renderCards() {
                 })
                 .join("")}<small style="color:var(--muted)">Pick ${card.focusCount || 2}. Default is electronics + ads.</small></div>`
             : "";
-          return `<article class="wallet-item">
+          return `<article class="wallet-item" style="border-left-color:${cardColor(card)}">
             ${cardMark(card)}
             <div>
               <b>${escapeHtml(card.name)}</b>
@@ -354,7 +354,7 @@ function renderSetup() {
         ${ordered
           .map((card) => {
             const on = s.owned.includes(card.id);
-            return `<article class="wallet-item ${on ? "is-picked" : ""}">
+            return `<article class="wallet-item ${on ? "is-picked" : ""}" style="border-left-color:${cardColor(card)}">
               ${cardMark(card)}
               <div>
                 <b>${escapeHtml(card.name)}</b>
@@ -438,7 +438,8 @@ function cardColor(card) {
 }
 
 function cardMark(card) {
-  return `<span class="card-mark" style="background:${cardColor(card)}" aria-hidden="true"></span>`;
+  const color = cardColor(card);
+  return `<div class="card-mark" style="background-color:${color}" aria-hidden="true"></div>`;
 }
 
 function persistOnHide() {
