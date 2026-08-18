@@ -48,10 +48,68 @@
     }
   </script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700&display=swap');
-    body { font-family: 'DM Sans', system-ui, sans-serif; background: #FAF8F5; }
+    @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap');
+
+    body { font-family: 'DM Sans', system-ui, sans-serif; background: #FAF8F5; position: relative; }
+
+    /* Ambient background depth */
+    body::before, body::after{
+      content:''; position:fixed; z-index:-1; border-radius:9999px; filter:blur(70px); opacity:.55;
+    }
+    body::before{ width:420px; height:420px; top:-140px; right:-100px; background:radial-gradient(circle, #E4EBE4 0%, transparent 70%); }
+    body::after{ width:460px; height:460px; bottom:-160px; left:-140px; background:radial-gradient(circle, #F5EEDD 0%, transparent 70%); }
+
+    h1.display{ font-family:'Fraunces', 'DM Sans', serif; }
+
     .card { transition: all 0.2s ease; }
-    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px -6px rgba(90, 60, 30, 0.12); }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 14px 32px -10px rgba(90, 60, 30, 0.16); }
+
+    /* Score ring */
+    .ring{
+      --score: 0;
+      width:58px; height:58px; border-radius:50%; flex:none;
+      background: conic-gradient(#557A5B calc(var(--score) * 1%), #EAE4D6 0);
+      display:flex; align-items:center; justify-content:center;
+      box-shadow: inset 0 0 0 1px rgba(90,60,30,.04);
+    }
+    .ring .ring-inner{
+      width:46px; height:46px; border-radius:50%; background:#fff;
+      display:flex; align-items:center; justify-content:center;
+      font-weight:700; font-size:14px; color:#3F3020;
+    }
+    .ring.big{ width:72px; height:72px; }
+    .ring.big .ring-inner{ width:58px; height:58px; font-size:17px; }
+
+    /* Rating pills */
+    .pill{
+      display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600;
+      padding:3px 10px; border-radius:9999px; letter-spacing:.01em; white-space:nowrap;
+    }
+    .pill .dot{ width:6px; height:6px; border-radius:9999px; flex:none; }
+
+    /* Stat row with icon */
+    .stat{ display:flex; gap:9px; align-items:flex-start; }
+    .stat .stat-icon{
+      width:26px; height:26px; border-radius:8px; flex:none; display:flex; align-items:center;
+      justify-content:center; font-size:13px; background:#F5F0E8;
+    }
+
+    /* Warmth dot meter */
+    .warm-meter{ display:inline-flex; gap:3px; align-items:center; }
+    .warm-meter .seg{ width:7px; height:7px; border-radius:9999px; background:#E8DFD0; }
+    .warm-meter .seg.on{ background:#C9954F; }
+
+    .medal{ font-size:20px; line-height:1; }
+
+    .rank-badge{
+      width:34px; height:34px; border-radius:9999px; display:flex; align-items:center; justify-content:center;
+      font-size:13px; font-weight:700; flex:none; background:#F5F0E8; color:#7A5F3A;
+    }
+    .rank-badge.top{ background:#557A5B; color:#fff; }
+
+    #search{ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%239A7B4F' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' width='16' height='16'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:14px center; padding-left:38px;
+    }
   </style>
 </head>
 <body class="text-earth-800 min-h-screen">
@@ -59,13 +117,16 @@
   <!-- Header -->
   <header class="border-b border-earth-200 bg-white/80 backdrop-blur sticky top-0 z-20">
     <div class="max-w-5xl mx-auto px-6 py-5 flex flex-wrap items-center justify-between gap-4">
-      <div>
-        <h1 class="text-2xl font-semibold tracking-tight text-earth-900">Where to Retire</h1>
-        <p class="text-sm text-earth-500 mt-0.5">Taxes, healthcare, climate & airports — ranked for 2026</p>
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-2xl bg-gradient-to-br from-sage-500 to-sage-700 flex items-center justify-center text-white text-lg shrink-0">📍</div>
+        <div>
+          <h1 class="display text-2xl tracking-tight text-earth-900">Where to Retire</h1>
+          <p class="text-sm text-earth-500 mt-0.5">Taxes, healthcare, climate & airports — ranked for 2026</p>
+        </div>
       </div>
       <div class="flex items-center gap-3">
         <input id="search" type="text" placeholder="Search states..." 
-          class="px-4 py-2 text-sm rounded-full border border-earth-200 bg-earth-50 focus:outline-none focus:ring-2 focus:ring-sage-500/30 focus:border-sage-500 w-44 placeholder:text-earth-400">
+          class="py-2 text-sm rounded-full border border-earth-200 bg-earth-50 focus:outline-none focus:ring-2 focus:ring-sage-500/30 focus:border-sage-500 w-44 placeholder:text-earth-400">
         <select id="sort" class="px-4 py-2 text-sm rounded-full border border-earth-200 bg-earth-50 focus:outline-none focus:ring-2 focus:ring-sage-500/30">
           <option value="score">Best overall</option>
           <option value="tax">Best for taxes</option>
@@ -139,6 +200,36 @@ const states = [
   {name:"New Jersey", abbr:"NJ", score:38, tax:"Poor", income:"Up to 10.75%", estate:"Inheritance", prop:"2.23%", sales:"6.6%", ss:"Not taxed", health:"Good", weather:"Cold winters", warm:1, airport:"Newark, Philadelphia", why:"Highest property taxes plus high income tax."}
 ];
 
+function ratingStyle(r){
+  const map = {
+    'Excellent':      { bg:'#E4EBE4', fg:'#2F4A35', dot:'#557A5B' },
+    'Very Good':      { bg:'#EDF2EA', fg:'#4B6350', dot:'#7C9B7E' },
+    'Good':           { bg:'#F5F0E8', fg:'#7A5F3A', dot:'#B8A07A' },
+    'Average':        { bg:'#F5EEE0', fg:'#8A6A3D', dot:'#C9A46A' },
+    'Below average':  { bg:'#F7E9DD', fg:'#9C5A34', dot:'#C17A4E' },
+    'Poor':           { bg:'#F5E2DC', fg:'#96422C', dot:'#B3503B' },
+  };
+  return map[r] || map['Average'];
+}
+
+function ratingPill(r){
+  const c = ratingStyle(r);
+  return `<span class="pill" style="background:${c.bg};color:${c.fg}"><span class="dot" style="background:${c.dot}"></span>${r}</span>`;
+}
+
+function warmMeter(level){
+  let segs = '';
+  for (let i = 1; i <= 5; i++) segs += `<span class="seg${i <= level ? ' on' : ''}"></span>`;
+  return `<span class="warm-meter">${segs}</span>`;
+}
+
+function scoreRing(score, big){
+  return `
+    <div class="ring${big ? ' big' : ''}" style="--score:${score}">
+      <div class="ring-inner">${score}</div>
+    </div>`;
+}
+
 function render() {
   const q = document.getElementById('search').value.toLowerCase();
   const sort = document.getElementById('sort').value;
@@ -157,15 +248,14 @@ function render() {
   });
   else if (sort === 'warm') data.sort((a,b) => b.warm - a.warm || b.score - a.score);
 
+  const medals = ['🥇','🥈','🥉'];
   const top = [...states].sort((a,b)=>b.score-a.score).slice(0,5);
   document.getElementById('topCards').innerHTML = top.map((s,i) => `
-    <div class="card bg-white rounded-2xl border border-earth-200 p-5">
-      <div class="flex items-center justify-between mb-3">
-        <span class="text-xs font-medium text-earth-400">#${i+1}</span>
-        <span class="text-lg font-semibold text-sage-600">${s.score}</span>
-      </div>
-      <h3 class="font-semibold text-earth-900 text-lg">${s.name}</h3>
-      <p class="text-xs text-earth-500 mt-1 mb-3">${s.tax} taxes · ${s.health} healthcare</p>
+    <div class="card bg-white rounded-2xl border border-earth-200 p-5 relative overflow-hidden">
+      ${i < 3 ? `<div class="absolute top-3 right-3 medal">${medals[i]}</div>` : `<div class="absolute top-3 right-3 text-xs font-medium text-earth-400">#${i+1}</div>`}
+      ${scoreRing(s.score)}
+      <h3 class="font-semibold text-earth-900 text-lg mt-3">${s.name}</h3>
+      <div class="mt-2 mb-3">${ratingPill(s.tax)}</div>
       <p class="text-sm text-earth-600 leading-snug">${s.why}</p>
     </div>
   `).join('');
@@ -175,46 +265,50 @@ function render() {
     <div class="card bg-white rounded-2xl border border-earth-200 p-6">
       <div class="flex flex-wrap items-start justify-between gap-4 mb-5">
         <div class="flex items-start gap-3">
-          <span class="w-9 h-9 rounded-full bg-earth-100 text-earth-600 text-sm font-medium flex items-center justify-center shrink-0 mt-0.5">${i+1}</span>
+          <span class="rank-badge${i < 3 ? ' top' : ''} mt-0.5">${i+1}</span>
           <div>
             <h3 class="font-semibold text-earth-900 text-xl">${s.name} <span class="text-earth-400 font-normal text-base">${s.abbr}</span></h3>
-            <p class="text-sm text-earth-600 mt-1 max-w-md leading-relaxed">${s.why}</p>
+            <div class="mt-2 flex flex-wrap items-center gap-2">
+              ${ratingPill(s.tax)}
+              <span class="text-xs text-earth-300">·</span>
+              ${ratingPill(s.health)}
+              <span class="text-xs text-earth-300">·</span>
+              ${warmMeter(s.warm)}
+            </div>
+            <p class="text-sm text-earth-600 mt-2 max-w-md leading-relaxed">${s.why}</p>
           </div>
         </div>
-        <div class="text-right shrink-0">
-          <div class="text-3xl font-semibold text-sage-600">${s.score}</div>
-          <div class="text-xs text-earth-400 mt-0.5">overall score</div>
-        </div>
+        <div class="shrink-0">${scoreRing(s.score, true)}</div>
       </div>
       
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-4 text-sm border-t border-earth-100 pt-5">
-        <div>
-          <p class="text-xs text-earth-400 mb-1">Income tax</p>
-          <p class="font-medium text-earth-800">${s.income}</p>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 text-sm border-t border-earth-100 pt-5">
+        <div class="stat">
+          <span class="stat-icon">💰</span>
+          <div><p class="text-xs text-earth-400 mb-0.5">Income tax</p><p class="font-medium text-earth-800">${s.income}</p></div>
         </div>
-        <div>
-          <p class="text-xs text-earth-400 mb-1">Estate / Inheritance</p>
-          <p class="font-medium text-earth-800">${s.estate}</p>
+        <div class="stat">
+          <span class="stat-icon">🏛️</span>
+          <div><p class="text-xs text-earth-400 mb-0.5">Estate / Inheritance</p><p class="font-medium text-earth-800">${s.estate}</p></div>
         </div>
-        <div>
-          <p class="text-xs text-earth-400 mb-1">Property · Sales</p>
-          <p class="font-medium text-earth-800">${s.prop} · ${s.sales}</p>
+        <div class="stat">
+          <span class="stat-icon">🏠</span>
+          <div><p class="text-xs text-earth-400 mb-0.5">Property · Sales</p><p class="font-medium text-earth-800">${s.prop} · ${s.sales}</p></div>
         </div>
-        <div>
-          <p class="text-xs text-earth-400 mb-1">Social Security</p>
-          <p class="font-medium text-earth-800">${s.ss}</p>
+        <div class="stat">
+          <span class="stat-icon">🛡️</span>
+          <div><p class="text-xs text-earth-400 mb-0.5">Social Security</p><p class="font-medium text-earth-800">${s.ss}</p></div>
         </div>
-        <div>
-          <p class="text-xs text-earth-400 mb-1">Healthcare</p>
-          <p class="font-medium text-earth-800">${s.health}</p>
+        <div class="stat">
+          <span class="stat-icon">⚕️</span>
+          <div><p class="text-xs text-earth-400 mb-0.5">Healthcare</p><p class="font-medium text-earth-800">${s.health}</p></div>
         </div>
-        <div>
-          <p class="text-xs text-earth-400 mb-1">Weather</p>
-          <p class="font-medium text-earth-800">${s.weather}</p>
+        <div class="stat">
+          <span class="stat-icon">☀️</span>
+          <div><p class="text-xs text-earth-400 mb-0.5">Weather</p><p class="font-medium text-earth-800">${s.weather}</p></div>
         </div>
-        <div class="md:col-span-2">
-          <p class="text-xs text-earth-400 mb-1">Airports</p>
-          <p class="font-medium text-earth-800">${s.airport}</p>
+        <div class="stat md:col-span-2">
+          <span class="stat-icon">✈️</span>
+          <div><p class="text-xs text-earth-400 mb-0.5">Airports</p><p class="font-medium text-earth-800">${s.airport}</p></div>
         </div>
       </div>
     </div>
