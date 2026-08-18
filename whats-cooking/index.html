@@ -244,6 +244,46 @@
       display: grid;
       grid-template-columns: 180px 1fr;
       gap: 0;
+      position: relative;
+    }
+
+    .fav-heart {
+      position: absolute;
+      top: 0.6rem;
+      right: 0.6rem;
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 2px 8px -2px rgba(30, 61, 54, 0.35);
+      color: var(--muted);
+      font-size: 1.2rem;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: transform 0.15s ease, color 0.15s ease;
+    }
+
+    .fav-heart:hover {
+      transform: scale(1.08);
+    }
+
+    .fav-heart:active {
+      transform: scale(0.92);
+    }
+
+    .fav-heart.active {
+      color: #e0554f;
+    }
+
+    @media (max-width: 600px) {
+      .fav-heart {
+        top: 0.7rem;
+        right: 0.7rem;
+      }
     }
 
     @media (max-width: 600px) {
@@ -646,6 +686,7 @@
         <button type="button" class="browse-btn" id="randomBtn">🎲 Random</button>
         <button type="button" class="browse-btn" id="categoriesBtn">📂 Categories</button>
         <button type="button" class="browse-btn" id="cuisinesBtn">🌍 All Cuisines</button>
+        <button type="button" class="browse-btn" id="favoritesBtn">♥ My Favorites</button>
       </div>
       <div class="fav-bar" id="favBar">
         <button type="button" class="fav-chip" data-cuisine="Filipino">🇵🇭 Filipino</button>
@@ -684,6 +725,70 @@
     const btnText = document.getElementById('btnText');
     const statusEl = document.getElementById('status');
     const resultsEl = document.getElementById('results');
+    const favoritesBtn = document.getElementById('favoritesBtn');
+
+    // Saved recipes ("My Favorites"), keyed by idMeal and stored on this device only
+    const FAVORITES_KEY = 'whats-cooking-favorites-v1';
+    let viewingFavorites = false;
+
+    function loadFavoriteMeals() {
+      try {
+        return JSON.parse(localStorage.getItem(FAVORITES_KEY) || '{}') || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function saveFavoriteMeals() {
+      try {
+        localStorage.setItem(FAVORITES_KEY, JSON.stringify(favoriteMeals));
+      } catch (e) { /* storage unavailable — favorites just won't persist */ }
+    }
+
+    let favoriteMeals = loadFavoriteMeals();
+
+    function isFavorited(id) {
+      return Object.prototype.hasOwnProperty.call(favoriteMeals, id);
+    }
+
+    function toggleFavoriteMeal(meal, heartBtn) {
+      const nowActive = !isFavorited(meal.idMeal);
+      if (nowActive) {
+        favoriteMeals[meal.idMeal] = meal;
+      } else {
+        delete favoriteMeals[meal.idMeal];
+      }
+      saveFavoriteMeals();
+      if (heartBtn) {
+        heartBtn.classList.toggle('active', nowActive);
+        heartBtn.textContent = nowActive ? '♥' : '♡';
+        heartBtn.setAttribute('aria-pressed', String(nowActive));
+        heartBtn.setAttribute('aria-label', (nowActive ? 'Remove ' : 'Save ') + meal.strMeal + (nowActive ? ' from' : ' to') + ' favorites');
+      }
+      if (viewingFavorites && !nowActive) renderFavoritesList();
+    }
+
+    function renderFavoritesList() {
+      viewingFavorites = true;
+      hideBrowsePanel();
+      resultsEl.innerHTML = '';
+      const favs = Object.values(favoriteMeals);
+      if (!favs.length) {
+        hideStatus();
+        resultsEl.innerHTML = `
+          <div class="empty-state">
+            <svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+              <path d="M12 21s-7.5-4.6-10-9.2C.4 8.1 2.3 4.5 6 4.5c2.1 0 3.6 1.1 4.5 2.3C11.4 5.6 12.9 4.5 15 4.5c3.7 0 5.6 3.6 4 7.3C19.5 16.4 12 21 12 21z"/>
+            </svg>
+            <h3>No favorites yet</h3>
+            <p>Tap the ♥ on any recipe to save it here for quick access, even after you close the app.</p>
+          </div>
+        `;
+        return;
+      }
+      favs.forEach(m => resultsEl.appendChild(createCard(m)));
+      showStatus(`${favs.length} favorite${favs.length === 1 ? '' : 's'} saved on this device`);
+    }
 
     // Example chips for empty state
     const EXAMPLES = ['Adobo', 'Sinigang', 'Tinola', 'Lechon Kawali', 'Bulalo', 'Bicol Express', 'Pinakbet', 'Inasal'];
@@ -1453,9 +1558,11 @@
         ? `<a class="btn btn-primary" href="${meal.strYoutube}" target="_blank" rel="noopener">▶ Watch Video</a>` 
         : '';
 
+      const favActive = isFavorited(meal.idMeal);
       card.innerHTML = `
         <div class="card-header">
           <img class="card-img" src="${meal.strMealThumb}" alt="${meal.strMeal}" loading="lazy">
+          <button type="button" class="fav-heart${favActive ? ' active' : ''}" aria-pressed="${favActive}" aria-label="${favActive ? 'Remove' : 'Save'} ${meal.strMeal} ${favActive ? 'from' : 'to'} favorites">${favActive ? '♥' : '♡'}</button>
           <div class="card-meta">
             <h2>${meal.strMeal}</h2>
             <div class="badges">
@@ -1528,6 +1635,9 @@
         toggleBtn.textContent = isOpen ? 'Hide Instructions' : 'Show Instructions';
       });
 
+      const heartBtn = card.querySelector('.fav-heart');
+      heartBtn.addEventListener('click', () => toggleFavoriteMeal(meal, heartBtn));
+
       return card;
     }
 
@@ -1568,6 +1678,7 @@
       const q = query.trim();
       if (!q) return;
 
+      viewingFavorites = false;
       setLoading(true);
       hideStatus();
       resultsEl.innerHTML = '';
@@ -1628,6 +1739,7 @@
     }
 
     async function loadFilterMeals(type, value) {
+      viewingFavorites = false;
       setLoading(true);
       hideStatus();
       hideBrowsePanel();
@@ -1693,6 +1805,7 @@
     }
 
     async function loadRandom() {
+      viewingFavorites = false;
       setLoading(true);
       hideStatus();
       hideBrowsePanel();
@@ -1714,6 +1827,7 @@
     }
 
     async function loadCuisineFavorite(cuisine) {
+      viewingFavorites = false;
       setLoading(true);
       hideStatus();
       hideBrowsePanel();
@@ -1779,6 +1893,7 @@
     randomBtn.addEventListener('click', loadRandom);
     categoriesBtn.addEventListener('click', () => showList('categories'));
     cuisinesBtn.addEventListener('click', () => showList('cuisines'));
+    favoritesBtn.addEventListener('click', renderFavoritesList);
     favBar.querySelectorAll('.fav-chip').forEach(chip => {
       chip.addEventListener('click', () => loadCuisineFavorite(chip.dataset.cuisine));
     });

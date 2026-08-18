@@ -1,4 +1,4 @@
-const CACHE = "whats-cooking-v2";
+const CACHE = "whats-cooking-v3";
 const CORE_ASSETS = [
   "./",
   "./index.html",
