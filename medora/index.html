@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Medora | Hospitals, Clinics & Vets in Bacolod, Silay & Talisay</title>
+  <meta name="description" content="Find and review hospitals, clinics, and veterinarians in Bacolod, Silay, and Talisay.">
+  <meta name="theme-color" content="#c45c26">
+  <meta name="color-scheme" content="light dark">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="Medora">
+
+  <link rel="manifest" href="./manifest.webmanifest?v=1">
+  <link rel="icon" href="./icons/icon.svg?v=1" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icons/icon-192.png?v=1">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+:root {
+  --primary: #c45c26;
+  --primary-dark: #9a4520;
+  --primary-light: #d4784a;
+  --secondary: #5c4a3a;
+  --accent: #b8860b;
+  --bg: #f7f3ee;
+  --card-bg: #fffcf7;
+  --text: #2c241c;
+  --text-muted: #6b5e52;
+  --border: #e8e0d5;
+  --shadow: 0 4px 6px -1px rgb(44 36 28 / 0.08);
+  --radius: 10px;
+  --transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+[data-theme="dark"] {
+  --primary: #d4784a;
+  --primary-dark: #c45c26;
+  --primary-light: #e09a6e;
+  --secondary: #c4a484;
+  --accent: #d4a84b;
+  --bg: #1c1916;
+  --card-bg: #2a2520;
+  --text: #f5efe6;
+  --text-muted: #a89a8c;
+  --border: #3d3630;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  min-height: 100vh;
+}
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.25rem; }
+.header {
+  background: var(--card-bg);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 100;
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.25rem; gap: 1rem; flex-wrap: wrap;
+}
+.logo { display: flex; align-items: center; gap: 0.75rem; }
+.logo i { font-size: 1.5rem; color: var(--primary); }
+.logo h1 { font-family: 'Poppins', system-ui, sans-serif; font-size: 1.2rem; font-weight: 600; letter-spacing: -0.02em; }
+.logo span { font-size: 0.72rem; color: var(--text-muted); }
+.nav { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+.nav-btn {
+  background: transparent; border: 1px solid transparent; color: var(--text-muted);
+  padding: 0.4rem 0.85rem; border-radius: 8px; font-size: 0.8125rem; font-weight: 500;
+  cursor: pointer; transition: var(--transition);
+}
+.nav-btn:hover { background: var(--bg); color: var(--text); border-color: var(--border); }
+.nav-btn.active { background: var(--primary); color: #fffcf7; border-color: var(--primary); }
+.theme-btn {
+  background: transparent; border: 1px solid var(--border); width: 36px; height: 36px;
+  border-radius: 8px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; color: var(--text-muted);
+}
+.theme-btn:hover { background: var(--bg); color: var(--text); }
+.hero { text-align: center; padding: 2.5rem 0 1.5rem; }
+.hero h2 {
+  font-family: 'Poppins', system-ui, sans-serif; font-size: clamp(1.45rem, 4vw, 1.85rem);
+  font-weight: 600; letter-spacing: -0.025em; margin-bottom: 0.6rem;
+}
+.hero p { color: var(--text-muted); max-width: 520px; margin: 0 auto 1.75rem; font-size: 0.975rem; }
+.search-bar {
+  display: flex; align-items: center; flex-wrap: wrap; background: var(--card-bg);
+  border: 1px solid var(--border); border-radius: 10px; padding: 0.45rem 0.9rem;
+  max-width: 720px; margin: 0 auto; gap: 0.65rem;
+}
+.search-bar i { color: var(--text-muted); }
+.search-bar input {
+  flex: 1; border: none; background: transparent; outline: none;
+  font-size: 1rem; color: var(--text); padding: 0.5rem 0; min-width: 120px;
+}
+.search-bar select {
+  border: 1px solid var(--border); background: var(--bg); color: var(--text);
+  padding: 0.4rem 0.6rem; border-radius: 8px; font-size: 0.875rem; cursor: pointer;
+}
+.verified-toggle {
+  display: flex; align-items: center; gap: 0.4rem; font-size: 0.85rem; font-weight: 600;
+  color: var(--text-muted); cursor: pointer; white-space: nowrap; padding: 0.35rem 0.6rem;
+  border-radius: 8px; border: 1px solid var(--border); background: var(--bg);
+}
+.verified-toggle input { accent-color: var(--primary); width: 1rem; height: 1rem; }
+.verified-toggle:has(input:checked) {
+  background: #f5e6d8; border-color: var(--primary); color: var(--primary-dark);
+}
+[data-theme="dark"] .verified-toggle:has(input:checked) { background: #3d2a1c; color: #e09a6e; }
+.stats {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem; margin-bottom: 2rem;
+}
+.stat-card {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 1rem 1.25rem; display: flex; align-items: center; gap: 0.875rem;
+}
+.stat-card i { font-size: 1.5rem; color: var(--primary); width: 40px; text-align: center; }
+.stat-card strong { display: block; font-size: 1.35rem; font-weight: 700; }
+.stat-card span { font-size: 0.8rem; color: var(--text-muted); }
+.providers {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.25rem; padding-bottom: 3rem;
+}
+.provider-card {
+  background: var(--card-bg); border: 1px solid var(--border); border-radius: 10px;
+  overflow: hidden; cursor: pointer; display: flex; flex-direction: column;
+  transition: border-color 0.2s ease;
+}
+.provider-card:hover { border-color: var(--primary-light); }
+.card-header {
+  padding: 1.25rem 1.25rem 0.75rem; display: flex; justify-content: space-between;
+  align-items: flex-start; gap: 0.75rem;
+}
+.card-type {
+  font-size: 0.7rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em;
+  padding: 0.25rem 0.6rem; border-radius: 999px;
+}
+.type-hospital { background: #f0e6dc; color: #6b4c35; }
+.type-clinic { background: #e8efe4; color: #3d5a3a; }
+.type-veterinary { background: #f5ead0; color: #7a5c28; }
+.type-carehome { background: #ebe4f0; color: #5c4a6b; }
+.type-private { background: #e8e4df; color: #5c4a3a; }
+[data-theme="dark"] .type-hospital { background: #3d3228; color: #d4b896; }
+[data-theme="dark"] .type-clinic { background: #2a3528; color: #a3c49a; }
+[data-theme="dark"] .type-veterinary { background: #3d3220; color: #e0c878; }
+[data-theme="dark"] .type-carehome { background: #352840; color: #c4a8d8; }
+[data-theme="dark"] .type-private { background: #352e28; color: #c4a484; }
+.card-city {
+  font-size: 0.7rem; font-weight: 600; background: var(--bg); color: var(--text-muted);
+  padding: 0.2rem 0.5rem; border-radius: 6px; border: 1px solid var(--border);
+}
+.verified-badge {
+  display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.75rem; font-weight: 600;
+  color: #9a4520; background: #f5e6d8; padding: 0.2rem 0.55rem; border-radius: 999px;
+  margin: 0.35rem 0 0.5rem;
+}
+[data-theme="dark"] .verified-badge { background: #3d2a1c; color: #e09a6e; }
+.card-body { padding: 0 1.25rem 1rem; flex: 1; }
+.card-body h3 {
+  font-family: 'Poppins', system-ui, sans-serif; font-size: 1.02rem; font-weight: 600;
+  letter-spacing: -0.015em; margin-bottom: 0.4rem; line-height: 1.35;
+}
+.card-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.35rem; }
+.card-meta i { width: 16px; margin-right: 0.35rem; color: var(--primary); }
+.card-rating { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; }
+.stars { color: var(--accent); font-size: 0.9rem; }
+.rating-value { font-weight: 600; font-size: 0.9rem; }
+.review-count { font-size: 0.8rem; color: var(--text-muted); }
+.card-footer {
+  padding: 0.75rem 1.25rem; border-top: 1px solid var(--border); display: flex; gap: 0.5rem;
+}
+.btn {
+  flex: 1; padding: 0.5rem; border-radius: 8px; font-size: 0.85rem; font-weight: 500;
+  cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 0.35rem;
+}
+.btn-primary { background: var(--primary); color: #fffcf7; }
+.btn-primary:hover { background: var(--primary-dark); }
+.btn-outline {
+  background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+}
+.btn-outline:hover { background: var(--bg); border-color: var(--primary-light); color: var(--text); }
+.modal {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex;
+  align-items: center; justify-content: center; z-index: 200; padding: 1rem;
+}
+.modal.hidden { display: none; }
+.modal-content {
+  background: var(--card-bg); border-radius: var(--radius); max-width: 640px; width: 100%;
+  max-height: 90vh; overflow-y: auto; position: relative; padding: 1.75rem;
+}
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem; background: var(--bg); border: none;
+  width: 36px; height: 36px; border-radius: 50%; font-size: 1.5rem; cursor: pointer;
+  color: var(--text-muted); display: flex; align-items: center; justify-content: center;
+}
+.modal-header { margin-bottom: 1.25rem; padding-right: 2rem; }
+.modal-header h2 { font-family: 'Poppins', sans-serif; font-size: 1.35rem; margin-bottom: 0.35rem; }
+.modal-info { display: grid; gap: 0.5rem; margin-bottom: 1.5rem; font-size: 0.95rem; }
+.modal-info i { color: var(--primary); width: 18px; }
+.modal-rating-big {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;
+  padding: 1rem; background: var(--bg); border-radius: 10px;
+}
+.modal-rating-big .big-num { font-size: 2rem; font-weight: 700; }
+.reviews-section h3 {
+  font-size: 1.1rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;
+}
+.review-item { border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
+.review-header { display: flex; justify-content: space-between; margin-bottom: 0.4rem; }
+.review-author { font-weight: 600; }
+.review-date { font-size: 0.75rem; color: var(--text-muted); }
+.review-stars { color: var(--accent); font-size: 0.85rem; margin-bottom: 0.35rem; }
+.review-sort { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; }
+.review-sort select {
+  padding: 0.35rem 0.6rem; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text);
+}
+.bot-alert {
+  display: flex; gap: 0.75rem; padding: 0.85rem 1rem; margin-bottom: 1rem; border-radius: 10px;
+  background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; font-size: 0.85rem;
+}
+.bot-alert-high { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.review-flagged { border-left: 3px solid #f59e0b; }
+.review-form h3 { margin-bottom: 1.25rem; font-family: 'Poppins', sans-serif; }
+.form-group { margin-bottom: 1.15rem; }
+.form-group label { display: block; font-weight: 500; margin-bottom: 0.4rem; font-size: 0.9rem; }
+.form-group input, .form-group textarea {
+  width: 100%; padding: 0.65rem 0.85rem; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 0.95rem;
+}
+.star-rating { display: flex; gap: 0.35rem; font-size: 1.75rem; color: #cbd5e1; cursor: pointer; }
+.star-rating i.active, .star-rating i.hover { color: var(--accent); }
+.footer {
+  background: var(--card-bg); border-top: 1px solid var(--border); padding: 1.5rem 0;
+  text-align: center; font-size: 0.85rem; color: var(--text-muted);
+}
+.empty-state { grid-column: 1 / -1; text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+.city-btn.active { background: var(--secondary) !important; border-color: var(--secondary) !important; color: white !important; }
+@media (max-width: 640px) {
+  .header-inner { flex-direction: column; align-items: stretch; }
+  .logo { justify-content: center; }
+  .nav { justify-content: center; }
+  .search-bar { flex-direction: column; align-items: stretch; }
+  .providers { grid-template-columns: 1fr; }
+}
+  </style>
+</head>
+<body>
+  <header class="header">
+    <div class="container header-inner">
+      <div class="logo">
+        <i class="fas fa-heartbeat"></i>
+        <div>
+          <h1>Medora</h1>
+          <span>Bacolod • Silay • Talisay</span>
+        </div>
+      </div>
+      <nav class="nav">
+        <button class="nav-btn active" data-filter="all">All Types</button>
+        <button class="nav-btn" data-filter="hospital">Hospitals</button>
+        <button class="nav-btn" data-filter="clinic">Clinics</button>
+        <button class="nav-btn" data-filter="veterinary">Veterinarians</button>
+        <button class="nav-btn" data-filter="carehome">Care Homes</button>
+        <button class="nav-btn" data-filter="private">Private Practice</button>
+      </nav>
+      <nav class="nav city-nav">
+        <button class="nav-btn city-btn active" data-city="all">All Cities</button>
+        <button class="nav-btn city-btn" data-city="Bacolod">Bacolod</button>
+        <button class="nav-btn city-btn" data-city="Silay">Silay</button>
+        <button class="nav-btn city-btn" data-city="Talisay">Talisay</button>
+      </nav>
+      <button id="theme-toggle" class="theme-btn" aria-label="Toggle theme"><i class="fas fa-moon"></i></button>
+    </div>
+  </header>
+
+  <main class="container">
+    <section class="hero">
+      <h2>Healthcare, reviewed by the community</h2>
+      <p>Hospitals, clinics, veterinarians, and care homes across Bacolod, Silay & Talisay — with ratings you can trust.</p>
+      <div class="search-bar">
+        <i class="fas fa-search"></i>
+        <input type="text" id="search-input" placeholder="Search by name, specialty, or area...">
+        <select id="sort-select">
+          <option value="rating">Highest Rated</option>
+          <option value="name">Name A-Z</option>
+          <option value="reviews">Most Reviewed</option>
+        </select>
+        <label class="verified-toggle" title="Show only Medora-verified providers">
+          <input type="checkbox" id="verified-only">
+          <span><i class="fas fa-check-circle"></i> Verified only</span>
+        </label>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stat-card"><i class="fas fa-hospital"></i><div><strong id="stat-hospitals">0</strong><span>Hospitals</span></div></div>
+      <div class="stat-card"><i class="fas fa-clinic-medical"></i><div><strong id="stat-clinics">0</strong><span>Clinics</span></div></div>
+      <div class="stat-card"><i class="fas fa-paw"></i><div><strong id="stat-vets">0</strong><span>Veterinarians</span></div></div>
+      <div class="stat-card"><i class="fas fa-home"></i><div><strong id="stat-carehomes">0</strong><span>Care Homes</span></div></div>
+      <div class="stat-card"><i class="fas fa-user-md"></i><div><strong id="stat-private">0</strong><span>Private Practice</span></div></div>
+      <div class="stat-card"><i class="fas fa-star"></i><div><strong id="stat-reviews">0</strong><span>Reviews</span></div></div>
+    </section>
+
+    <section class="providers" id="providers-grid"></section>
+  </main>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close">&times;</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <div id="review-modal" class="modal hidden">
+    <div class="modal-content review-form">
+      <button class="modal-close" id="review-close">&times;</button>
+      <h3>Write a Review</h3>
+      <form id="review-form">
+        <input type="hidden" id="review-provider-id">
+        <div class="form-group">
+          <label for="reviewer-name">Your Name</label>
+          <input type="text" id="reviewer-name" required placeholder="Juan Dela Cruz">
+        </div>
+        <div class="form-group">
+          <label>Rating</label>
+          <div class="star-rating" id="star-rating">
+            <i class="far fa-star" data-value="1"></i>
+            <i class="far fa-star" data-value="2"></i>
+            <i class="far fa-star" data-value="3"></i>
+            <i class="far fa-star" data-value="4"></i>
+            <i class="far fa-star" data-value="5"></i>
+          </div>
+          <input type="hidden" id="review-rating" value="0" required>
+        </div>
+        <div class="form-group">
+          <label for="review-text">Your Review</label>
+          <textarea id="review-text" rows="4" required placeholder="Share your experience..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%">Submit Review</button>
+      </form>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="container">
+      <p>© 2026 Medora • Bacolod • Silay • Talisay</p>
+      <p style="margin-top:0.35rem;font-size:0.75rem;opacity:0.8">Community-driven directory. Always verify info with providers.</p>
+    </div>
+  </footer>
+
+  <script>
+/* === MEDORA APP DATA + LOGIC (single-file) === */
+const providers = [
+  {id:"clmmrh",name:"Corazon Locsin Montelibano Memorial Regional Hospital (CLMMRH)",type:"hospital",city:"Bacolod",category:"Public Tertiary Hospital",address:"Lacson Street corner Burgos Street, Bacolod City, Negros Occidental",phone:"(034) 435-1591 / (034) 703-1350",website:"https://clmmrh.doh.gov.ph",parking:"Limited on-site parking; street parking and nearby paid lots available.",description:"The largest DOH-retained government hospital in Western Visayas and the end-referral center for the region.",specialties:["Emergency","Pediatrics","OB-GYN","Surgery","Internal Medicine","Orthopedics"],baseRating:4.1,baseReviews:12,verified:true},
+  {id:"riverside",name:"Riverside Medical Center (Dr. Pablo O. Torre Memorial Hospital)",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"B.S. Aquino Drive, Bacolod City, Negros Occidental 6100",phone:"(034) 432-7624 / (034) 705-0000",website:"https://www.rivermedcenter.net",parking:"On-site patient & visitor parking available. Nearby Riverside Community Carpark.",description:"Largest private hospital in Bacolod. Modern facilities, broad HMO coverage. Member of Metro Pacific Health.",specialties:["Emergency","Cardiology","Cancer Care","Pediatrics","OB-GYN","Surgery"],baseRating:4.2,baseReviews:18,verified:true},
+  {id:"doctors-hospital",name:"The Doctors' Hospital, Inc.",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"B.S. Aquino Drive, Bacolod City, Negros Occidental 6100",phone:"(034) 468-2100 (Hotline 24/7)",website:"https://thedoctorshospital.com",parking:"Covered and frontage parking on-site. Limited spaces — arrive early.",description:"Premier private tertiary hospital serving Bacolod and Negros since 1950.",specialties:["Internal Medicine","Pediatrics","OB-GYN","Surgery","Ophthalmology"],baseRating:4.3,baseReviews:9,verified:true},
+  {id:"adventist",name:"Bacolod Adventist Medical Center",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"C.V. Ramos Avenue, Taculing, Bacolod City",phone:"(034) 488-7777",website:"https://adventisthealth-bcd.com",parking:"On-site parking available. Spacious grounds.",description:"Faith-based hospital with compassionate care and modern facilities.",specialties:["Emergency","General Medicine","Surgery","OB-GYN","Pediatrics"],baseRating:4.1,baseReviews:11,verified:true},
+  {id:"metro-bacolod",name:"Metro Bacolod Hospital and Medical Center",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Burgos Extension, Camingawan, Brgy. Estefania, Bacolod City",phone:"(034) 431-2013",website:"",parking:"On-site parking. Less congested area.",description:"Newer private facility with expanding specialties and good HMO coverage.",specialties:["General Medicine","Pediatrics","OB-GYN","Emergency"],baseRating:4.0,baseReviews:6,verified:true},
+  {id:"south-bacolod",name:"South Bacolod General Hospital and Medical Center",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Araneta Street, Bacolod City",phone:"(034) 704-2911",website:"",parking:"On-site and roadside parking.",description:"Convenient private hospital serving southern Bacolod. PhilHealth accredited.",specialties:["General Medicine","Emergency","Surgery","OB-GYN"],baseRating:3.9,baseReviews:5},
+  {id:"queen-of-mercy",name:"Bacolod Queen of Mercy Hospital",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Eroreco Lane Drive, Brgy. Mandalagan, Bacolod City",phone:"(034) 708-0181",website:"",description:"Private hospital known for specialized care including pediatrics.",specialties:["Pediatrics","General Medicine","OB-GYN","Emergency"],baseRating:4.0,baseReviews:7},
+  {id:"tljph",name:"Teresita L. Jalandoni Provincial Hospital (TLJPH)",type:"hospital",city:"Silay",category:"Public Level 2 General Hospital",address:"Brgy. Lantad / Rizal Street, Silay City, Negros Occidental",phone:"(034) 495-1705",website:"",parking:"On-site parking along national highway.",description:"Provincial government hospital in Silay. Level 2 with ICU and specialty services.",specialties:["Emergency","Internal Medicine","Pediatrics","OB-GYN","Surgery"],baseRating:3.8,baseReviews:8,verified:true},
+  {id:"tmc-clinic",name:"The Medical City Clinic – Ayala Malls Capitol Central",type:"clinic",city:"Bacolod",category:"Outpatient Clinic",address:"2nd Level, Ayala Malls Capitol Central, Bacolod City",phone:"(02) 8396-9898",website:"",description:"Hospital-quality outpatient care in a mall location.",specialties:["General Consultation","Laboratory","Imaging"],baseRating:4.4,baseReviews:8},
+  {id:"doh-wellness",name:"DOH Wellness Clinic – SM City Bacolod",type:"clinic",city:"Bacolod",category:"Government Wellness Hub",address:"3rd Floor, North Wing, SM City Bacolod",phone:"",website:"",description:"First DOH wellness clinic in the Visayas. Free screenings and consultations.",specialties:["Health Screening","Nutrition","Pediatrics","Telemedicine"],baseRating:4.5,baseReviews:4},
+  {id:"maxicare-pcc",name:"Maxicare Primary Care Clinic – Bacolod",type:"clinic",city:"Bacolod",category:"HMO Primary Care",address:"Lopues Mandalagan Building, Lacson Street, Bacolod City",phone:"(034) 458-6715",website:"",description:"Primary care for Maxicare members and walk-ins.",specialties:["General Consultation","Laboratory","Primary Care"],baseRating:4.4,baseReviews:10},
+  {id:"silay-cho",name:"Silay City Health Office",type:"clinic",city:"Silay",category:"Government Health Center",address:"Senator Jose Locsin Street, Barangay V, Silay City",phone:"(034) 495-5018",website:"",description:"Main government health office of Silay City.",specialties:["General Consultation","Maternal Care","Immunization"],baseRating:4.0,baseReviews:5},
+  {id:"talisay-cho",name:"Talisay City Health Office",type:"clinic",city:"Talisay",category:"Government Health Center",address:"Bonifacio Street, Talisay City",phone:"(034) 495-5991",website:"",description:"Primary government health facility for Talisay residents.",specialties:["General Consultation","Maternal Care","Senior Care"],baseRating:3.9,baseReviews:6},
+  {id:"animal-bite-talisay",name:"Dr. Care Animal Bite Center and Medical Clinic – Talisay",type:"clinic",city:"Talisay",category:"Animal Bite & Medical Clinic",address:"Corner Bonifacio – Felipe Lacson Streets, Talisay City",phone:"0962-902-4565",website:"",description:"RITM-trained Animal Bite Center open daily including holidays.",specialties:["Animal Bite Treatment","Anti-Rabies","General Medical Care"],baseRating:4.5,baseReviews:7},
+  {id:"mandalagan-vet",name:"Mandalagan Veterinary Hospital and Marketing",type:"veterinary",city:"Bacolod",category:"Animal Hospital",address:"310 Lacson Street, Mandalagan, Bacolod City",phone:"+63 960 360 1677",website:"https://www.mvhmarketing.com",description:"One of the most reviewed veterinary hospitals in Bacolod.",specialties:["Consultation","Surgery","Diagnostics","Vaccination"],baseRating:4.3,baseReviews:22},
+  {id:"alivet",name:"Alivet Animal Clinic",type:"veterinary",city:"Bacolod",category:"Veterinary Clinic",address:"Door 2, Garces Building, Alijis Road, Bacolod City",phone:"+63 908 695 8978",website:"",description:"Compassionate veterinary care. Consultation, vaccination, surgery, grooming.",specialties:["Consultation","Vaccination","Surgery","Grooming"],baseRating:4.3,baseReviews:14},
+  {id:"de-perro",name:"De Perro Pet Clinic and Supplies",type:"veterinary",city:"Bacolod",category:"Pet Clinic & Shop",address:"Victorina Heights, Door 4 & 5, Bacolod City",phone:"+63 917 252 5754",website:"",description:"Highly rated clinic with friendly staff and good outcomes.",specialties:["Consultation","Vaccination","Surgery","Pet Supplies"],baseRating:4.8,baseReviews:16},
+  {id:"happyfeet",name:"Happyfeet Veterinary Clinic",type:"veterinary",city:"Bacolod",category:"Veterinary Clinic",address:"Guadalupe Building, Araneta Avenue, Bacolod City",phone:"+63 921 923 1333",website:"",description:"Attentive care and good communication with pet parents.",specialties:["Consultation","Vaccination","Surgery","Grooming"],baseRating:4.6,baseReviews:12,verified:true},
+  {id:"barkery-silay",name:"Barkery Animal Clinic",type:"veterinary",city:"Silay",category:"Veterinary Clinic & Grooming",address:"Hugos-Walden Building, Sen. Jose Locsin Street, Silay City",phone:"(034) 714-3994",website:"",description:"Full-service vet clinic and pet grooming in Silay.",specialties:["Consultation","Vaccination","Grooming","Surgery"],baseRating:4.7,baseReviews:10,verified:true},
+  {id:"royal-k9",name:"Royal K9 Animal Clinic",type:"veterinary",city:"Talisay",category:"Veterinary Clinic",address:"Mabini Street, Brgy. Zone II, Talisay City",phone:"(034) 213-5440",website:"",description:"Clinic visits and home services for vaccination and consultation.",specialties:["Consultation","Vaccination","Deworming","Home Service"],baseRating:4.4,baseReviews:9},
+  {id:"st-vincent-home",name:"St. Vincent's Home for the Aged",type:"carehome",city:"Bacolod",category:"Home for the Aged",address:"St. Vincent's Village, Brgy. Tangub, Bacolod City",phone:"(034) 432-0011",website:"",parking:"On-site parking within compound.",description:"DSWD-accredited home for neglected and abandoned elderly. Managed by Daughters of Charity.",specialties:["Elderly Care","Shelter","Social Services"],baseRating:4.3,baseReviews:11,verified:true},
+  {id:"st-marys-home",name:"St. Mary's Home for the Aged",type:"carehome",city:"Bacolod",category:"Home for the Aged",address:"Brgy. Alangilan, Bacolod City",phone:"(034) 433-3310",website:"",description:"Charitable facility offering shelter and care for abandoned elderly.",specialties:["Elderly Care","Shelter","Health Services"],baseRating:4.1,baseReviews:8},
+  {id:"divine-mercy-home",name:"Divine Mercy Home for the Elderly",type:"carehome",city:"Silay",category:"Home for the Elderly",address:"Brgy. Bagtic, Silay City",phone:"+63 946 064 7194",website:"",description:"Home for abandoned and poor elderly in Silay. Compassionate care for seniors.",specialties:["Elderly Care","Shelter","Charitable Care"],baseRating:4.5,baseReviews:4,verified:true},
+  {id:"rivendel",name:"Rivendel Wellness and Leisure Park",type:"carehome",city:"Talisay",category:"Retirement & Wellness Community",address:"Talisay City / near Bacolod-Silay area",phone:"",website:"https://www.rivendelwellnessandleisure.com/",description:"Premium retirement park with assisted living, rehab, and wellness programs.",specialties:["Assisted Living","Rehabilitation","Hospice","Wellness"],baseRating:4.6,baseReviews:7,verified:true},
+  {id:"david-medical",name:"David Medical Clinic (ENT)",type:"private",city:"Bacolod",category:"Private Practice – ENT",address:"35 Burgos Street, Barangay 18, Bacolod City",phone:"(034) 435-8771",website:"",parking:"Limited street parking. Appointment preferred.",description:"Private ENT–Head & Neck Surgery clinic of Dr. Michael Joseph C. David, FPSO-HNS.",specialties:["ENT","Head & Neck Surgery","Voice & Swallowing"],baseRating:4.7,baseReviews:14,verified:true},
+  {id:"paez-clinic",name:"Paez Medical Clinic",type:"private",city:"Silay",category:"Private Practice – Primary Care",address:"Unit 14, Montinola Building, Bonifacio Street, Silay City",phone:"(034) 476-1458",website:"",parking:"Street parking along Bonifacio St.",description:"Family primary care by Dr. Daniel T. Paez Jr. & Dr. Larny Joy Paez.",specialties:["Primary Care","ECG","Ultrasound","Laboratory"],baseRating:4.5,baseReviews:9,verified:true},
+  {id:"breast-clinic-vli",name:"205 Breast Clinic – VLI Medical Plaza",type:"private",city:"Bacolod",category:"Private Practice – Breast Surgical Oncology",address:"205 Breast Clinic, VLI Medical Plaza, B.S. Aquino Drive, Bacolod City",phone:"",website:"",description:"Specialty clinic for breast disease evaluation, biopsy, and oncoplastic surgery.",specialties:["Breast Surgery","Oncology","Breast Screening"],baseRating:4.8,baseReviews:11,verified:true},
+  {id:"c-m-medical",name:"C&M Medical Clinic",type:"private",city:"Bacolod",category:"Private Practice – Internal Medicine",address:"Cor. Raymond Street, Brgy. Singcang Airport, Bacolod City",phone:"",website:"",description:"Internal medicine for adults and elderly. Flexible scheduling.",specialties:["Internal Medicine","Adult Care","Elderly Care"],baseRating:4.4,baseReviews:7,verified:false},
+  {id:"gohing-ob",name:"Gohing OB-Gyne & Ultrasound Clinic",type:"private",city:"Silay",category:"Private Practice – Obstetrics & Gynecology",address:"Door #4 Hugos-Walden Building, Jose Locsin Street, Silay City",phone:"",website:"",description:"Private OB-Gyne clinic with prenatal care and ultrasound.",specialties:["OB-Gyne","Ultrasound","Prenatal Care"],baseRating:4.6,baseReviews:8,verified:true}
+];
+
+const sampleReviews = {
+  "clmmrh":[{name:"Maria S.",rating:4,text:"Affordable care and competent doctors. Expect longer waiting times in OPD.",date:"2026-03-12"},{name:"Jose R.",rating:5,text:"Saved my father's life. The ER team was fast and professional.",date:"2025-11-20"}],
+  "riverside":[{name:"Anna L.",rating:5,text:"Clean, modern facilities. HMO accepted without issues.",date:"2026-01-15"},{name:"Carlo M.",rating:4,text:"Great doctors and nurses. Billing can take time.",date:"2025-09-08"}],
+  "doctors-hospital":[{name:"Elena P.",rating:5,text:"Been going here for years. Specialists explain everything clearly.",date:"2026-02-28"}],
+  "c-m-medical":[{name:"User123",rating:5,text:"Great",date:"2026-06-01"},{name:"User123",rating:5,text:"Great",date:"2026-06-01"},{name:"User456",rating:5,text:"Great",date:"2026-06-01"},{name:"Anon",rating:5,text:"Excellent",date:"2026-06-01"},{name:"RealPatient",rating:4,text:"Doctor was thorough and explained lab results clearly.",date:"2026-05-20"}]
+};
+
+let currentFilter="all",currentCity="all",currentSearch="",currentSort="rating",verifiedOnly=false;
+let userReviews=JSON.parse(localStorage.getItem("bacolodHealthReviews")||"{}");
+
+function getReviews(id){return[...(userReviews[id]||[]),...(sampleReviews[id]||[])];}
+function getAverageRating(id){
+  const p=providers.find(x=>x.id===id);if(!p)return 0;
+  const r=getReviews(id);if(!r.length)return p.baseRating;
+  const sum=r.reduce((a,x)=>a+x.rating,0);
+  return Math.round(((p.baseRating*p.baseReviews+sum)/(p.baseReviews+r.length))*10)/10;
+}
+function getReviewCount(id){const p=providers.find(x=>x.id===id);return p?p.baseReviews+getReviews(id).length:0;}
+function renderStars(r){
+  let h="";const f=Math.floor(r),half=r%1>=0.5;
+  for(let i=0;i<f;i++)h+='<i class="fas fa-star"></i>';
+  if(half)h+='<i class="fas fa-star-half-alt"></i>';
+  for(let i=0;i<5-f-(half?1:0);i++)h+='<i class="far fa-star"></i>';
+  return h;
+}
+function updateStats(){
+  document.getElementById("stat-hospitals").textContent=providers.filter(p=>p.type==="hospital").length;
+  document.getElementById("stat-clinics").textContent=providers.filter(p=>p.type==="clinic").length;
+  document.getElementById("stat-vets").textContent=providers.filter(p=>p.type==="veterinary").length;
+  document.getElementById("stat-carehomes").textContent=providers.filter(p=>p.type==="carehome").length;
+  document.getElementById("stat-private").textContent=providers.filter(p=>p.type==="private").length;
+  let t=0;providers.forEach(p=>t+=getReviewCount(p.id));
+  document.getElementById("stat-reviews").textContent=t;
+}
+function typeLabel(t){return{hospital:"Hospital",clinic:"Clinic",veterinary:"Veterinary",carehome:"Care Home",private:"Private Practice"}[t]||"Provider";}
+function renderProviders(){
+  const grid=document.getElementById("providers-grid");
+  let filtered=providers.filter(p=>{
+    const mf=currentFilter==="all"||p.type===currentFilter;
+    const mc=currentCity==="all"||p.city===currentCity;
+    const mv=!verifiedOnly||p.verified===true;
+    const s=currentSearch.toLowerCase();
+    const ms=!s||p.name.toLowerCase().includes(s)||p.address.toLowerCase().includes(s)||(p.specialties&&p.specialties.some(x=>x.toLowerCase().includes(s)));
+    return mf&&mc&&mv&&ms;
+  });
+  filtered.sort((a,b)=>{
+    if(currentSort==="name")return a.name.localeCompare(b.name);
+    if(currentSort==="reviews")return getReviewCount(b.id)-getReviewCount(a.id);
+    return getAverageRating(b.id)-getAverageRating(a.id);
+  });
+  if(!filtered.length){grid.innerHTML='<div class="empty-state"><i class="fas fa-search"></i><p>No providers found.</p></div>';return;}
+  grid.innerHTML=filtered.map(p=>{
+    const rating=getAverageRating(p.id),count=getReviewCount(p.id);
+    return`<article class="provider-card" data-id="${p.id}">
+      <div class="card-header"><span class="card-type type-${p.type}">${typeLabel(p.type)}</span><span class="card-city">${p.city}</span></div>
+      <div class="card-body">
+        <h3>${p.name}</h3>
+        ${p.verified?'<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified by Medora</span>':''}
+        <p class="card-meta"><i class="fas fa-map-marker-alt"></i> ${p.address.split(",")[0]}, ${p.city}</p>
+        ${p.phone?`<p class="card-meta"><i class="fas fa-phone"></i> ${p.phone}</p>`:''}
+        ${p.parking?`<p class="card-meta"><i class="fas fa-parking"></i> Parking available</p>`:''}
+        <div class="card-rating"><span class="stars">${renderStars(rating)}</span><span class="rating-value">${rating.toFixed(1)}</span><span class="review-count">(${count} reviews)</span></div>
+      </div>
+      <div class="card-footer">
+        <button class="btn btn-outline view-btn" data-id="${p.id}"><i class="fas fa-info-circle"></i> Details</button>
+        <button class="btn btn-primary review-btn" data-id="${p.id}"><i class="fas fa-pen"></i> Review</button>
+      </div>
+    </article>`;
+  }).join("");
+  document.querySelectorAll(".view-btn").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();openModal(b.dataset.id);}));
+  document.querySelectorAll(".review-btn").forEach(b=>b.addEventListener("click",e=>{e.stopPropagation();openReviewForm(b.dataset.id);}));
+  document.querySelectorAll(".provider-card").forEach(c=>c.addEventListener("click",()=>openModal(c.dataset.id)));
+}
+function sortReviews(reviews,sortBy){
+  const s=[...reviews];
+  if(sortBy==="oldest")return s.sort((a,b)=>new Date(a.date)-new Date(b.date));
+  if(sortBy==="highest")return s.sort((a,b)=>b.rating-a.rating);
+  if(sortBy==="lowest")return s.sort((a,b)=>a.rating-b.rating);
+  return s.sort((a,b)=>new Date(b.date)-new Date(a.date));
+}
+function detectBotSignals(reviews){
+  if(!reviews||reviews.length<2)return{flags:[],score:0};
+  const flags=[];let score=0;
+  const texts=reviews.map(r=>(r.text||"").trim().toLowerCase());
+  const counts={};texts.forEach(t=>{if(t.length>=8)counts[t]=(counts[t]||0)+1;});
+  const rep=Object.entries(counts).filter(([,c])=>c>=2);
+  if(rep.length){flags.push(`Repeated text (${rep.length} pattern${rep.length>1?"s":""})`);score+=rep.length*2;}
+  const byA={};reviews.forEach(r=>{const n=(r.name||"anon").toLowerCase();if(!byA[n])byA[n]=[];byA[n].push(r);});
+  Object.values(byA).forEach(list=>{if(list.length>=3){flags.push(`Same name left ${list.length} reviews`);score+=2;}});
+  const gen=reviews.filter(r=>{const t=(r.text||"").toLowerCase();return t.length<15||/^(good|great|nice|ok|excellent|bad)\.?$/i.test(t.trim());});
+  if(gen.length>=3&&gen.length/reviews.length>0.4){flags.push("Many short/generic reviews");score+=2;}
+  return{flags,score};
+}
+function renderReviewsSection(id,sortBy="recent"){
+  const reviews=getReviews(id),sorted=sortReviews(reviews,sortBy),bot=detectBotSignals(reviews);
+  let botAlert="";
+  if(bot.score>=3)botAlert=`<div class="bot-alert ${bot.score>=5?"bot-alert-high":""}"><i class="fas fa-robot"></i><div><strong>${bot.score>=5?"High bot / spam risk":"Possible repetitive activity"}</strong><ul>${bot.flags.map(f=>`<li>${f}</li>`).join("")}</ul></div></div>`;
+  const sortCtrl=reviews.length>1?`<div class="review-sort"><label>Sort:</label><select onchange="changeReviewSort('${id}',this.value)"><option value="recent" ${sortBy==="recent"?"selected":""}>Most Recent</option><option value="highest" ${sortBy==="highest"?"selected":""}>Highest Rated</option><option value="lowest" ${sortBy==="lowest"?"selected":""}>Lowest Rated</option><option value="oldest" ${sortBy==="oldest"?"selected":""}>Oldest First</option></select></div>`:"";
+  const html=sorted.length?sorted.map(r=>{
+    const isDup=bot.flags.some(f=>f.includes("Repeated"))&&sorted.filter(x=>(x.text||"").trim().toLowerCase()===(r.text||"").trim().toLowerCase()).length>=2;
+    return`<div class="review-item ${isDup?"review-flagged":""}"><div class="review-header"><span class="review-author">${r.name}</span><span class="review-date">${r.date}</span></div><div class="review-stars">${renderStars(r.rating)}</div><p>${r.text}</p></div>`;
+  }).join(""):`<p style="text-align:center;color:var(--text-muted);padding:1.5rem;font-style:italic">No reviews yet. Be the first!</p>`;
+  return`<div class="reviews-section"><h3>Reviews <button class="btn btn-primary" style="padding:0.35rem 0.75rem;font-size:0.8rem;width:auto" onclick="openReviewForm('${id}')"><i class="fas fa-plus"></i> Add Review</button></h3>${sortCtrl}${botAlert}${html}</div>`;
+}
+function changeReviewSort(id,sortBy){window._currentReviewSort=sortBy;openModal(id,sortBy);}
+window.changeReviewSort=changeReviewSort;
+function openModal(id,sortBy="recent"){
+  const p=providers.find(x=>x.id===id);if(!p)return;
+  const rating=getAverageRating(id);
+  const activeSort=sortBy||window._currentReviewSort||"recent";
+  document.getElementById("modal-body").innerHTML=`
+    <div class="modal-header"><span class="card-type type-${p.type}">${typeLabel(p.type)} • ${p.category}</span>
+    <h2>${p.name}</h2>${p.verified?'<span class="verified-badge"><i class="fas fa-check-circle"></i> Verified by Medora</span>':''}</div>
+    <div class="modal-rating-big"><span class="big-num">${rating.toFixed(1)}</span><div><div class="stars">${renderStars(rating)}</div><div class="review-count">${getReviewCount(id)} reviews</div></div></div>
+    <div class="modal-info">
+      <p><i class="fas fa-map-marker-alt"></i> <strong>Address:</strong> ${p.address||"Not listed"}</p>
+      <p><i class="fas fa-phone"></i> <strong>Phone:</strong> ${p.phone||"Not listed"}</p>
+      <p><i class="fas fa-globe"></i> <strong>Website:</strong> ${p.website?`<a href="${p.website}" target="_blank" rel="noopener">${p.website.replace(/^https?:\/\//,"")}</a>`:"Not listed"}</p>
+      <p><i class="fas fa-parking"></i> <strong>Parking:</strong> ${p.parking||"Street / limited on-site (confirm on arrival)"}</p>
+      <p><i class="fas fa-stethoscope"></i> <strong>Services:</strong> ${p.specialties.join(" • ")}</p>
+    </div>
+    <p style="margin-bottom:1.25rem;color:var(--text-muted);font-size:0.95rem">${p.description}</p>
+    ${renderReviewsSection(id,activeSort)}`;
+  document.getElementById("modal").classList.remove("hidden");
+}
+function openReviewForm(id){
+  document.getElementById("review-provider-id").value=id;
+  document.getElementById("reviewer-name").value="";
+  document.getElementById("review-text").value="";
+  document.getElementById("review-rating").value="0";
+  document.querySelectorAll("#star-rating i").forEach(s=>{s.classList.remove("active","fas");s.classList.add("far");});
+  document.getElementById("review-modal").classList.remove("hidden");
+  document.getElementById("modal").classList.add("hidden");
+}
+window.openReviewForm=openReviewForm;
+function closeModals(){document.getElementById("modal").classList.add("hidden");document.getElementById("review-modal").classList.add("hidden");}
+
+document.querySelectorAll(".nav-btn:not(.city-btn)").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".nav-btn:not(.city-btn)").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");currentFilter=btn.dataset.filter;renderProviders();
+}));
+document.querySelectorAll(".city-btn").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".city-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");currentCity=btn.dataset.city;renderProviders();
+}));
+document.getElementById("search-input").addEventListener("input",e=>{currentSearch=e.target.value;renderProviders();});
+document.getElementById("sort-select").addEventListener("change",e=>{currentSort=e.target.value;renderProviders();});
+document.getElementById("verified-only").addEventListener("change",e=>{verifiedOnly=e.target.checked;renderProviders();});
+document.getElementById("modal-close").addEventListener("click",closeModals);
+document.getElementById("review-close").addEventListener("click",closeModals);
+document.getElementById("modal").addEventListener("click",e=>{if(e.target.id==="modal")closeModals();});
+document.getElementById("review-modal").addEventListener("click",e=>{if(e.target.id==="review-modal")closeModals();});
+
+const starContainer=document.getElementById("star-rating");
+starContainer.addEventListener("mouseover",e=>{
+  if(e.target.tagName==="I"){const val=parseInt(e.target.dataset.value);
+    starContainer.querySelectorAll("i").forEach((s,i)=>{if(i<val){s.classList.add("hover","fas");s.classList.remove("far");}else{s.classList.remove("hover","fas");s.classList.add("far");}});}});
+starContainer.addEventListener("mouseleave",()=>{
+  const current=parseInt(document.getElementById("review-rating").value)||0;
+  starContainer.querySelectorAll("i").forEach((s,i)=>{s.classList.remove("hover");if(i<current){s.classList.add("active","fas");s.classList.remove("far");}else{s.classList.remove("active","fas");s.classList.add("far");}});});
+starContainer.addEventListener("click",e=>{
+  if(e.target.tagName==="I"){const val=parseInt(e.target.dataset.value);
+    document.getElementById("review-rating").value=val;
+    starContainer.querySelectorAll("i").forEach((s,i)=>{if(i<val){s.classList.add("active","fas");s.classList.remove("far");}else{s.classList.remove("active","fas");s.classList.add("far");}});}});
+
+document.getElementById("review-form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const id=document.getElementById("review-provider-id").value;
+  const name=document.getElementById("reviewer-name").value.trim();
+  const rating=parseInt(document.getElementById("review-rating").value);
+  const text=document.getElementById("review-text").value.trim();
+  if(!rating||rating<1){alert("Please select a rating.");return;}
+  if(!userReviews[id])userReviews[id]=[];
+  userReviews[id].unshift({name,rating,text,date:new Date().toISOString().split("T")[0]});
+  localStorage.setItem("bacolodHealthReviews",JSON.stringify(userReviews));
+  closeModals();updateStats();renderProviders();openModal(id);
+});
+
+const themeToggle=document.getElementById("theme-toggle");
+if(localStorage.getItem("bacolodTheme")==="dark"){document.documentElement.setAttribute("data-theme","dark");themeToggle.innerHTML='<i class="fas fa-sun"></i>';}
+themeToggle.addEventListener("click",()=>{
+  const isDark=document.documentElement.getAttribute("data-theme")==="dark";
+  if(isDark){document.documentElement.removeAttribute("data-theme");themeToggle.innerHTML='<i class="fas fa-moon"></i>';localStorage.setItem("bacolodTheme","light");}
+  else{document.documentElement.setAttribute("data-theme","dark");themeToggle.innerHTML='<i class="fas fa-sun"></i>';localStorage.setItem("bacolodTheme","dark");}
+});
+
+document.addEventListener("DOMContentLoaded", function() {
+  try {
+    updateStats();
+    renderProviders();
+  } catch (err) {
+    document.getElementById("providers-grid").innerHTML =
+      '<div class="empty-state"><p>Error loading providers. Please re-download the file.</p><p style="font-size:0.8rem">' + err.message + '</p></div>';
+    console.error(err);
+  }
+});
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (refreshing) return;
+      refreshing = true;
+      location.reload();
+    });
+    navigator.serviceWorker.register('./sw.js', { updateViaCache: 'none' }).then((reg) => {
+      reg.update().catch(() => {});
+    }).catch(() => {});
+  });
+}
+  </script>
+</body>
+</html>

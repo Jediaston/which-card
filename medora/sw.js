@@ -1,4 +1,4 @@
-const CACHE = "ai-build-hub-v6";
+const CACHE = "medora-v1";
 const CORE_ASSETS = [
   "./",
   "./index.html",

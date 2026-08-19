@@ -1,0 +1,15 @@
+{
+  "name": "Medora – Hospitals, Clinics & Vets in Bacolod, Silay & Talisay",
+  "short_name": "Medora",
+  "description": "Find and review hospitals, clinics, veterinarians, and care homes in Bacolod, Silay, and Talisay.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#f7f3ee",
+  "theme_color": "#c45c26",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
