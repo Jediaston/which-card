@@ -1,4 +1,4 @@
-const CACHE = "medora-v1";
+const CACHE = "medora-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
