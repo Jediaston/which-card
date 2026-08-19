@@ -1,7 +1,7 @@
 {
-  "name": "Medora – Hospitals, Clinics & Vets in Bacolod, Silay & Talisay",
+  "name": "Medora – Healthcare Directory for Bacolod, Silay & Talisay",
   "short_name": "Medora",
-  "description": "Find and review hospitals, clinics, veterinarians, and care homes in Bacolod, Silay, and Talisay.",
+  "description": "Directory of hospitals, clinics, veterinarians, care homes, and private practices in Bacolod, Silay, and Talisay, Negros Occidental.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
