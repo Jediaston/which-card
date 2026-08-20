@@ -1689,6 +1689,25 @@
         const data = await res.json();
         let meals = data.meals || [];
 
+        // TheMealDB matches literal substrings of the full title, so a common
+        // two-word dish name (e.g. "Spaghetti Carbonara") can miss when the
+        // real title has an extra word in the middle (e.g. "Spaghetti alla
+        // Carbonara"). Retry with just the most distinctive (last) word
+        // before giving up.
+        if (meals.length === 0 && q.includes(' ')) {
+          const words = q.split(/\s+/).filter(Boolean);
+          const lastWord = words[words.length - 1];
+          if (lastWord.length > 3) {
+            try {
+              const res2 = await fetch(`https://www.themealdb.com/api/json/v1/1/search.php?s=${encodeURIComponent(lastWord)}`);
+              if (res2.ok) {
+                const data2 = await res2.json();
+                meals = data2.meals || [];
+              }
+            } catch (e) {}
+          }
+        }
+
         // Merge local Filipino matches
         const localHits = findLocalMatches(q);
         const existingNames = new Set(meals.map(m => m.strMeal.toLowerCase()));
