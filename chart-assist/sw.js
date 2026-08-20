@@ -1,4 +1,4 @@
-const CACHE = "chart-assist-v3";
+const CACHE = "chart-assist-v4";
 const CORE_ASSETS = [
   "./",
   "./index.html",
