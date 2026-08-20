@@ -94,9 +94,15 @@
   .copy-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600;border-radius:6px;padding:8px 12px;background:var(--navy);color:#fff;border:none;cursor:pointer;}
   .regen-btn{font-size:12px;font-weight:500;border-radius:6px;padding:7px 10px;border:1px solid var(--border);color:var(--muted);background:#fff;cursor:pointer;}
   .edited-note{font-size:12px;color:var(--muted);margin-top:8px;}
+  .demo-banner{position:sticky;top:0;z-index:20;background:var(--amber-light);border-bottom:1px solid #E8D4B4;
+               color:#6B5310;font-size:13.5px;line-height:1.5;padding:10px 16px}
+  .demo-banner .inner{max-width:1180px;margin:0 auto}
 </style>
 </head>
 <body>
+<div class="demo-banner" role="status">
+  <div class="inner">Personal demo — not a coverage determination. Do not enter real member, patient, or claim data. Nothing is saved.</div>
+</div>
 <div class="bar">
   <div class="wrap brandrow">
     <div class="brand">
@@ -478,7 +484,7 @@ function renderBuilder(){
       ${sectionsHtml}
       <div class="section">
         <h4>Additional narrative (optional)</h4>
-        <textarea class="narrative" id="${narrId}" rows="3" placeholder="Add anything not captured above…" data-action="narrative-input">${esc(state.narrative[state.activeId] || "")}</textarea>
+        <textarea class="narrative" id="${narrId}" rows="3" autocomplete="off" placeholder="Add anything not captured above… (synthetic / demo only; nothing is saved)" data-action="narrative-input">${esc(state.narrative[state.activeId] || "")}</textarea>
       </div>
     </div>
   `;
@@ -499,7 +505,7 @@ function renderNote(){
     </div>
     <div class="notebox">
       <div class="paper">
-        <textarea id="${noteId}" class="font-mono" rows="16" data-action="manual-note">${esc(displayed)}</textarea>
+        <textarea id="${noteId}" class="font-mono" rows="16" autocomplete="off" data-action="manual-note">${esc(displayed)}</textarea>
       </div>
       <div class="notefoot">
         <button type="button" class="copy-btn" data-action="copy-note">${state.copied ? "✓ Copied" : "⧉ Copy note"}</button>

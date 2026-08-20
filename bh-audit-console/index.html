@@ -136,9 +136,15 @@
   .dx-plain{font-size:13.5px;margin:5px 0 0;line-height:1.55}
   .dx-note{font-size:12px;color:var(--mute);margin:5px 0 0;line-height:1.6;
            padding-left:11px;border-left:2px solid var(--hair)}
+  .demo-banner{position:sticky;top:0;z-index:20;background:#F3EEE2;border-bottom:1px solid #E2D3B0;
+               color:#6B5310;font-size:13.5px;line-height:1.5;padding:10px 20px}
+  .demo-banner .inner{max-width:1060px;margin:0 auto}
 </style>
 </head>
 <body>
+<div class="demo-banner" role="status">
+  <div class="inner">Personal demo — not a coverage determination. Do not enter real member, patient, or claim data. Nothing is saved.</div>
+</div>
 <div class="wrap">
   <header>
     <div>
@@ -171,13 +177,13 @@
         <label class="check"><input type="checkbox" id="f-tele"> Delivered by synchronous telehealth</label>
         <div id="drop" class="drop">
           <input type="file" id="f-file" accept=".txt,.md,.rtf,.csv,.log,.docx" hidden>
-          <button type="button" class="btn ghost" id="pick">Upload a note file</button>
-          <span class="drop-h">or drag one here &mdash; .txt, .md, .rtf, .docx</span>
+          <button type="button" class="btn ghost" id="pick">Upload a demo note</button>
+          <span class="drop-h">synthetic / demo files only &mdash; .txt, .md, .rtf, .docx. Not saved.</span>
           <span id="f-status"></span>
         </div>
-        <label><span class="lbl">Progress note text</span><textarea id="f-note" rows="8"></textarea></label>
-        <p style="font-size:12px;color:#7A8A8E;margin:0">Note text is scanned for the documentation
-        elements each code depends on. Everything stays in this browser tab &mdash; nothing is sent anywhere.</p>
+        <label><span class="lbl">Progress note text (synthetic / demo only)</span><textarea id="f-note" rows="8" autocomplete="off" placeholder="Paste a synthetic or demo note only. Nothing is saved."></textarea></label>
+        <p style="font-size:12px;color:#7A8A8E;margin:0">Note text is scanned in this tab for the documentation
+        elements each code depends on. Nothing is saved or sent anywhere.</p>
       </section>
 
       <section>
