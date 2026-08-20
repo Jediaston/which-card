@@ -27,6 +27,7 @@
   --primary-light: #e08556;
   --secondary: #1f7a72;
   --secondary-dark: #145a54;
+  --accent: #b8860b;
   --bg: #f7f3ee;
   --card-bg: #fffcf7;
   --text: #241f19;
@@ -41,6 +42,7 @@
   --primary-light: #ecab7f;
   --secondary: #4bb3a8;
   --secondary-dark: #2f8a80;
+  --accent: #d4a84b;
   --bg: #1c1916;
   --card-bg: #2a2520;
   --text: #f5efe6;
@@ -154,6 +156,10 @@ body {
 }
 .card-meta { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.35rem; }
 .card-meta i { width: 16px; margin-right: 0.35rem; color: var(--primary); }
+.card-rating { display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; }
+.stars { color: var(--accent); font-size: 0.9rem; }
+.rating-value { font-weight: 600; font-size: 0.9rem; }
+.review-count { font-size: 0.8rem; color: var(--text-muted); }
 .card-footer {
   padding: 0.75rem 1.25rem; border-top: 1px solid var(--border);
 }
@@ -190,6 +196,31 @@ body {
   font-size: 0.75rem; padding: 0.25rem 0.6rem; border-radius: 999px;
   background: var(--bg); border: 1px solid var(--border); color: var(--text-muted);
 }
+.modal-rating-big {
+  display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.25rem;
+  padding: 1rem; background: var(--bg); border-radius: 10px;
+}
+.modal-rating-big .big-num { font-size: 2rem; font-weight: 700; }
+.reviews-section { margin-top: 1.25rem; }
+.reviews-section h3 { font-size: 1.05rem; margin-bottom: 0.75rem; }
+.review-sort { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; font-size: 0.875rem; color: var(--text-muted); }
+.review-sort select {
+  padding: 0.35rem 0.6rem; border-radius: 8px; border: 1px solid var(--border);
+  background: var(--bg); color: var(--text);
+}
+.review-item { border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: 0.75rem; }
+.review-header { display: flex; justify-content: space-between; margin-bottom: 0.4rem; gap: 0.5rem; }
+.review-author { font-weight: 600; }
+.review-date { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+.review-stars { color: var(--accent); font-size: 0.85rem; margin-bottom: 0.35rem; }
+.bot-alert {
+  display: flex; gap: 0.75rem; padding: 0.85rem 1rem; margin-bottom: 1rem; border-radius: 10px;
+  background: #fef3c7; border: 1px solid #f59e0b; color: #92400e; font-size: 0.85rem;
+}
+.bot-alert i { flex-shrink: 0; margin-top: 0.15rem; }
+.bot-alert ul { margin: 0.3rem 0 0 1.1rem; padding: 0; }
+.bot-alert-high { background: #fee2e2; border-color: #ef4444; color: #991b1b; }
+.review-flagged { border-left: 3px solid #f59e0b; }
 .footer {
   background: var(--card-bg); border-top: 1px solid var(--border); padding: 1.5rem 0;
   text-align: center; font-size: 0.85rem; color: var(--text-muted);
@@ -244,6 +275,8 @@ body {
         <input type="text" id="search-input" placeholder="Search by name, specialty, or area...">
         <select id="sort-select">
           <option value="name">Name A-Z</option>
+          <option value="rating">Highest Rated</option>
+          <option value="reviews">Most Reviewed</option>
           <option value="city">City</option>
           <option value="type">Type</option>
         </select>
@@ -256,6 +289,7 @@ body {
       <div class="stat-card"><i class="fas fa-paw"></i><div><strong id="stat-vets">0</strong><span>Veterinarians</span></div></div>
       <div class="stat-card"><i class="fas fa-home"></i><div><strong id="stat-carehomes">0</strong><span>Care Homes</span></div></div>
       <div class="stat-card"><i class="fas fa-user-md"></i><div><strong id="stat-private">0</strong><span>Private Practice</span></div></div>
+      <div class="stat-card"><i class="fas fa-star"></i><div><strong id="stat-reviews">0</strong><span>Reviews</span></div></div>
     </section>
 
     <section class="providers" id="providers-grid"></section>
@@ -280,37 +314,54 @@ body {
 
   <script>
 const providers = [
-  {id:"clmmrh",name:"Corazon Locsin Montelibano Memorial Regional Hospital (CLMMRH)",type:"hospital",city:"Bacolod",category:"Public Tertiary Hospital",address:"Lacson Street corner Burgos Street, Bacolod City, Negros Occidental",phone:"(034) 435-1591 / (034) 703-1350",website:"https://clmmrh.doh.gov.ph",parking:"Limited on-site parking; street parking and nearby paid lots available. Can be crowded during peak hours.",description:"The largest DOH-retained government hospital in Western Visayas and the end-referral center for the region. Handles complex cases with more affordable rates.",specialties:["Emergency","Pediatrics","OB-GYN","Surgery","Internal Medicine","Orthopedics","Ophthalmology"]},
-  {id:"riverside",name:"Riverside Medical Center (Dr. Pablo O. Torre Memorial Hospital)",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"B.S. Aquino Drive, Bacolod City, Negros Occidental 6100",phone:"(034) 432-7624 / (034) 705-0000",website:"https://www.rivermedcenter.net",parking:"On-site patient & visitor parking available. Nearby Riverside Community Carpark.",description:"Largest private hospital in Bacolod. Modern facilities and broad HMO coverage. Member of Metro Pacific Health.",specialties:["Emergency","Cardiology","Cancer Care","Pediatrics","OB-GYN","Surgery","Diagnostics"]},
-  {id:"doctors-hospital",name:"The Doctors' Hospital, Inc.",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"B.S. Aquino Drive, Bacolod City, Negros Occidental 6100",phone:"(034) 468-2100 (Hotline 24/7)",website:"https://thedoctorshospital.com",parking:"Covered and frontage parking on-site. Limited spaces — arrive early.",description:"Private tertiary hospital serving Bacolod and Negros since 1950.",specialties:["Internal Medicine","Pediatrics","OB-GYN","Surgery","Ophthalmology","Dentistry"]},
-  {id:"adventist",name:"Bacolod Adventist Medical Center",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"C.V. Ramos Avenue, Taculing, Bacolod City",phone:"(034) 488-7777",website:"https://adventisthealth-bcd.com",parking:"On-site parking available. Spacious grounds.",description:"Faith-based hospital with modern facilities and client-centered care programs.",specialties:["Emergency","General Medicine","Surgery","OB-GYN","Pediatrics","Diagnostics"]},
-  {id:"metro-bacolod",name:"Metro Bacolod Hospital and Medical Center",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Burgos Extension, Camingawan, Brgy. Estefania, Bacolod City",phone:"(034) 431-2013",website:"",parking:"On-site parking. Less congested area than downtown.",description:"Private facility with expanding specialty services and HMO coverage.",specialties:["General Medicine","Pediatrics","OB-GYN","Emergency","Diagnostics"]},
-  {id:"south-bacolod",name:"South Bacolod General Hospital and Medical Center",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Araneta Street, Bacolod City",phone:"(034) 704-2911",website:"",parking:"On-site and roadside parking available.",description:"Private hospital serving southern Bacolod. PhilHealth accredited.",specialties:["General Medicine","Emergency","Surgery","OB-GYN"]},
-  {id:"queen-of-mercy",name:"Bacolod Queen of Mercy Hospital",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Eroreco Lane Drive, Brgy. Mandalagan, Bacolod City",phone:"(034) 708-0181",website:"",parking:"Limited on-site and nearby street parking.",description:"Private hospital with specialized care including pediatric services.",specialties:["Pediatrics","General Medicine","OB-GYN","Emergency"]},
-  {id:"tljph",name:"Teresita L. Jalandoni Provincial Hospital (TLJPH)",type:"hospital",city:"Silay",category:"Public Level 2 General Hospital",address:"Brgy. Lantad / Rizal Street (National Highway), Silay City, Negros Occidental",phone:"(034) 495-1705 / (034) 495-1736",website:"",parking:"On-site parking along the national highway frontage.",description:"Provincial government hospital in Silay. Level 2 facility with ICU, delivery room, and specialty services.",specialties:["Emergency","Internal Medicine","Pediatrics","OB-GYN","Surgery","Dental","X-ray"]},
-  {id:"tmc-clinic",name:"The Medical City Clinic – Ayala Malls Capitol Central",type:"clinic",city:"Bacolod",category:"Outpatient Clinic",address:"2nd Level, Ayala Malls Capitol Central, Bacolod City",phone:"(02) 8396-9898",website:"",parking:"Mall parking available.",description:"Outpatient care in a mall location: consultations, laboratory, imaging, and check-ups.",specialties:["General Consultation","Laboratory","Imaging","Executive Check-up"]},
-  {id:"doh-wellness",name:"DOH Wellness Clinic – SM City Bacolod",type:"clinic",city:"Bacolod",category:"Government Wellness Hub",address:"3rd Floor, Government Service Express Area, North Wing, SM City Bacolod",phone:"",website:"",parking:"SM City parking.",description:"DOH wellness clinic offering screenings, nutrition counseling, and consultations. Typically Mon–Fri.",specialties:["Health Screening","Nutrition","OB-GYN","Pediatrics","Telemedicine"]},
-  {id:"maxicare-pcc",name:"Maxicare Primary Care Clinic – Bacolod",type:"clinic",city:"Bacolod",category:"HMO Primary Care",address:"Lopues Mandalagan Building, Lacson Street, Mandalagan, Bacolod City",phone:"(034) 458-6715 / (034) 458-6714",website:"",parking:"Limited street and building parking.",description:"Primary care clinic for Maxicare members and walk-ins.",specialties:["General Consultation","Laboratory","Primary Care"]},
-  {id:"silay-cho",name:"Silay City Health Office",type:"clinic",city:"Silay",category:"Government Health Center",address:"Senator Jose Locsin Street, Barangay V, Silay City, Negros Occidental",phone:"(034) 495-5018",website:"",parking:"Street parking nearby.",description:"Main government health office of Silay City: outpatient consultations, maternal & child health, immunization.",specialties:["General Consultation","Maternal Care","Immunization","Family Planning"]},
-  {id:"talisay-cho",name:"Talisay City Health Office / Health Center",type:"clinic",city:"Talisay",category:"Government Health Center",address:"Bonifacio Street, Brgy. Zone 4-A / Zone 6, Talisay City, Negros Occidental",phone:"(034) 495-5991 / 712-8466",website:"",parking:"Street parking nearby.",description:"Primary government health facility for Talisay residents: consultations, maternal care, senior services.",specialties:["General Consultation","Maternal Care","Immunization","Senior Care"]},
-  {id:"animal-bite-talisay",name:"Dr. Care Animal Bite Center and Medical Clinic – Talisay",type:"clinic",city:"Talisay",category:"Animal Bite & Medical Clinic",address:"Corner Bonifacio – Felipe Lacson Streets, Brgy. Zone 12, Talisay City",phone:"0962-902-4565 / 0991-830-7698",website:"",parking:"Street parking.",description:"Animal Bite Center (RITM-trained) open daily including holidays; also general medical care.",specialties:["Animal Bite Treatment","Anti-Rabies","General Medical Care"]},
-  {id:"mandalagan-vet",name:"Mandalagan Veterinary Hospital and Marketing",type:"veterinary",city:"Bacolod",category:"Animal Hospital",address:"310 Lacson Street, Mandalagan, Bacolod City, Negros Occidental 6100",phone:"+63 960 360 1677 / (034) 447-0341",website:"https://www.mvhmarketing.com",parking:"Limited street parking.",description:"Veterinary hospital offering medical care, surgery, diagnostics, and pet supplies.",specialties:["Consultation","Surgery","Diagnostics","Vaccination","Pet Supplies"]},
-  {id:"alivet",name:"Alivet Animal Clinic",type:"veterinary",city:"Bacolod",category:"Veterinary Clinic",address:"Door 2, Garces Building, Alijis Road, Bacolod City",phone:"+63 908 695 8978",website:"",parking:"Street parking.",description:"Veterinary clinic: consultation, vaccination, surgery, and grooming.",specialties:["Consultation","Vaccination","Surgery","Grooming"]},
-  {id:"de-perro",name:"De Perro Pet Clinic and Supplies",type:"veterinary",city:"Bacolod",category:"Pet Clinic & Shop",address:"Victorina Heights, Door 4 & 5, Block 3, Lot 1, Bacolod City",phone:"+63 917 252 5754",website:"",parking:"Street / subdivision parking.",description:"Pet clinic and supplies: medical care and pet products.",specialties:["Consultation","Vaccination","Surgery","Pet Supplies"]},
-  {id:"bacolod-animal-hospital",name:"Bacolod Animal Hospital and Diagnostic Center",type:"veterinary",city:"Bacolod",category:"Animal Hospital",address:"Lacson Street / Hilado Street area, Bacolod City",phone:"(034) 432-1776",website:"",parking:"Street parking.",description:"Facility with digital X-ray, ultrasound, in-house lab, and surgery.",specialties:["Diagnostics","Surgery","Orthopedics","Dental","Confinement"]},
-  {id:"happyfeet",name:"Happyfeet Veterinary Clinic",type:"veterinary",city:"Bacolod",category:"Veterinary Clinic",address:"Guadalupe Building, Araneta Avenue, Bacolod City",phone:"+63 921 923 1333",website:"",parking:"Street parking.",description:"Veterinary clinic for consultation, vaccination, surgery, and grooming.",specialties:["Consultation","Vaccination","Surgery","Grooming"]},
-  {id:"barkery-silay",name:"Barkery Animal Clinic",type:"veterinary",city:"Silay",category:"Veterinary Clinic & Grooming",address:"Hugos-Walden Building, Sen. Jose Locsin Street, Brgy. V, Silay City",phone:"(034) 714-3994 / +63 951 001 6818",website:"",parking:"Street parking.",description:"Veterinary clinic and pet grooming in Silay.",specialties:["Consultation","Vaccination","Grooming","Surgery"]},
-  {id:"royal-k9",name:"Royal K9 Animal Clinic",type:"veterinary",city:"Talisay",category:"Veterinary Clinic",address:"Mabini Street / Paseo Mabini, Brgy. Zone II, Talisay City",phone:"(034) 213-5440 / 0910-820-5451",website:"",parking:"Street parking.",description:"Veterinary clinic serving Talisay and nearby areas; clinic and home service options.",specialties:["Consultation","Vaccination","Deworming","Home Service"]},
-  {id:"st-vincent-home",name:"St. Vincent's Home for the Aged",type:"carehome",city:"Bacolod",category:"Home for the Aged",address:"St. Vincent's Village, Brgy. Tangub, Bacolod City, Negros Occidental",phone:"(034) 432-0011 / (034) 432-0399",website:"",parking:"On-site parking within St. Vincent's Village compound.",description:"DSWD-accredited home for older persons. Managed by the Daughters of Charity of St. Vincent de Paul.",specialties:["Elderly Care","Shelter","Social Services","Spiritual Care"]},
-  {id:"st-marys-home",name:"St. Mary's Home for the Aged",type:"carehome",city:"Bacolod",category:"Home for the Aged",address:"Brgy. Alangilan, Bacolod City, Negros Occidental",phone:"(034) 433-3310 / (034) 435-6465",website:"",parking:"Limited on-site / street parking.",description:"Residential facility offering shelter and care for elderly residents.",specialties:["Elderly Care","Shelter","Health Services","Social Support"]},
-  {id:"divine-mercy-home",name:"Divine Mercy Home for the Elderly",type:"carehome",city:"Silay",category:"Home for the Elderly",address:"Brgy. Bagtic, Silay City, Negros Occidental",phone:"+63 946 064 7194",website:"",parking:"Limited on-site parking.",description:"Home for abandoned and poor elderly in Silay City.",specialties:["Elderly Care","Shelter","Charitable Care"]},
-  {id:"rivendel",name:"Rivendel Wellness and Leisure Park",type:"carehome",city:"Talisay",category:"Retirement & Wellness Community",address:"Talisay City / near Bacolod-Silay area, Negros Occidental",phone:"",website:"https://www.rivendelwellnessandleisure.com/",parking:"On-site parking (confirm when contacting).",description:"Retirement and wellness community with assisted living, rehabilitation, and related services.",specialties:["Assisted Living","Rehabilitation","Hospice","Wellness","Memory Care"]},
-  {id:"david-medical",name:"David Medical Clinic (ENT)",type:"private",city:"Bacolod",category:"Private Practice – ENT / Head & Neck",address:"35 Burgos Street, Barangay 18, Bacolod City, Negros Occidental",phone:"(034) 435-8771 / 0968-743-9891",website:"",parking:"Limited street parking along Burgos St. Appointment preferred.",description:"Private ENT–Head & Neck Surgery clinic. Appointment preferred.",specialties:["ENT","Head & Neck Surgery","Voice & Swallowing","Facial Trauma"]},
-  {id:"paez-clinic",name:"Paez Medical Clinic",type:"private",city:"Silay",category:"Private Practice – Primary Care",address:"Unit 14, Montinola Building, Bonifacio Street, Brgy. IV, Silay City",phone:"(034) 476-1458 / 0933-471-8443",website:"",parking:"Street parking along Bonifacio St.",description:"Family primary care clinic. General check-ups, ECG, ultrasound, and laboratory services.",specialties:["Primary Care","General Check-up","ECG","Ultrasound","Laboratory"]},
-  {id:"breast-clinic-vli",name:"205 Breast Clinic – VLI Medical Plaza",type:"private",city:"Bacolod",category:"Private Practice – Breast Surgical Oncology",address:"205 Breast Clinic, VLI Medical Plaza, B.S. Aquino Drive, Bacolod City",phone:"",website:"",parking:"Plaza / nearby parking (confirm on site).",description:"Specialty clinic focused on breast disease evaluation, biopsy, and breast surgery.",specialties:["Breast Surgery","Oncology","Breast Screening","Biopsy"]},
-  {id:"c-m-medical",name:"C&M Medical Clinic",type:"private",city:"Bacolod",category:"Private Practice – Internal Medicine",address:"Cor. Raymond Street, Brgy. Singcang Airport, Bacolod City",phone:"",website:"",parking:"Street parking.",description:"Private internal medicine clinic for adult and elderly care.",specialties:["Internal Medicine","Adult Care","Elderly Care","Medical Certificates"]},
-  {id:"gohing-ob",name:"Gohing OB-Gyne & Ultrasound Clinic",type:"private",city:"Silay",category:"Private Practice – Obstetrics & Gynecology",address:"Door #4 Hugos-Walden Building, Jose Locsin Street, Silay City",phone:"",website:"",parking:"Street parking.",description:"Private OB-Gyne clinic: prenatal care, gynecologic consultations, and ultrasound.",specialties:["OB-Gyne","Ultrasound","Prenatal Care","Women's Health"]}
+  {id:"clmmrh",name:"Corazon Locsin Montelibano Memorial Regional Hospital (CLMMRH)",type:"hospital",city:"Bacolod",category:"Public Tertiary Hospital",address:"Lacson Street corner Burgos Street, Bacolod City, Negros Occidental",phone:"(034) 435-1591 / (034) 703-1350",website:"https://clmmrh.doh.gov.ph",parking:"Limited on-site parking; street parking and nearby paid lots available. Can be crowded during peak hours.",description:"The largest DOH-retained government hospital in Western Visayas and the end-referral center for the region. Handles complex cases with more affordable rates.",specialties:["Emergency","Pediatrics","OB-GYN","Surgery","Internal Medicine","Orthopedics","Ophthalmology"],baseRating:4.1,baseReviews:12},
+  {id:"riverside",name:"Riverside Medical Center (Dr. Pablo O. Torre Memorial Hospital)",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"B.S. Aquino Drive, Bacolod City, Negros Occidental 6100",phone:"(034) 432-7624 / (034) 705-0000",website:"https://www.rivermedcenter.net",parking:"On-site patient & visitor parking available. Nearby Riverside Community Carpark.",description:"Largest private hospital in Bacolod. Modern facilities and broad HMO coverage. Member of Metro Pacific Health.",specialties:["Emergency","Cardiology","Cancer Care","Pediatrics","OB-GYN","Surgery","Diagnostics"],baseRating:4.2,baseReviews:18},
+  {id:"doctors-hospital",name:"The Doctors' Hospital, Inc.",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"B.S. Aquino Drive, Bacolod City, Negros Occidental 6100",phone:"(034) 468-2100 (Hotline 24/7)",website:"https://thedoctorshospital.com",parking:"Covered and frontage parking on-site. Limited spaces — arrive early.",description:"Private tertiary hospital serving Bacolod and Negros since 1950.",specialties:["Internal Medicine","Pediatrics","OB-GYN","Surgery","Ophthalmology","Dentistry"],baseRating:4.3,baseReviews:9},
+  {id:"adventist",name:"Bacolod Adventist Medical Center",type:"hospital",city:"Bacolod",category:"Private Tertiary Hospital",address:"C.V. Ramos Avenue, Taculing, Bacolod City",phone:"(034) 488-7777",website:"https://adventisthealth-bcd.com",parking:"On-site parking available. Spacious grounds.",description:"Faith-based hospital with modern facilities and client-centered care programs.",specialties:["Emergency","General Medicine","Surgery","OB-GYN","Pediatrics","Diagnostics"],baseRating:4.1,baseReviews:11},
+  {id:"metro-bacolod",name:"Metro Bacolod Hospital and Medical Center",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Burgos Extension, Camingawan, Brgy. Estefania, Bacolod City",phone:"(034) 431-2013",website:"",parking:"On-site parking. Less congested area than downtown.",description:"Private facility with expanding specialty services and HMO coverage.",specialties:["General Medicine","Pediatrics","OB-GYN","Emergency","Diagnostics"],baseRating:4.0,baseReviews:6},
+  {id:"south-bacolod",name:"South Bacolod General Hospital and Medical Center",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Araneta Street, Bacolod City",phone:"(034) 704-2911",website:"",parking:"On-site and roadside parking available.",description:"Private hospital serving southern Bacolod. PhilHealth accredited.",specialties:["General Medicine","Emergency","Surgery","OB-GYN"],baseRating:3.9,baseReviews:5},
+  {id:"queen-of-mercy",name:"Bacolod Queen of Mercy Hospital",type:"hospital",city:"Bacolod",category:"Private Hospital",address:"Eroreco Lane Drive, Brgy. Mandalagan, Bacolod City",phone:"(034) 708-0181",website:"",parking:"Limited on-site and nearby street parking.",description:"Private hospital with specialized care including pediatric services.",specialties:["Pediatrics","General Medicine","OB-GYN","Emergency"],baseRating:4.0,baseReviews:7},
+  {id:"tljph",name:"Teresita L. Jalandoni Provincial Hospital (TLJPH)",type:"hospital",city:"Silay",category:"Public Level 2 General Hospital",address:"Brgy. Lantad / Rizal Street (National Highway), Silay City, Negros Occidental",phone:"(034) 495-1705 / (034) 495-1736",website:"",parking:"On-site parking along the national highway frontage.",description:"Provincial government hospital in Silay. Level 2 facility with ICU, delivery room, and specialty services.",specialties:["Emergency","Internal Medicine","Pediatrics","OB-GYN","Surgery","Dental","X-ray"],baseRating:3.8,baseReviews:8},
+  {id:"tmc-clinic",name:"The Medical City Clinic – Ayala Malls Capitol Central",type:"clinic",city:"Bacolod",category:"Outpatient Clinic",address:"2nd Level, Ayala Malls Capitol Central, Bacolod City",phone:"(02) 8396-9898",website:"",parking:"Mall parking available.",description:"Outpatient care in a mall location: consultations, laboratory, imaging, and check-ups.",specialties:["General Consultation","Laboratory","Imaging","Executive Check-up"],baseRating:4.4,baseReviews:8},
+  {id:"doh-wellness",name:"DOH Wellness Clinic – SM City Bacolod",type:"clinic",city:"Bacolod",category:"Government Wellness Hub",address:"3rd Floor, Government Service Express Area, North Wing, SM City Bacolod",phone:"",website:"",parking:"SM City parking.",description:"DOH wellness clinic offering screenings, nutrition counseling, and consultations. Typically Mon–Fri.",specialties:["Health Screening","Nutrition","OB-GYN","Pediatrics","Telemedicine"],baseRating:4.5,baseReviews:4},
+  {id:"maxicare-pcc",name:"Maxicare Primary Care Clinic – Bacolod",type:"clinic",city:"Bacolod",category:"HMO Primary Care",address:"Lopues Mandalagan Building, Lacson Street, Mandalagan, Bacolod City",phone:"(034) 458-6715 / (034) 458-6714",website:"",parking:"Limited street and building parking.",description:"Primary care clinic for Maxicare members and walk-ins.",specialties:["General Consultation","Laboratory","Primary Care"],baseRating:4.4,baseReviews:10},
+  {id:"silay-cho",name:"Silay City Health Office",type:"clinic",city:"Silay",category:"Government Health Center",address:"Senator Jose Locsin Street, Barangay V, Silay City, Negros Occidental",phone:"(034) 495-5018",website:"",parking:"Street parking nearby.",description:"Main government health office of Silay City: outpatient consultations, maternal & child health, immunization.",specialties:["General Consultation","Maternal Care","Immunization","Family Planning"],baseRating:4.0,baseReviews:5},
+  {id:"talisay-cho",name:"Talisay City Health Office / Health Center",type:"clinic",city:"Talisay",category:"Government Health Center",address:"Bonifacio Street, Brgy. Zone 4-A / Zone 6, Talisay City, Negros Occidental",phone:"(034) 495-5991 / 712-8466",website:"",parking:"Street parking nearby.",description:"Primary government health facility for Talisay residents: consultations, maternal care, senior services.",specialties:["General Consultation","Maternal Care","Immunization","Senior Care"],baseRating:3.9,baseReviews:6},
+  {id:"animal-bite-talisay",name:"Dr. Care Animal Bite Center and Medical Clinic – Talisay",type:"clinic",city:"Talisay",category:"Animal Bite & Medical Clinic",address:"Corner Bonifacio – Felipe Lacson Streets, Brgy. Zone 12, Talisay City",phone:"0962-902-4565 / 0991-830-7698",website:"",parking:"Street parking.",description:"Animal Bite Center (RITM-trained) open daily including holidays; also general medical care.",specialties:["Animal Bite Treatment","Anti-Rabies","General Medical Care"],baseRating:4.5,baseReviews:7},
+  {id:"mandalagan-vet",name:"Mandalagan Veterinary Hospital and Marketing",type:"veterinary",city:"Bacolod",category:"Animal Hospital",address:"310 Lacson Street, Mandalagan, Bacolod City, Negros Occidental 6100",phone:"+63 960 360 1677 / (034) 447-0341",website:"https://www.mvhmarketing.com",parking:"Limited street parking.",description:"Veterinary hospital offering medical care, surgery, diagnostics, and pet supplies.",specialties:["Consultation","Surgery","Diagnostics","Vaccination","Pet Supplies"],baseRating:4.3,baseReviews:22},
+  {id:"alivet",name:"Alivet Animal Clinic",type:"veterinary",city:"Bacolod",category:"Veterinary Clinic",address:"Door 2, Garces Building, Alijis Road, Bacolod City",phone:"+63 908 695 8978",website:"",parking:"Street parking.",description:"Veterinary clinic: consultation, vaccination, surgery, and grooming.",specialties:["Consultation","Vaccination","Surgery","Grooming"],baseRating:4.3,baseReviews:14},
+  {id:"de-perro",name:"De Perro Pet Clinic and Supplies",type:"veterinary",city:"Bacolod",category:"Pet Clinic & Shop",address:"Victorina Heights, Door 4 & 5, Block 3, Lot 1, Bacolod City",phone:"+63 917 252 5754",website:"",parking:"Street / subdivision parking.",description:"Pet clinic and supplies: medical care and pet products.",specialties:["Consultation","Vaccination","Surgery","Pet Supplies"],baseRating:4.8,baseReviews:16},
+  {id:"bacolod-animal-hospital",name:"Bacolod Animal Hospital and Diagnostic Center",type:"veterinary",city:"Bacolod",category:"Animal Hospital",address:"Lacson Street / Hilado Street area, Bacolod City",phone:"(034) 432-1776",website:"",parking:"Street parking.",description:"Facility with digital X-ray, ultrasound, in-house lab, and surgery.",specialties:["Diagnostics","Surgery","Orthopedics","Dental","Confinement"],baseRating:4.6,baseReviews:9},
+  {id:"happyfeet",name:"Happyfeet Veterinary Clinic",type:"veterinary",city:"Bacolod",category:"Veterinary Clinic",address:"Guadalupe Building, Araneta Avenue, Bacolod City",phone:"+63 921 923 1333",website:"",parking:"Street parking.",description:"Veterinary clinic for consultation, vaccination, surgery, and grooming.",specialties:["Consultation","Vaccination","Surgery","Grooming"],baseRating:4.6,baseReviews:12},
+  {id:"barkery-silay",name:"Barkery Animal Clinic",type:"veterinary",city:"Silay",category:"Veterinary Clinic & Grooming",address:"Hugos-Walden Building, Sen. Jose Locsin Street, Brgy. V, Silay City",phone:"(034) 714-3994 / +63 951 001 6818",website:"",parking:"Street parking.",description:"Veterinary clinic and pet grooming in Silay.",specialties:["Consultation","Vaccination","Grooming","Surgery"],baseRating:4.7,baseReviews:10},
+  {id:"royal-k9",name:"Royal K9 Animal Clinic",type:"veterinary",city:"Talisay",category:"Veterinary Clinic",address:"Mabini Street / Paseo Mabini, Brgy. Zone II, Talisay City",phone:"(034) 213-5440 / 0910-820-5451",website:"",parking:"Street parking.",description:"Veterinary clinic serving Talisay and nearby areas; clinic and home service options.",specialties:["Consultation","Vaccination","Deworming","Home Service"],baseRating:4.4,baseReviews:9},
+  {id:"st-vincent-home",name:"St. Vincent's Home for the Aged",type:"carehome",city:"Bacolod",category:"Home for the Aged",address:"St. Vincent's Village, Brgy. Tangub, Bacolod City, Negros Occidental",phone:"(034) 432-0011 / (034) 432-0399",website:"",parking:"On-site parking within St. Vincent's Village compound.",description:"DSWD-accredited home for older persons. Managed by the Daughters of Charity of St. Vincent de Paul.",specialties:["Elderly Care","Shelter","Social Services","Spiritual Care"],baseRating:4.3,baseReviews:11},
+  {id:"st-marys-home",name:"St. Mary's Home for the Aged",type:"carehome",city:"Bacolod",category:"Home for the Aged",address:"Brgy. Alangilan, Bacolod City, Negros Occidental",phone:"(034) 433-3310 / (034) 435-6465",website:"",parking:"Limited on-site / street parking.",description:"Residential facility offering shelter and care for elderly residents.",specialties:["Elderly Care","Shelter","Health Services","Social Support"],baseRating:4.1,baseReviews:8},
+  {id:"divine-mercy-home",name:"Divine Mercy Home for the Elderly",type:"carehome",city:"Silay",category:"Home for the Elderly",address:"Brgy. Bagtic, Silay City, Negros Occidental",phone:"+63 946 064 7194",website:"",parking:"Limited on-site parking.",description:"Home for abandoned and poor elderly in Silay City.",specialties:["Elderly Care","Shelter","Charitable Care"],baseRating:4.5,baseReviews:4},
+  {id:"rivendel",name:"Rivendel Wellness and Leisure Park",type:"carehome",city:"Talisay",category:"Retirement & Wellness Community",address:"Talisay City / near Bacolod-Silay area, Negros Occidental",phone:"",website:"https://www.rivendelwellnessandleisure.com/",parking:"On-site parking (confirm when contacting).",description:"Retirement and wellness community with assisted living, rehabilitation, and related services.",specialties:["Assisted Living","Rehabilitation","Hospice","Wellness","Memory Care"],baseRating:4.6,baseReviews:7},
+  {id:"david-medical",name:"David Medical Clinic (ENT)",type:"private",city:"Bacolod",category:"Private Practice – ENT / Head & Neck",address:"35 Burgos Street, Barangay 18, Bacolod City, Negros Occidental",phone:"(034) 435-8771 / 0968-743-9891",website:"",parking:"Limited street parking along Burgos St. Appointment preferred.",description:"Private ENT–Head & Neck Surgery clinic. Appointment preferred.",specialties:["ENT","Head & Neck Surgery","Voice & Swallowing","Facial Trauma"],baseRating:4.7,baseReviews:14},
+  {id:"paez-clinic",name:"Paez Medical Clinic",type:"private",city:"Silay",category:"Private Practice – Primary Care",address:"Unit 14, Montinola Building, Bonifacio Street, Brgy. IV, Silay City",phone:"(034) 476-1458 / 0933-471-8443",website:"",parking:"Street parking along Bonifacio St.",description:"Family primary care clinic. General check-ups, ECG, ultrasound, and laboratory services.",specialties:["Primary Care","General Check-up","ECG","Ultrasound","Laboratory"],baseRating:4.5,baseReviews:9},
+  {id:"breast-clinic-vli",name:"205 Breast Clinic – VLI Medical Plaza",type:"private",city:"Bacolod",category:"Private Practice – Breast Surgical Oncology",address:"205 Breast Clinic, VLI Medical Plaza, B.S. Aquino Drive, Bacolod City",phone:"",website:"",parking:"Plaza / nearby parking (confirm on site).",description:"Specialty clinic focused on breast disease evaluation, biopsy, and breast surgery.",specialties:["Breast Surgery","Oncology","Breast Screening","Biopsy"],baseRating:4.8,baseReviews:11},
+  {id:"c-m-medical",name:"C&M Medical Clinic",type:"private",city:"Bacolod",category:"Private Practice – Internal Medicine",address:"Cor. Raymond Street, Brgy. Singcang Airport, Bacolod City",phone:"",website:"",parking:"Street parking.",description:"Private internal medicine clinic for adult and elderly care.",specialties:["Internal Medicine","Adult Care","Elderly Care","Medical Certificates"],baseRating:4.4,baseReviews:7},
+  {id:"gohing-ob",name:"Gohing OB-Gyne & Ultrasound Clinic",type:"private",city:"Silay",category:"Private Practice – Obstetrics & Gynecology",address:"Door #4 Hugos-Walden Building, Jose Locsin Street, Silay City",phone:"",website:"",parking:"Street parking.",description:"Private OB-Gyne clinic: prenatal care, gynecologic consultations, and ultrasound.",specialties:["OB-Gyne","Ultrasound","Prenatal Care","Women's Health"],baseRating:4.6,baseReviews:8}
 ];
+
+const sampleReviews = {
+  "clmmrh": [
+    { name: "Maria S.", rating: 4, text: "Affordable care and competent doctors. Expect longer waiting times in OPD.", date: "2026-03-12" },
+    { name: "Jose R.", rating: 5, text: "Saved my father's life. The ER team was fast and professional.", date: "2025-11-20" }
+  ],
+  "riverside": [
+    { name: "Anna L.", rating: 5, text: "Clean, modern facilities. HMO accepted without issues.", date: "2026-01-15" },
+    { name: "Carlo M.", rating: 4, text: "Great doctors and nurses. Billing can take time.", date: "2025-09-08" }
+  ],
+  "doctors-hospital": [
+    { name: "Elena P.", rating: 5, text: "Been going here for years. Specialists explain everything clearly.", date: "2026-02-28" }
+  ],
+  "c-m-medical": [
+    { name: "RealPatient", rating: 4, text: "Doctor was thorough and explained lab results clearly.", date: "2026-05-20" }
+  ]
+};
 
 let currentFilter = "all";
 let currentCity = "all";
@@ -321,12 +372,59 @@ function typeLabel(t) {
   return { hospital: "Hospital", clinic: "Clinic", veterinary: "Veterinary", carehome: "Care Home", private: "Private Practice" }[t] || "Provider";
 }
 
+function getReviews(id) {
+  return sampleReviews[id] || [];
+}
+
+function getAverageRating(id) {
+  const p = providers.find(x => x.id === id);
+  if (!p) return 0;
+  const r = getReviews(id);
+  if (!r.length) return p.baseRating;
+  const sum = r.reduce((a, x) => a + x.rating, 0);
+  return Math.round(((p.baseRating * p.baseReviews + sum) / (p.baseReviews + r.length)) * 10) / 10;
+}
+
+function getReviewCount(id) {
+  const p = providers.find(x => x.id === id);
+  return p ? p.baseReviews + getReviews(id).length : 0;
+}
+
+function renderStars(r) {
+  let h = "";
+  const f = Math.floor(r), half = r % 1 >= 0.5;
+  for (let i = 0; i < f; i++) h += '<i class="fas fa-star"></i>';
+  if (half) h += '<i class="fas fa-star-half-alt"></i>';
+  for (let i = 0; i < 5 - f - (half ? 1 : 0); i++) h += '<i class="far fa-star"></i>';
+  return h;
+}
+
+function detectBotSignals(reviews) {
+  if (!reviews || reviews.length < 2) return { flags: [], score: 0 };
+  const flags = [];
+  let score = 0;
+  const texts = reviews.map(r => (r.text || "").trim().toLowerCase());
+  const counts = {};
+  texts.forEach(t => { if (t.length >= 8) counts[t] = (counts[t] || 0) + 1; });
+  const rep = Object.entries(counts).filter(([, c]) => c >= 2);
+  if (rep.length) { flags.push(`Repeated text (${rep.length} pattern${rep.length > 1 ? "s" : ""})`); score += rep.length * 2; }
+  const byAuthor = {};
+  reviews.forEach(r => { const n = (r.name || "anon").toLowerCase(); if (!byAuthor[n]) byAuthor[n] = []; byAuthor[n].push(r); });
+  Object.values(byAuthor).forEach(list => { if (list.length >= 3) { flags.push(`Same name left ${list.length} reviews`); score += 2; } });
+  const generic = reviews.filter(r => { const t = (r.text || "").toLowerCase(); return t.length < 15 || /^(good|great|nice|ok|excellent|bad)\.?$/i.test(t.trim()); });
+  if (generic.length >= 3 && generic.length / reviews.length > 0.4) { flags.push("Many short/generic reviews"); score += 2; }
+  return { flags, score };
+}
+
 function updateStats() {
   document.getElementById("stat-hospitals").textContent = providers.filter(p => p.type === "hospital").length;
   document.getElementById("stat-clinics").textContent = providers.filter(p => p.type === "clinic").length;
   document.getElementById("stat-vets").textContent = providers.filter(p => p.type === "veterinary").length;
   document.getElementById("stat-carehomes").textContent = providers.filter(p => p.type === "carehome").length;
   document.getElementById("stat-private").textContent = providers.filter(p => p.type === "private").length;
+  let totalReviews = 0;
+  providers.forEach(p => { totalReviews += getReviewCount(p.id); });
+  document.getElementById("stat-reviews").textContent = totalReviews;
 }
 
 function renderProviders() {
@@ -344,6 +442,8 @@ function renderProviders() {
   });
 
   filtered.sort((a, b) => {
+    if (currentSort === "rating") return getAverageRating(b.id) - getAverageRating(a.id);
+    if (currentSort === "reviews") return getReviewCount(b.id) - getReviewCount(a.id);
     if (currentSort === "city") return a.city.localeCompare(b.city) || a.name.localeCompare(b.name);
     if (currentSort === "type") return a.type.localeCompare(b.type) || a.name.localeCompare(b.name);
     return a.name.localeCompare(b.name);
@@ -354,7 +454,9 @@ function renderProviders() {
     return;
   }
 
-  grid.innerHTML = filtered.map(p => `
+  grid.innerHTML = filtered.map(p => {
+    const rating = getAverageRating(p.id), count = getReviewCount(p.id);
+    return `
     <article class="provider-card" data-id="${p.id}">
       <div class="card-header">
         <span class="card-type type-${p.type}">${typeLabel(p.type)}</span>
@@ -365,12 +467,14 @@ function renderProviders() {
         <p class="card-meta"><i class="fas fa-map-marker-alt"></i> ${p.address.split(",")[0]}, ${p.city}</p>
         ${p.phone ? `<p class="card-meta"><i class="fas fa-phone"></i> ${p.phone}</p>` : ""}
         ${p.parking ? `<p class="card-meta"><i class="fas fa-parking"></i> Parking notes available</p>` : ""}
+        <div class="card-rating"><span class="stars">${renderStars(rating)}</span><span class="rating-value">${rating.toFixed(1)}</span><span class="review-count">(${count} reviews)</span></div>
       </div>
       <div class="card-footer">
         <button class="btn view-btn" data-id="${p.id}"><i class="fas fa-info-circle"></i> View details</button>
       </div>
     </article>
-  `).join("");
+  `;
+  }).join("");
 
   document.querySelectorAll(".view-btn").forEach(b => {
     b.addEventListener("click", e => { e.stopPropagation(); openModal(b.dataset.id); });
@@ -380,15 +484,56 @@ function renderProviders() {
   });
 }
 
-function openModal(id) {
+function sortReviews(reviews, sortBy) {
+  const s = [...reviews];
+  if (sortBy === "oldest") return s.sort((a, b) => new Date(a.date) - new Date(b.date));
+  if (sortBy === "highest") return s.sort((a, b) => b.rating - a.rating);
+  if (sortBy === "lowest") return s.sort((a, b) => a.rating - b.rating);
+  return s.sort((a, b) => new Date(b.date) - new Date(a.date));
+}
+
+function renderReviewsSection(id, sortBy = "recent") {
+  const reviews = getReviews(id), sorted = sortReviews(reviews, sortBy), bot = detectBotSignals(reviews);
+  let botAlert = "";
+  if (bot.score >= 3) {
+    botAlert = `<div class="bot-alert ${bot.score >= 5 ? "bot-alert-high" : ""}"><i class="fas fa-robot"></i><div><strong>${bot.score >= 5 ? "High bot / spam risk" : "Possible repetitive activity"}</strong><ul>${bot.flags.map(f => `<li>${f}</li>`).join("")}</ul></div></div>`;
+  }
+  const sortCtrl = reviews.length > 1
+    ? `<div class="review-sort"><label>Sort:</label><select onchange="changeReviewSort('${id}',this.value)">
+        <option value="recent" ${sortBy === "recent" ? "selected" : ""}>Most Recent</option>
+        <option value="highest" ${sortBy === "highest" ? "selected" : ""}>Highest Rated</option>
+        <option value="lowest" ${sortBy === "lowest" ? "selected" : ""}>Lowest Rated</option>
+        <option value="oldest" ${sortBy === "oldest" ? "selected" : ""}>Oldest First</option>
+      </select></div>`
+    : "";
+  const html = sorted.length
+    ? sorted.map(r => {
+        const isDup = bot.flags.some(f => f.includes("Repeated")) &&
+          sorted.filter(x => (x.text || "").trim().toLowerCase() === (r.text || "").trim().toLowerCase()).length >= 2;
+        return `<div class="review-item ${isDup ? "review-flagged" : ""}"><div class="review-header"><span class="review-author">${r.name}</span><span class="review-date">${r.date}</span></div><div class="review-stars">${renderStars(r.rating)}</div><p>${r.text}</p></div>`;
+      }).join("")
+    : `<p style="text-align:center;color:var(--text-muted);padding:1.5rem;font-style:italic">No individual reviews listed yet — the rating above reflects overall visitor feedback.</p>`;
+  return `<div class="reviews-section"><h3>Reviews</h3>${sortCtrl}${botAlert}${html}</div>`;
+}
+
+function changeReviewSort(id, sortBy) {
+  window._currentReviewSort = sortBy;
+  openModal(id, sortBy);
+}
+window.changeReviewSort = changeReviewSort;
+
+function openModal(id, sortBy) {
   const p = providers.find(x => x.id === id);
   if (!p) return;
+  const rating = getAverageRating(id);
+  const activeSort = sortBy || window._currentReviewSort || "recent";
 
   document.getElementById("modal-body").innerHTML = `
     <div class="modal-header">
       <span class="card-type type-${p.type}">${typeLabel(p.type)} • ${p.category}</span>
       <h2>${p.name}</h2>
     </div>
+    <div class="modal-rating-big"><span class="big-num">${rating.toFixed(1)}</span><div><div class="stars">${renderStars(rating)}</div><div class="review-count">${getReviewCount(id)} reviews</div></div></div>
     <div class="modal-info">
       <p><i class="fas fa-map-marker-alt"></i> <span><strong>Address</strong><br>${p.address || "Not listed"}</span></p>
       <p><i class="fas fa-phone"></i> <span><strong>Phone</strong><br>${p.phone || "Not listed"}</span></p>
@@ -402,6 +547,7 @@ function openModal(id) {
         ${p.specialties.map(s => `<span class="specialty-tag">${s}</span>`).join("")}
       </div>
     </div>
+    ${renderReviewsSection(id, activeSort)}
   `;
   document.getElementById("modal").classList.remove("hidden");
 }
