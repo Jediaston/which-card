@@ -47,10 +47,12 @@
   .icon.chart-app{background:#E4F1EC;color:#1F3854;font-size:15px;font-weight:700}
   .icon.cooking-app{background:#DDF0E9;color:#3D9A87}
   .icon.medora-app{background:#F7E9E0;color:#C45C26}
+  .icon.ollama-app{background:#E4E6EF;color:#2B3A55;font-size:15px;font-weight:700}
   .body{flex:1;min-width:0}
   .name{font-size:16.5px;font-weight:600;margin:0 0 3px}
   .desc{font-size:13.5px;color:var(--muted);margin:0;line-height:1.5}
   .caveat{font-size:12.5px;color:#8A6A2B;margin:5px 0 0;line-height:1.45}
+  .caveat code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px}
   .go{color:#B7BAC0;font-size:18px;flex:none}
   footer{margin-top:52px;padding-top:20px;border-top:1px solid var(--line);
          font-size:12.5px;line-height:1.7;color:#8B9096}
@@ -127,6 +129,16 @@
       <div class="body">
         <p class="name">Medora</p>
         <p class="desc">Directory of hospitals, clinics, vets & care homes in Bacolod, Silay & Talisay.</p>
+      </div>
+      <div class="go">›</div>
+    </a>
+
+    <a class="card" href="../ollama-chat/">
+      <div class="icon ollama-app">OC</div>
+      <div class="body">
+        <p class="name">Ollama Chat</p>
+        <p class="desc">Talk to a local Ollama model on your Mac. On-device only — nothing is saved.</p>
+        <p class="caveat">Local only — this github.io page cannot chat. From the repo: <code>python3 -m http.server 4173</code> then open /ollama-chat/.</p>
       </div>
       <div class="go">›</div>
     </a>
