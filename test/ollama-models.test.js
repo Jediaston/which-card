@@ -97,8 +97,8 @@ describe("parseChatChunk", () => {
   });
 });
 
-describe("chrome tokens + no people strip", () => {
-  it("uses Chart Assist navy #1F3854 as a 1px rule and keeps people out", () => {
+describe("chrome tokens + earthy people strip", () => {
+  it("keeps cream paper and a 1px #1F3854 rule", () => {
     const css = readFileSync(new URL("../ollama-chat/styles.css", import.meta.url), "utf8");
     const html = readFileSync(new URL("../ollama-chat/index.html", import.meta.url), "utf8");
     const icon = readFileSync(new URL("../ollama-chat/icons/icon.svg", import.meta.url), "utf8");
@@ -110,10 +110,21 @@ describe("chrome tokens + no people strip", () => {
     assert.match(css, /border-bottom:\s*1px solid var\(--navy\)/);
     assert.doesNotMatch(css, /--navy:\s*#(2f5a8a|244870|1e3a5f)/i);
     assert.doesNotMatch(blob, /#2F5A8A|#244870|#1E3A5F/i);
+  });
 
-    assert.doesNotMatch(html, /people|humaaans|standing-row|cropped-row/i);
-    assert.doesNotMatch(html, /<img[^>]+people/i);
-    assert.doesNotMatch(html, /<svg[\s\S]*?(orb|pant|lego)/i);
+  it("shows Mira's earthy Humaaans strip on the empty state only", () => {
+    const html = readFileSync(new URL("../ollama-chat/index.html", import.meta.url), "utf8");
+    const svg = readFileSync(new URL("../ollama-chat/people-strip.svg", import.meta.url));
+    const text = svg.toString("utf8");
+
+    assert.match(html, /<img class="people-strip" src="\.\/people-strip\.svg" alt="" width="720">/);
+    assert.equal(text.startsWith("<?xml"), true);
+    assert.ok(svg.length > 32000);
+    for (const fill of ["#D97757", "#D4A27F", "#788C5D", "#F0D5B8", "#E8C4A2", "#D4A181"]) {
+      assert.match(text, new RegExp(fill, "i"));
+    }
+    assert.doesNotMatch(text, /#1F3854|#C4A35A|#C6A15B|#8FCBB3|#E3F3EC/i);
+    assert.doesNotMatch(text, /<rect[^>]+(?:width|height)="(?:1200|360|320)"/);
   });
 });
 

@@ -310,9 +310,17 @@ button:focus-visible {
 .empty {
   margin: auto;
   text-align: center;
-  max-width: 28em;
+  max-width: 720px;
   color: var(--muted);
   padding: 48px 8px;
+}
+
+.empty .people-strip {
+  display: block;
+  width: 720px;
+  max-width: 100%;
+  height: auto;
+  margin: 0 auto 20px;
 }
 
 .empty h2 {
