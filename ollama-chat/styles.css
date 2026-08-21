@@ -144,12 +144,6 @@ textarea:disabled {
   border-color: var(--mint);
 }
 
-.chip-gold {
-  color: var(--ink);
-  background: var(--canvas);
-  border-color: var(--gold);
-}
-
 .controls {
   display: flex;
   align-items: center;
