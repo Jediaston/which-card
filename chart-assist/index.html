@@ -653,7 +653,7 @@ document.addEventListener("input", (e)=>{
   else if(action === "header-time"){ state.header.time = t.value; }
   else if(action === "field-input"){ setFieldValue(t.dataset.section, t.dataset.field, t.value); return; }
   else if(action === "narrative-input"){ state.narrative[state.activeId] = t.value; return; }
-  else if(action === "manual-note"){ state.manualNote[noteKey()] = t.value; return; }
+  else if(action === "manual-note"){ state.manualNote[noteKey()] = t.value; }
   render();
 });
 
