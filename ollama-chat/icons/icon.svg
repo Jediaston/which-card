@@ -1,5 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
-  <rect width="512" height="512" rx="77" fill="#D97757"/>
-  <text x="256" y="330" font-family="'IBM Plex Sans', ui-sans-serif, system-ui, sans-serif"
+  <rect width="512" height="512" rx="77" fill="#1E3A5F"/>
+  <rect x="10" y="10" width="492" height="492" rx="70" fill="none" stroke="#C6A15B" stroke-width="8"/>
+  <text x="256" y="330" font-family="'IBM Plex Sans', Calibri, ui-sans-serif, system-ui, sans-serif"
         font-size="200" font-weight="500" fill="#FAF9F5" text-anchor="middle">OC</text>
 </svg>

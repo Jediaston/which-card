@@ -1,19 +1,19 @@
 :root {
   --canvas: #faf9f5;
   --surface: #f0eee6;
-  --parchment: #f5f0e8;
   --hairline: #e8e6dc;
-  --text: #141413;
+  --ink: #141413;
   --body: #3d3d3a;
   --muted: #5e5d59;
-  --clay: #d97757;
-  --hover: #c6613f;
+  --navy: #1e3a5f;
+  --navy-hover: #162a45;
+  --gold: #c6a15b;
   --disabled: #e6dfd8;
   --success: #788c5d;
   --warning: #d4a27f;
   --error: #c46686;
   --serif: "Source Serif 4", "Iowan Old Style", Palatino, Georgia, serif;
-  --sans: "IBM Plex Sans", ui-sans-serif, system-ui, sans-serif;
+  --sans: "IBM Plex Sans", Calibri, ui-sans-serif, system-ui, sans-serif;
   --mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
 }
 
@@ -69,7 +69,7 @@ textarea:disabled {
   gap: 20px;
   flex-wrap: wrap;
   padding-bottom: 20px;
-  border-bottom: 1px solid var(--hairline);
+  border-bottom: 1px solid var(--navy);
 }
 
 .brand {
@@ -83,8 +83,9 @@ textarea:disabled {
   width: 40px;
   height: 40px;
   border-radius: 6px;
-  background: var(--clay);
+  background: var(--navy);
   color: var(--canvas);
+  border: 1px solid var(--gold);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -101,7 +102,7 @@ textarea:disabled {
   font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1.15;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .brand p {
@@ -112,12 +113,12 @@ textarea:disabled {
 }
 
 .hub {
-  color: var(--clay);
+  color: var(--navy);
   text-decoration: none;
 }
 
 .hub:hover {
-  color: var(--hover);
+  color: var(--navy-hover);
   text-decoration: underline;
 }
 
@@ -162,7 +163,7 @@ label.sr {
 
 #model:focus,
 button:focus-visible {
-  outline: 1px solid var(--clay);
+  outline: 1px solid var(--navy);
   outline-offset: 2px;
 }
 
@@ -173,12 +174,12 @@ button:focus-visible {
   padding: 8px 12px;
   font-size: 13px;
   font-weight: 500;
-  color: var(--text);
+  color: var(--ink);
 }
 
 .ghost:hover:not(:disabled) {
-  border-color: var(--clay);
-  color: var(--clay);
+  border-color: var(--navy);
+  color: var(--navy);
 }
 
 .ghost:disabled {
@@ -222,7 +223,7 @@ button:focus-visible {
   padding: 12px 14px;
   border-radius: 6px;
   border: 1px solid var(--hairline);
-  background: var(--parchment);
+  background: var(--surface);
   color: var(--body);
   font-size: 14px;
   font-weight: 400;
@@ -238,7 +239,7 @@ button:focus-visible {
 .privacy code {
   font-family: var(--mono);
   font-size: 0.92em;
-  background: var(--surface);
+  background: var(--canvas);
   padding: 1px 5px;
   border-radius: 6px;
 }
@@ -264,14 +265,14 @@ button:focus-visible {
   margin-left: 8px;
   border: 0;
   background: transparent;
-  color: var(--clay);
+  color: var(--navy);
   font-weight: 500;
   text-decoration: underline;
   padding: 0;
 }
 
 #retry:hover {
-  color: var(--hover);
+  color: var(--navy-hover);
 }
 
 .thread {
@@ -297,7 +298,7 @@ button:focus-visible {
   font-family: var(--serif);
   font-size: 28px;
   font-weight: 400;
-  color: var(--text);
+  color: var(--ink);
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
@@ -325,7 +326,7 @@ button:focus-visible {
 
 .msg.user {
   align-self: flex-end;
-  background: var(--parchment);
+  background: var(--canvas);
 }
 
 .msg.assistant {
@@ -338,7 +339,7 @@ button:focus-visible {
   display: inline-block;
   margin-left: 1px;
   animation: blink 0.9s steps(1) infinite;
-  color: var(--clay);
+  color: var(--navy);
 }
 
 @keyframes blink {
@@ -365,7 +366,7 @@ button:focus-visible {
 }
 
 .box:focus-within {
-  border-color: var(--clay);
+  border-color: var(--navy);
 }
 
 textarea {
@@ -378,7 +379,7 @@ textarea {
   padding: 8px 0;
   line-height: 1.5;
   font-size: 16px;
-  color: var(--text);
+  color: var(--ink);
 }
 
 textarea:focus {
@@ -405,12 +406,12 @@ textarea:disabled {
 }
 
 .primary {
-  background: var(--clay);
+  background: var(--navy);
   color: var(--canvas);
 }
 
 .primary:hover:not(:disabled) {
-  background: var(--hover);
+  background: var(--navy-hover);
 }
 
 .primary:disabled {
@@ -420,7 +421,7 @@ textarea:disabled {
 
 .stop {
   background: var(--surface);
-  color: var(--text);
+  color: var(--ink);
   border: 1px solid var(--hairline);
 }
 
