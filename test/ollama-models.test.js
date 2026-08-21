@@ -97,6 +97,26 @@ describe("parseChatChunk", () => {
   });
 });
 
+describe("chrome tokens + no people strip", () => {
+  it("uses Chart Assist navy #1F3854 as a 1px rule and keeps people out", () => {
+    const css = readFileSync(new URL("../ollama-chat/styles.css", import.meta.url), "utf8");
+    const html = readFileSync(new URL("../ollama-chat/index.html", import.meta.url), "utf8");
+    const icon = readFileSync(new URL("../ollama-chat/icons/icon.svg", import.meta.url), "utf8");
+    const blob = [css, html, icon].join("\n");
+
+    assert.match(css, /--canvas:\s*#faf9f5/i);
+    assert.match(css, /--ink:\s*#141413/i);
+    assert.match(css, /--navy:\s*#1f3854/i);
+    assert.match(css, /border-bottom:\s*1px solid var\(--navy\)/);
+    assert.doesNotMatch(css, /--navy:\s*#(2f5a8a|244870|1e3a5f)/i);
+    assert.doesNotMatch(blob, /#2F5A8A|#244870|#1E3A5F/i);
+
+    assert.doesNotMatch(html, /people|humaaans|standing-row|cropped-row/i);
+    assert.doesNotMatch(html, /<img[^>]+people/i);
+    assert.doesNotMatch(html, /<svg[\s\S]*?(orb|pant|lego)/i);
+  });
+});
+
 describe("privacy + no containers in the app", () => {
   it("does not persist transcripts or mention Docker / cloud LLM APIs", () => {
     const files = [

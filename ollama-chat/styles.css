@@ -5,9 +5,10 @@
   --ink: #141413;
   --body: #3d3d3a;
   --muted: #5e5d59;
-  --navy: #1e3a5f;
-  --navy-hover: #162a45;
+  --navy: #1f3854;
+  --navy-hover: #183048;
   --gold: #c6a15b;
+  --mint: #8fcbb3;
   --disabled: #e6dfd8;
   --success: #788c5d;
   --warning: #d4a27f;
@@ -69,6 +70,7 @@ textarea:disabled {
   gap: 20px;
   flex-wrap: wrap;
   padding-bottom: 20px;
+  background: var(--canvas);
   border-bottom: 1px solid var(--navy);
 }
 
@@ -120,6 +122,32 @@ textarea:disabled {
 .hub:hover {
   color: var(--navy-hover);
   text-decoration: underline;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--hairline);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+.chip-mint {
+  color: var(--ink);
+  background: var(--canvas);
+  border-color: var(--mint);
+}
+
+.chip-gold {
+  color: var(--ink);
+  background: var(--canvas);
+  border-color: var(--gold);
 }
 
 .controls {
