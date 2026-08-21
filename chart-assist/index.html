@@ -83,9 +83,14 @@
   textarea.narrative{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13.5px;color:var(--ink);resize:vertical;}
   aside.notepanel{flex-shrink:0;width:100%;}
   @media (min-width:1024px){aside.notepanel{width:384px;position:sticky;top:16px;}}
-  .note-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+  .note-head{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;margin-bottom:8px;flex-wrap:wrap;}
   .note-head .lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy-soft);}
   .note-head .wc{font-size:12px;color:var(--muted);}
+  .format-toggle{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;flex-shrink:0;}
+  .format-btn{font-size:11px;font-weight:600;letter-spacing:.04em;padding:5px 10px;border:none;background:#fff;color:var(--muted);cursor:pointer;}
+  .format-btn + .format-btn{border-left:1px solid var(--border);}
+  .format-btn.active{background:var(--navy);color:#fff;}
+  .format-btn:not(.active):hover{background:var(--paper);}
   .notebox{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(31,56,84,.06);}
   .paper{padding-left:28px;margin-left:14px;border-left:2px solid var(--rule-red);
     background-image:repeating-linear-gradient(var(--surface),var(--surface) 27px,var(--border-soft) 28px);}
@@ -297,6 +302,25 @@ function sentenceFromList(leadIn, items){
   return `${leadIn} ${list}.`;
 }
 
+function sentenceFromSection(section, d){
+  if(section.type === "checklist"){
+    const sel = d[section.key] || [];
+    const leadIn = LEAD_IN[section.key] || `${section.heading}:`;
+    return sentenceFromList(leadIn, sel);
+  }
+  if(section.type === "vitals"){
+    const v = d[section.key] || {};
+    const parts = section.fields.filter(f=>v[f] && String(v[f]).trim()).map(f=>`${f} ${v[f]}`);
+    return parts.length ? `Vitals: ${parts.join(", ")}.` : null;
+  }
+  if(section.type === "fields"){
+    const v = d[section.key] || {};
+    const parts = section.items.filter(f=>v[f.key] && String(v[f.key]).trim()).map(f=>`${f.label.toLowerCase()} ${v[f.key]}`);
+    return parts.length ? `Also noted: ${parts.join("; ")}.` : null;
+  }
+  return null;
+}
+
 function composeNote(diag, data, header, narrative){
   const d = data || {};
   const paragraphs = [];
@@ -306,23 +330,11 @@ function composeNote(diag, data, header, narrative){
   const bodySentences = [];
   let sawNotify = false, sawPlan = false;
   diag.sections.forEach(section=>{
-    if(section.type === "checklist"){
-      const sel = d[section.key] || [];
-      const leadIn = LEAD_IN[section.key] || `${section.heading}:`;
-      const s = sentenceFromList(leadIn, sel);
-      if(s){
-        bodySentences.push(s);
-        if(section.key === "notify" && sel.length) sawNotify = true;
-        if(section.key === "plan" && sel.length) sawPlan = true;
-      }
-    } else if(section.type === "vitals"){
-      const v = d[section.key] || {};
-      const parts = section.fields.filter(f=>v[f] && String(v[f]).trim()).map(f=>`${f} ${v[f]}`);
-      if(parts.length) bodySentences.push(`Vitals: ${parts.join(", ")}.`);
-    } else if(section.type === "fields"){
-      const v = d[section.key] || {};
-      const parts = section.items.filter(f=>v[f.key] && String(v[f.key]).trim()).map(f=>`${f.label.toLowerCase()} ${v[f.key]}`);
-      if(parts.length) bodySentences.push(`Also noted: ${parts.join("; ")}.`);
+    const s = sentenceFromSection(section, d);
+    if(s){
+      bodySentences.push(s);
+      if(section.type === "checklist" && section.key === "notify") sawNotify = true;
+      if(section.type === "checklist" && section.key === "plan") sawPlan = true;
     }
   });
 
@@ -338,17 +350,88 @@ function composeNote(diag, data, header, narrative){
   return paragraphs.join("\n\n");
 }
 
+// SBAR buckets verified against DIAGNOSES section keys (not assumed):
+//   S — header/time + condition; fall circumstances; glycemic event type
+//   B — vitals and free-text context fields (location, I&O, last BM, etc.)
+//   A — symptoms / findings / neuro / behaviors / pain signs / possible triggers
+//   R — interventions + notify + plan
+// Unknown checklist keys default to Assessment so new findings stay clinical.
+const SBAR_BUCKET = {
+  circumstances:"S",
+  event:"S",
+  symptoms:"A",
+  symptomsHypo:"A",
+  symptomsHyper:"A",
+  findings:"A",
+  neuro:"A",
+  behaviors:"A",
+  triggers:"A",
+  associated:"A",
+  characteristics:"A",
+  interventions:"R",
+  notify:"R",
+  plan:"R",
+};
+
+function sbarBucketFor(section){
+  if(section.type === "vitals" || section.type === "fields") return "B";
+  return SBAR_BUCKET[section.key] || "A";
+}
+
+function composeSbar(diag, data, header, narrative){
+  const d = data || {};
+  const when = [header.date, header.time].filter(Boolean).join(" at ");
+  const buckets = { S:[], B:[], A:[], R:[] };
+
+  buckets.S.push(`Resident situation: ${diag.subtitle.toLowerCase()}${when ? `. Charted ${when}` : ""}.`);
+
+  diag.sections.forEach(section=>{
+    const s = sentenceFromSection(section, d);
+    if(s) buckets[sbarBucketFor(section)].push(s);
+  });
+
+  if(narrative && narrative.trim()) buckets.A.push(narrative.trim());
+  if(buckets.R.length) buckets.R.push("Requesting review and further orders as indicated.");
+
+  const empty = {
+    B:"No vitals or background details entered.",
+    A:"No assessment findings selected.",
+    R:"No interventions, notifications, or plan items selected.",
+  };
+  const labels = {
+    S:"S — Situation",
+    B:"B — Background",
+    A:"A — Assessment",
+    R:"R — Recommendation",
+  };
+
+  return ["S","B","A","R"].map(key=>{
+    const body = buckets[key].length ? buckets[key].join(" ") : empty[key];
+    return `${labels[key]}\n${body}`;
+  }).join("\n\n");
+}
+
 // ---------------------------------------------------------------------
 // State
 // ---------------------------------------------------------------------
 const state = {
   header:{ date:"", time:"" },
   activeId: DIAGNOSES[0].id,
+  format:"narrative",
   data:{},
   narrative:{},
   manualNote:{},
   copied:false,
 };
+
+function noteKey(diagId, format){
+  return `${diagId || state.activeId}:${format || state.format}`;
+}
+function clearManualNotes(diagId){
+  const id = diagId || state.activeId;
+  delete state.manualNote[`${id}:narrative`];
+  delete state.manualNote[`${id}:sbar`];
+}
 
 function esc(s){
   return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
@@ -372,13 +455,13 @@ function setFieldValue(sectionKey, fieldKey, value){
 function applyPreset(preset){
   const cur = state.data[state.activeId] || {};
   state.data[state.activeId] = {...cur, ...preset.values};
-  state.manualNote[state.activeId] = undefined;
+  clearManualNotes();
   render();
 }
 function resetDiagnosis(){
   state.data[state.activeId] = {};
   state.narrative[state.activeId] = "";
-  state.manualNote[state.activeId] = undefined;
+  clearManualNotes();
   render();
 }
 function setNow(){
@@ -389,6 +472,9 @@ function setNow(){
 }
 async function copyNote(){
   const text = getDisplayedNote();
+  state.copied = true;
+  render();
+  setTimeout(()=>{ state.copied = false; render(); }, 1500);
   try{
     await navigator.clipboard.writeText(text);
   }catch(e){
@@ -397,15 +483,14 @@ async function copyNote(){
     try{ document.execCommand("copy"); }catch(e2){}
     document.body.removeChild(ta);
   }
-  state.copied = true;
-  render();
-  setTimeout(()=>{ state.copied = false; render(); }, 1500);
 }
 function getComposed(){
-  return composeNote(activeDiag(), diagData(), state.header, state.narrative[state.activeId] || "");
+  const extra = state.narrative[state.activeId] || "";
+  const args = [activeDiag(), diagData(), state.header, extra];
+  return state.format === "sbar" ? composeSbar(...args) : composeNote(...args);
 }
 function getDisplayedNote(){
-  const m = state.manualNote[state.activeId];
+  const m = state.manualNote[noteKey()];
   return m !== undefined ? m : getComposed();
 }
 
@@ -494,13 +579,19 @@ function renderNote(){
   const el = document.getElementById("notepanel");
   const displayed = getDisplayedNote();
   const composed = getComposed();
-  const isEdited = state.manualNote[state.activeId] !== undefined && state.manualNote[state.activeId] !== composed;
+  const manual = state.manualNote[noteKey()];
+  const isEdited = manual !== undefined && manual !== composed;
   const wordCount = displayed.trim() ? displayed.trim().split(/\s+/).length : 0;
   const noteId = `manual-note-${state.activeId}`;
+  const isSbar = state.format === "sbar";
 
   el.innerHTML = `
     <div class="note-head">
       <span class="lbl">Suggested note</span>
+      <div class="format-toggle" role="group" aria-label="Note format">
+        <button type="button" class="format-btn${!isSbar?" active":""}" data-action="set-format" data-format="narrative" aria-pressed="${!isSbar}">Narrative</button>
+        <button type="button" class="format-btn${isSbar?" active":""}" data-action="set-format" data-format="sbar" aria-pressed="${isSbar}">SBAR</button>
+      </div>
       <span class="wc">${wordCount} words</span>
     </div>
     <div class="notebox">
@@ -550,7 +641,8 @@ document.addEventListener("click", (e)=>{
   else if(action === "reset-diag"){ resetDiagnosis(); }
   else if(action === "set-now"){ setNow(); }
   else if(action === "copy-note"){ copyNote(); }
-  else if(action === "regenerate"){ state.manualNote[state.activeId] = undefined; render(); }
+  else if(action === "set-format"){ state.format = t.dataset.format; render(); }
+  else if(action === "regenerate"){ delete state.manualNote[noteKey()]; render(); }
 });
 
 document.addEventListener("input", (e)=>{
@@ -561,7 +653,7 @@ document.addEventListener("input", (e)=>{
   else if(action === "header-time"){ state.header.time = t.value; }
   else if(action === "field-input"){ setFieldValue(t.dataset.section, t.dataset.field, t.value); return; }
   else if(action === "narrative-input"){ state.narrative[state.activeId] = t.value; return; }
-  else if(action === "manual-note"){ state.manualNote[state.activeId] = t.value; return; }
+  else if(action === "manual-note"){ state.manualNote[noteKey()] = t.value; }
   render();
 });
 
