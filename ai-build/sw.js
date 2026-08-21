@@ -1,4 +1,4 @@
-const CACHE = "ai-build-hub-v12";
+const CACHE = "ai-build-hub-v13";
 const CORE_ASSETS = [
   "./",
   "./index.html",
