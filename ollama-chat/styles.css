@@ -71,7 +71,7 @@ textarea:disabled {
   gap: 20px;
   flex-wrap: wrap;
   padding-bottom: 20px;
-  border-bottom: 1px solid var(--navy);
+  border-bottom: 1px solid var(--hairline);
 }
 
 .brand {
@@ -85,9 +85,9 @@ textarea:disabled {
   width: 40px;
   height: 40px;
   border-radius: 6px;
-  background: var(--navy);
-  color: var(--canvas);
-  border: 1px solid var(--gold);
+  background: var(--surface);
+  color: var(--navy);
+  border: 1px solid var(--hairline);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -297,7 +297,7 @@ button:focus-visible {
 
 .people {
   margin: 0 auto 20px;
-  max-width: 320px;
+  max-width: 360px;
   background: var(--mint-wash);
   border-radius: 6px;
 }

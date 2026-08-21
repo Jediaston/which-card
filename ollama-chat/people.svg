@@ -1,34 +1,33 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 100" width="320" height="100" role="img" aria-hidden="true">
-  <!-- Original waist/legs crop. Light mint wash. Clothing: navy + gold + mint. -->
-  <rect x="0" y="0" width="320" height="100" rx="6" fill="#E3F3EC"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 120" width="360" height="120" role="img" aria-hidden="true">
+  <rect width="360" height="120" rx="6" fill="#E3F3EC"/>
 
-  <!-- Navy trousers, gold shoes -->
-  <rect x="28" y="8" width="38" height="22" rx="6" fill="#1E3A5F"/>
-  <rect x="30" y="26" width="15" height="50" rx="6" fill="#1E3A5F"/>
-  <rect x="49" y="28" width="15" height="48" rx="6" fill="#1E3A5F"/>
-  <rect x="26" y="74" width="20" height="9" rx="3" fill="#C6A15B"/>
-  <rect x="48" y="74" width="20" height="9" rx="3" fill="#C6A15B"/>
+  <!-- 1. Navy trousers, gold shoes — weight on left -->
+  <ellipse cx="52" cy="18" rx="24" ry="13" fill="#1E3A5F"/>
+  <path fill="#1E3A5F" d="M32 16c1 22 3 48 4 70h16c0-24-1-48 2-70z"/>
+  <path fill="#1E3A5F" d="M54 18c4 20 8 46 10 68h16c-3-24-8-50-12-68z"/>
+  <path fill="#C6A15B" d="M28 84c0 6 6 10 18 10s16-3 16-8-7-6-17-6-17 1-17 4z"/>
+  <path fill="#C6A15B" d="M62 86c1 5 8 9 18 8s15-5 14-9-8-5-17-4-16 2-15 5z"/>
 
-  <!-- Mint trousers, navy shoes -->
-  <rect x="102" y="4" width="40" height="24" rx="6" fill="#8FCBB3"/>
-  <rect x="104" y="24" width="16" height="52" rx="6" fill="#8FCBB3"/>
-  <rect x="124" y="26" width="16" height="50" rx="6" fill="#8FCBB3"/>
-  <rect x="100" y="74" width="21" height="9" rx="3" fill="#1E3A5F"/>
-  <rect x="123" y="74" width="21" height="9" rx="3" fill="#1E3A5F"/>
+  <!-- 2. Mint trousers, navy shoes — stride -->
+  <ellipse cx="138" cy="16" rx="25" ry="14" fill="#8FCBB3"/>
+  <path fill="#8FCBB3" d="M116 14c-2 24 0 50 1 72h17c2-24 3-50 6-72z"/>
+  <path fill="#8FCBB3" d="M140 16c6 18 16 44 22 66h16c-8-24-18-50-22-66z"/>
+  <path fill="#1E3A5F" d="M108 84c-1 6 6 11 19 11s18-4 18-9-8-6-18-6-18 1-19 4z"/>
+  <path fill="#1E3A5F" d="M158 80c2 6 10 10 20 9s16-6 14-10-9-5-18-4-18 2-16 5z"/>
 
-  <!-- Gold trousers, mint shoes -->
-  <rect x="178" y="10" width="36" height="20" rx="6" fill="#C6A15B"/>
-  <rect x="180" y="26" width="14" height="48" rx="6" fill="#C6A15B"/>
-  <rect x="198" y="28" width="14" height="46" rx="6" fill="#C6A15B"/>
-  <rect x="176" y="72" width="19" height="9" rx="3" fill="#8FCBB3"/>
-  <rect x="196" y="72" width="19" height="9" rx="3" fill="#8FCBB3"/>
+  <!-- 3. Gold trousers, mint shoes — feet together -->
+  <ellipse cx="228" cy="20" rx="22" ry="12" fill="#C6A15B"/>
+  <path fill="#C6A15B" d="M210 18c1 22 2 48 3 68h15c1-22 1-48 4-68z"/>
+  <path fill="#C6A15B" d="M230 20c3 20 6 46 7 66h15c-2-22-5-48-8-66z"/>
+  <path fill="#8FCBB3" d="M206 84c0 5 5 9 16 9s15-3 15-7-6-6-15-6-16 1-16 4z"/>
+  <path fill="#8FCBB3" d="M232 85c1 5 7 8 16 8s14-4 13-8-7-5-15-4-15 1-14 4z"/>
 
-  <!-- Navy trousers, gold shoes, mint cuff -->
-  <rect x="250" y="6" width="38" height="22" rx="6" fill="#1E3A5F"/>
-  <rect x="252" y="24" width="15" height="50" rx="6" fill="#1E3A5F"/>
-  <rect x="271" y="26" width="15" height="48" rx="6" fill="#1E3A5F"/>
-  <rect x="252" y="66" width="15" height="6" rx="2" fill="#8FCBB3"/>
-  <rect x="271" y="66" width="15" height="6" rx="2" fill="#8FCBB3"/>
-  <rect x="248" y="74" width="20" height="9" rx="3" fill="#C6A15B"/>
-  <rect x="270" y="74" width="20" height="9" rx="3" fill="#C6A15B"/>
+  <!-- 4. Navy trousers, gold shoes, mint cuff — slight step -->
+  <ellipse cx="306" cy="17" rx="23" ry="13" fill="#1E3A5F"/>
+  <path fill="#1E3A5F" d="M286 16c2 22 4 46 5 66h16c0-22-1-46 2-66z"/>
+  <path fill="#1E3A5F" d="M308 18c4 20 9 44 12 64h15c-4-22-10-46-13-64z"/>
+  <rect x="290" y="78" width="16" height="5" rx="2" fill="#8FCBB3"/>
+  <rect x="319" y="76" width="16" height="5" rx="2" fill="#8FCBB3"/>
+  <path fill="#C6A15B" d="M283 83c0 6 6 10 17 10s16-3 16-8-7-6-16-6-17 1-17 4z"/>
+  <path fill="#C6A15B" d="M316 81c1 6 8 10 18 9s15-5 14-9-8-5-17-4-16 1-15 4z"/>
 </svg>
