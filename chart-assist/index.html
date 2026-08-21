@@ -472,6 +472,9 @@ function setNow(){
 }
 async function copyNote(){
   const text = getDisplayedNote();
+  state.copied = true;
+  render();
+  setTimeout(()=>{ state.copied = false; render(); }, 1500);
   try{
     await navigator.clipboard.writeText(text);
   }catch(e){
@@ -480,9 +483,6 @@ async function copyNote(){
     try{ document.execCommand("copy"); }catch(e2){}
     document.body.removeChild(ta);
   }
-  state.copied = true;
-  render();
-  setTimeout(()=>{ state.copied = false; render(); }, 1500);
 }
 function getComposed(){
   const extra = state.narrative[state.activeId] || "";
