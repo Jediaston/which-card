@@ -7,101 +7,129 @@
 <meta name="description" content="Drafts clear, thorough nursing notes from checklists — falls, UTI, skin, CHF, and more.">
 
 <meta name="color-scheme" content="light">
-<meta name="theme-color" content="#F6F3EA">
+<meta name="theme-color" content="#FAF9F5">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="Chart Assist">
 
-<link rel="manifest" href="./manifest.webmanifest?v=1">
-<link rel="icon" href="./icons/icon.svg?v=1" type="image/svg+xml">
-<link rel="apple-touch-icon" href="./icons/icon-192.png?v=1">
+<link rel="manifest" href="./manifest.webmanifest?v=2">
+<link rel="icon" href="./icons/icon.svg?v=2" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icons/icon-192.png?v=2">
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400&family=IBM+Plex+Sans:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root{
-    --paper:#F6F3EA; --surface:#FFFFFF; --ink:#212B33; --muted:#6B7A82;
-    --navy:#1F3854; --navy-soft:#3C5878; --teal:#2C7A67; --teal-light:#E4F1EC;
-    --amber:#B8752E; --amber-light:#F6EBDA; --rule-red:#C1584F;
-    --border:#E1D9C6; --border-soft:#EDE7D8;
+    --canvas:#FAF9F5; --surface:#F0EEE6; --hairline:#E8E6DC;
+    --ink:#141413; --body:#3D3D3A; --muted:#5E5D59;
+    --navy:#1E3A5F; --navy-hover:#162A45; --gold:#C6A15B; --mint:#8FCBB3;
   }
   *{box-sizing:border-box;}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;}
-  .font-display{font-family:'Source Serif 4',Georgia,serif;}
-  .font-mono{font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;}
-  input,textarea,button{font-family:inherit;}
-  input:focus,button:focus,textarea:focus{outline:none;box-shadow:0 0 0 2px rgba(44,122,103,.35);}
-  ::placeholder{color:#9AA6AC;}
+  body{margin:0;background:var(--canvas);color:var(--body);font-family:"IBM Plex Sans",Calibri,ui-sans-serif,system-ui,sans-serif;font-weight:400;}
+  h1,h2,h3,.font-display{font-family:"Source Serif 4","Iowan Old Style",Palatino,Georgia,serif;font-weight:400;letter-spacing:-0.02em;color:var(--ink);}
+  .font-mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;}
+  input,textarea,button{font-family:"IBM Plex Sans",Calibri,ui-sans-serif,system-ui,sans-serif;font-weight:400;}
+  input:focus,button:focus,textarea:focus{outline:1px solid var(--navy);outline-offset:2px;}
+  ::placeholder{color:var(--muted);}
+  a{color:var(--navy);}
+  a:hover{color:var(--navy-hover);}
   .wrap{max-width:1180px;margin:0 auto;padding:0 16px;}
-  .bar{border-bottom:1px solid var(--border);background:var(--surface);}
+  .bar{border-bottom:1px solid var(--hairline);background:var(--navy);}
+  .bar .brand h1{color:var(--canvas);}
+  .bar .brand p{color:var(--canvas);}
+  .bar.tsbar{background:var(--surface);color:var(--body);}
   .brandrow{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:16px 0;}
   .brand{display:flex;align-items:center;gap:12px;}
-  .brand-mark{width:38px;height:38px;border-radius:10px;background:var(--navy);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:15px;flex-shrink:0;}
-  .brand h1{font-size:21px;margin:0;color:var(--navy);line-height:1.15;}
-  .brand p{font-size:12px;margin:2px 0 0;color:var(--muted);}
-  .badge{font-size:12px;font-weight:500;border-radius:999px;padding:5px 12px;background:var(--amber-light);color:var(--amber);}
+  .brand-mark{width:38px;height:38px;border-radius:6px;background:var(--navy);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;color:var(--canvas);font-weight:500;font-size:15px;flex-shrink:0;}
+  .brand h1{font-size:21px;margin:0;line-height:1.15;}
+  .brand p{font-size:12px;margin:2px 0 0;}
+  .badge{font-size:12px;font-weight:500;border-radius:6px;padding:5px 12px;background:var(--surface);color:var(--canvas);border:1px solid var(--gold);}
+  .bar .badge{background:transparent;color:var(--canvas);}
   .tsrow{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:10px 0;}
   .tsrow label{font-size:12px;font-weight:500;color:var(--muted);}
-  .tsrow input{border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px;color:var(--ink);}
-  .btn-ghost{border:1px solid var(--border);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:500;color:var(--navy);background:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
-  .btn-ghost:hover{background:var(--paper);}
+  .tsrow input{border:1px solid var(--hairline);border-radius:6px;padding:6px 8px;font-size:13px;color:var(--body);background:var(--canvas);}
+  .btn-ghost{border:1px solid var(--hairline);border-radius:6px;padding:6px 10px;font-size:12px;font-weight:500;color:var(--navy);background:var(--canvas);cursor:pointer;display:inline-flex;align-items:center;gap:6px;}
+  .btn-ghost:hover{background:var(--surface);color:var(--navy-hover);}
   .note-hint{font-size:12px;color:var(--muted);margin-left:auto;}
   .layout{display:flex;gap:24px;padding:24px 0;align-items:flex-start;}
   @media (max-width:1023px){.layout{flex-direction:column;}}
   nav.diag{display:flex;gap:8px;overflow-x:auto;flex-shrink:0;padding-bottom:4px;}
   @media (min-width:1024px){nav.diag{flex-direction:column;width:224px;overflow:visible;}}
-  .diag-btn{display:flex;align-items:center;gap:10px;font-size:14px;border-radius:8px;padding:10px 12px;flex-shrink:0;text-align:left;background:transparent;border:none;border-left:3px solid transparent;cursor:pointer;color:var(--ink);font-weight:500;white-space:nowrap;}
+  .diag-btn{display:flex;align-items:center;gap:10px;font-size:14px;border-radius:6px;padding:10px 12px;flex-shrink:0;text-align:left;background:transparent;border:1px solid transparent;border-left:1px solid transparent;cursor:pointer;color:var(--body);font-weight:400;white-space:nowrap;}
   @media (min-width:1024px){.diag-btn{white-space:normal;}}
-  .diag-btn.active{background:var(--teal-light);color:var(--navy);font-weight:600;border-left:3px solid var(--teal);}
-  .abbr{width:34px;height:22px;border-radius:5px;background:var(--navy-soft);color:#fff;font-size:10px;font-weight:700;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-  .diag-btn.active .abbr{background:var(--teal);}
+  .diag-btn.active{background:var(--surface);color:var(--ink);font-weight:500;border-color:var(--hairline);border-left-color:var(--navy);}
+  .abbr{width:34px;height:22px;border-radius:6px;background:var(--navy);color:var(--canvas);font-size:10px;font-weight:500;letter-spacing:.02em;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .diag-btn.active .abbr{background:var(--navy);}
   .builder{flex:1;min-width:0;display:flex;flex-direction:column;gap:20px;}
-  .builder h2{font-size:24px;margin:0;color:var(--navy);}
+  .builder h2{font-size:24px;margin:0;}
   .builder .sub{font-size:13px;color:var(--muted);margin:2px 0 0;}
   .presets{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
-  .presets .label{font-size:12px;font-weight:500;color:var(--amber);display:inline-flex;align-items:center;gap:5px;}
-  .preset-btn{font-size:12px;font-weight:500;border-radius:999px;border:1px solid var(--amber);color:var(--amber);background:var(--amber-light);padding:5px 12px;cursor:pointer;}
+  .presets .label{font-size:12px;font-weight:500;color:var(--navy);display:inline-flex;align-items:center;gap:5px;}
+  .preset-btn{font-size:12px;font-weight:500;border-radius:6px;border:1px solid var(--navy);color:var(--navy);background:var(--surface);padding:5px 12px;cursor:pointer;}
+  .preset-btn:hover{background:var(--navy);color:var(--canvas);}
   .clear-btn{font-size:12px;font-weight:500;color:var(--muted);background:none;border:none;cursor:pointer;margin-left:auto;display:inline-flex;align-items:center;gap:5px;}
-  .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px;display:flex;flex-direction:column;gap:20px;}
-  .section h4{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy-soft);margin:0 0 8px;display:flex;align-items:center;justify-content:space-between;}
-  .count{font-size:11px;font-weight:700;background:var(--teal);color:#fff;border-radius:999px;padding:1px 8px;}
+  .clear-btn:hover{color:var(--navy-hover);}
+  .card{background:var(--surface);border:1px solid var(--hairline);border-radius:6px;padding:18px 20px;display:flex;flex-direction:column;gap:20px;}
+  .section h4{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;display:flex;align-items:center;justify-content:space-between;}
+  .count{font-size:11px;font-weight:500;background:var(--navy);color:var(--canvas);border-radius:6px;padding:1px 8px;}
   .chips{display:grid;grid-template-columns:1fr;gap:8px;}
   @media (min-width:640px){.chips{grid-template-columns:1fr 1fr;}}
-  .chip{display:flex;align-items:flex-start;gap:8px;text-align:left;font-size:13.5px;border-radius:6px;border:1px solid var(--border);background:#fff;padding:8px 10px;cursor:pointer;color:var(--ink);}
-  .chip.active{border-color:var(--teal);background:var(--teal-light);color:var(--navy);font-weight:600;}
-  .box{width:14px;height:14px;margin-top:2px;border-radius:4px;border:1.5px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
-  .chip.active .box{border-color:var(--teal);background:var(--teal);}
+  .chip{display:flex;align-items:flex-start;gap:8px;text-align:left;font-size:13.5px;border-radius:6px;border:1px solid var(--hairline);background:var(--canvas);padding:8px 10px;cursor:pointer;color:var(--body);font-weight:400;}
+  .chip.active{border-color:var(--navy);background:var(--surface);color:var(--ink);font-weight:500;}
+  .box{width:14px;height:14px;margin-top:2px;border-radius:6px;border:1px solid var(--muted);flex-shrink:0;display:flex;align-items:center;justify-content:center;}
+  .chip.active .box{border-color:var(--navy);background:var(--navy);}
   .box svg{display:none;width:9px;height:9px;}
   .chip.active .box svg{display:block;}
   .grid-fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
   @media (min-width:640px){.grid-fields.vitals{grid-template-columns:repeat(3,1fr);}}
   .field label{display:flex;flex-direction:column;gap:4px;}
   .field span{font-size:11px;font-weight:500;color:var(--muted);}
-  .field input{border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-size:13px;color:var(--ink);background:#fff;width:100%;}
-  textarea.narrative{width:100%;border:1px solid var(--border);border-radius:6px;padding:8px 10px;font-size:13.5px;color:var(--ink);resize:vertical;}
-  aside.notepanel{flex-shrink:0;width:100%;}
+  .field input{border:1px solid var(--hairline);border-radius:6px;padding:6px 8px;font-size:13px;color:var(--body);background:var(--canvas);width:100%;}
+  textarea.narrative{width:100%;border:1px solid var(--hairline);border-radius:6px;padding:8px 10px;font-size:13.5px;color:var(--body);background:var(--canvas);resize:vertical;}
+  aside.notepanel{flex-shrink:0;width:100%;display:flex;flex-direction:column;gap:16px;}
   @media (min-width:1024px){aside.notepanel{width:384px;position:sticky;top:16px;}}
   .note-head{display:flex;align-items:center;justify-content:space-between;gap:8px 12px;margin-bottom:8px;flex-wrap:wrap;}
-  .note-head .lbl{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--navy-soft);}
+  .note-head .lbl{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
   .note-head .wc{font-size:12px;color:var(--muted);}
-  .format-toggle{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;flex-shrink:0;}
-  .format-btn{font-size:11px;font-weight:600;letter-spacing:.04em;padding:5px 10px;border:none;background:#fff;color:var(--muted);cursor:pointer;}
-  .format-btn + .format-btn{border-left:1px solid var(--border);}
-  .format-btn.active{background:var(--navy);color:#fff;}
-  .format-btn:not(.active):hover{background:var(--paper);}
-  .notebox{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;box-shadow:0 2px 10px rgba(31,56,84,.06);}
-  .paper{padding-left:28px;margin-left:14px;border-left:2px solid var(--rule-red);
-    background-image:repeating-linear-gradient(var(--surface),var(--surface) 27px,var(--border-soft) 28px);}
-  .paper textarea{width:100%;border:none;background:transparent;font-size:12.5px;line-height:28px;padding:12px;resize:vertical;color:var(--ink);}
-  .notefoot{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--border);}
-  .copy-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:600;border-radius:6px;padding:8px 12px;background:var(--navy);color:#fff;border:none;cursor:pointer;}
-  .regen-btn{font-size:12px;font-weight:500;border-radius:6px;padding:7px 10px;border:1px solid var(--border);color:var(--muted);background:#fff;cursor:pointer;}
+  .key-num{color:var(--gold);font-weight:500;}
+  .format-toggle{display:inline-flex;border:1px solid var(--hairline);border-radius:6px;overflow:hidden;flex-shrink:0;}
+  .format-btn{font-size:11px;font-weight:500;letter-spacing:.04em;padding:5px 10px;border:none;background:var(--canvas);color:var(--muted);cursor:pointer;}
+  .format-btn + .format-btn{border-left:1px solid var(--hairline);}
+  .format-btn.active{background:var(--navy);color:var(--canvas);}
+  .format-btn:not(.active):hover{background:var(--surface);}
+  .notebox{background:var(--surface);border:1px solid var(--hairline);border-radius:6px;overflow:hidden;}
+  .paper{padding-left:28px;margin-left:14px;border-left:1px solid var(--navy);
+    background-image:repeating-linear-gradient(var(--surface),var(--surface) 27px,var(--hairline) 28px);}
+  .paper textarea{width:100%;border:none;background:transparent;font-size:12.5px;line-height:28px;padding:12px;resize:vertical;color:var(--body);}
+  .notefoot{display:flex;align-items:center;gap:8px;padding:10px 12px;border-top:1px solid var(--hairline);}
+  .copy-btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;font-size:14px;font-weight:500;border-radius:6px;padding:8px 12px;background:var(--navy);color:var(--canvas);border:none;cursor:pointer;}
+  .copy-btn:hover{background:var(--navy-hover);}
+  .regen-btn{font-size:12px;font-weight:500;border-radius:6px;padding:7px 10px;border:1px solid var(--hairline);color:var(--muted);background:var(--canvas);cursor:pointer;}
+  .regen-btn:hover{color:var(--navy-hover);}
   .edited-note{font-size:12px;color:var(--muted);margin-top:8px;}
-  .demo-banner{position:sticky;top:0;z-index:20;background:var(--amber-light);border-bottom:1px solid #E8D4B4;
-               color:#6B5310;font-size:13.5px;line-height:1.5;padding:10px 16px}
+  .demo-banner{position:sticky;top:0;z-index:20;background:var(--surface);border-bottom:1px solid var(--gold);
+               color:var(--body);font-size:13.5px;line-height:1.5;padding:10px 16px}
   .demo-banner .inner{max-width:1180px;margin:0 auto}
+  .codes-head{display:flex;align-items:baseline;justify-content:space-between;gap:8px;margin-bottom:8px;}
+  .codes-head .lbl{font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);}
+  .codes-note{font-size:12px;color:var(--muted);margin:0 0 10px;line-height:1.45;}
+  .codes-search{width:100%;border:1px solid var(--hairline);border-radius:6px;padding:7px 10px;font-size:13px;color:var(--body);background:var(--canvas);margin-bottom:10px;}
+  .codes-list{max-height:280px;overflow:auto;display:flex;flex-direction:column;gap:6px;}
+  .code-row{display:grid;grid-template-columns:72px 1fr auto;gap:8px;align-items:start;border:1px solid var(--hairline);border-radius:6px;padding:8px 10px;background:var(--canvas);}
+  .code-row.added{border-color:var(--mint);}
+  .code-row .code{font-weight:500;color:var(--navy);}
+  .code-row .desc{font-size:12.5px;color:var(--body);line-height:1.35;}
+  .code-row .hint{display:block;font-size:11px;color:var(--muted);margin-top:4px;}
+  .code-actions{display:flex;flex-direction:column;gap:4px;}
+  .code-actions button{border:1px solid var(--hairline);border-radius:6px;background:var(--surface);color:var(--navy);font-size:11px;font-weight:500;padding:4px 8px;cursor:pointer;}
+  .code-actions button:hover{background:var(--navy);color:var(--canvas);}
+  .code-actions .insert-btn.added{border-color:var(--mint);color:var(--navy);background:var(--canvas);}
+  .people-strip{position:relative;height:56px;overflow:hidden;border:1px solid var(--hairline);border-radius:6px;background:#E3F3EC;margin:0 0 8px;}
+  .people-strip .people-wash{fill:#E3F3EC;}
+  .people-strip .mint-fill{fill:#8FCBB3;}
+  .people-strip svg{display:block;width:100%;height:56px;}
 </style>
 </head>
 <body>
@@ -121,7 +149,7 @@
   </div>
 </div>
 
-<div class="bar">
+<div class="bar tsbar">
   <div class="wrap tsrow">
     <label for="header-date">Note date/time:</label>
     <input type="date" id="header-date" data-action="header-date" />
@@ -134,7 +162,10 @@
 <div class="wrap layout">
   <nav class="diag" id="diag-nav"></nav>
   <div class="builder" id="builder"></div>
-  <aside class="notepanel" id="notepanel"></aside>
+  <aside class="notepanel">
+    <div id="notepanel"></div>
+    <div id="codepanel"></div>
+  </aside>
 </div>
 
 <script>
@@ -271,6 +302,62 @@ const DIAGNOSES = [
   },
 ];
 
+// HCPCS T series (CMS Level II, 2026) — code + short descriptor only.
+// Do not invent codes. ABA medical stays 97151–97158; T1026 is not a 97153 substitute.
+const HCPCS_T_CODES = [
+  { code:"T1006", desc:"Alcohol/substance abuse services, family/couple counseling" },
+  { code:"T1007", desc:"Alcohol/substance abuse services, treatment plan development/modification" },
+  { code:"T1012", desc:"Alcohol/substance abuse services, skills development" },
+  { code:"T1013", desc:"Sign language or oral interpretive services, per 15 min" },
+  { code:"T1015", desc:"Clinic visit/encounter, all-inclusive" },
+  { code:"T1016", desc:"Case management, each 15 min" },
+  { code:"T1017", desc:"Targeted case management, each 15 min" },
+  { code:"T1018", desc:"School-based IEP services, bundled" },
+  { code:"T1023", desc:"Screening for program/protocol appropriateness, per encounter" },
+  { code:"T1024", desc:"Integrated specialty team eval/treatment, multiple or severely handicapped children, per encounter" },
+  { code:"T1025", desc:"Intensive extended multidisciplinary clinic services, children with complex impairments, per diem" },
+  { code:"T1026", desc:"Same, per hour (also used in some state ABA/wrap manuals)" },
+  { code:"T1027", desc:"Family training and counseling for child development, per 15 min" },
+  { code:"T1028", desc:"Assessment of home, physical, and family environment" },
+  { code:"T1040", desc:"Medicaid CCBHC services, per diem" },
+  { code:"T1041", desc:"Medicaid CCBHC services, per month" },
+  { code:"T2010", desc:"PASRR Level I identification screening" },
+  { code:"T2011", desc:"PASRR Level II evaluation" },
+  { code:"T2022", desc:"Case management, per month" },
+  { code:"T2023", desc:"Targeted case management, per month" },
+  { code:"T2024", desc:"Service assessment / plan of care development, waiver" },
+  { code:"T2034", desc:"Crisis intervention, waiver, per diem" },
+  { code:"T2048", desc:"Behavioral health long-term care residential (typically >30 days), with room and board, per diem" },
+];
+
+function peopleSceneSvg(){
+  return `<svg viewBox="0 0 240 56" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <rect class="people-wash" x="0" y="0" width="240" height="56"/>
+    <ellipse class="mint-fill" cx="120" cy="40" rx="96" ry="18" opacity="0.45"/>
+    <g fill="#1E3A5F">
+      <rect x="38" y="0" width="22" height="18" rx="8"/>
+      <rect x="40" y="16" width="8" height="32" rx="4"/>
+      <rect x="50" y="16" width="8" height="32" rx="4"/>
+      <rect x="38" y="46" width="10" height="6" rx="3"/>
+      <rect x="50" y="46" width="10" height="6" rx="3"/>
+    </g>
+    <g fill="#C6A15B">
+      <rect x="109" y="2" width="22" height="18" rx="8"/>
+      <rect x="111" y="18" width="8" height="30" rx="4"/>
+      <rect x="121" y="18" width="8" height="30" rx="4"/>
+      <rect x="109" y="46" width="10" height="6" rx="3"/>
+      <rect x="121" y="46" width="10" height="6" rx="3"/>
+    </g>
+    <g fill="#8FCBB3">
+      <rect x="180" y="0" width="22" height="18" rx="8"/>
+      <rect x="182" y="16" width="8" height="32" rx="4"/>
+      <rect x="192" y="16" width="8" height="32" rx="4"/>
+      <rect x="180" y="46" width="10" height="6" rx="3"/>
+      <rect x="192" y="46" width="10" height="6" rx="3"/>
+    </g>
+  </svg>`;
+}
+
 // ---------------------------------------------------------------------
 // Note composition — written the way a seasoned charge nurse would chart
 // it: plain, precise, and attentive. No patient-identifying fields.
@@ -343,6 +430,9 @@ function composeNote(diag, data, header, narrative){
 
   if(narrative && narrative.trim()) paragraphs.push(narrative.trim());
 
+  const codes = tCodeNoteLine();
+  if(codes) paragraphs.push(codes);
+
   if(bodySentences.length){
     paragraphs.push(sawPlan ? CLOSERS.plan : sawNotify ? CLOSERS.notify : "Resident tolerated the assessment well; will continue to monitor.");
   }
@@ -391,6 +481,8 @@ function composeSbar(diag, data, header, narrative){
   });
 
   if(narrative && narrative.trim()) buckets.A.push(narrative.trim());
+  const codes = tCodeNoteLine();
+  if(codes) buckets.R.push(codes);
   if(buckets.R.length) buckets.R.push("Requesting review and further orders as indicated.");
 
   const empty = {
@@ -421,8 +513,64 @@ const state = {
   data:{},
   narrative:{},
   manualNote:{},
+  tCodes:[],
+  tCodeQuery:"",
   copied:false,
+  copiedTCode:"",
 };
+
+function tCodeById(code){
+  return HCPCS_T_CODES.find(c=>c.code===code);
+}
+function tCodeNoteLine(){
+  if(!state.tCodes.length) return null;
+  const parts = state.tCodes.map(code=>{
+    const row = tCodeById(code);
+    return row ? `${row.code} — ${row.desc}` : code;
+  });
+  return "T-code lookup (state-specific; not a coverage, payment, or UM determination): " + parts.join("; ") + ".";
+}
+function filteredTCodes(){
+  const q = (state.tCodeQuery || "").trim().toLowerCase();
+  if(!q) return HCPCS_T_CODES;
+  return HCPCS_T_CODES.filter(c=>c.code.toLowerCase().includes(q) || c.desc.toLowerCase().includes(q));
+}
+function insertTCode(code){
+  if(state.tCodes.includes(code)){
+    state.tCodes = state.tCodes.filter(c=>c!==code);
+  }else{
+    state.tCodes = [...state.tCodes, code];
+    const row = tCodeById(code);
+    const line = row ? `${row.code} — ${row.desc}` : code;
+    const key = noteKey();
+    if(state.manualNote[key] !== undefined && !state.manualNote[key].includes(code)){
+      state.manualNote[key] = state.manualNote[key].replace(/\s*$/, "") + "\n" + line;
+    }
+  }
+  render();
+}
+async function copyTCode(code){
+  state.copiedTCode = code;
+  render();
+  setTimeout(()=>{ if(state.copiedTCode === code){ state.copiedTCode = ""; render(); } }, 1500);
+  try{
+    await navigator.clipboard.writeText(code);
+  }catch(e){
+    const ta = document.createElement("textarea");
+    ta.value = code; document.body.appendChild(ta); ta.select();
+    try{ document.execCommand("copy"); }catch(e2){}
+    document.body.removeChild(ta);
+  }
+}
+function isNoteEmpty(){
+  const d = diagData();
+  const hasSection = activeDiag().sections.some(section=>{
+    if(section.type === "checklist") return (d[section.key] || []).length;
+    const v = d[section.key] || {};
+    return Object.values(v).some(x=>String(x || "").trim());
+  });
+  return !hasSection && !(state.narrative[state.activeId] || "").trim() && !state.tCodes.length;
+}
 
 function noteKey(diagId, format){
   return `${diagId || state.activeId}:${format || state.format}`;
@@ -508,7 +656,7 @@ function renderNav(){
 }
 
 function checkIcon(){
-  return `<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="#FAF9F5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
 }
 
 function renderBuilder(){
@@ -592,8 +740,9 @@ function renderNote(){
         <button type="button" class="format-btn${!isSbar?" active":""}" data-action="set-format" data-format="narrative" aria-pressed="${!isSbar}">Narrative</button>
         <button type="button" class="format-btn${isSbar?" active":""}" data-action="set-format" data-format="sbar" aria-pressed="${isSbar}">SBAR</button>
       </div>
-      <span class="wc">${wordCount} words</span>
+      <span class="wc"><span class="key-num">${wordCount}</span> words</span>
     </div>
+    ${!isEdited && isNoteEmpty() ? `<div class="people-strip" aria-hidden="true">${peopleSceneSvg()}</div>` : ""}
     <div class="notebox">
       <div class="paper">
         <textarea id="${noteId}" class="font-mono" rows="16" autocomplete="off" data-action="manual-note">${esc(displayed)}</textarea>
@@ -607,6 +756,33 @@ function renderNote(){
   `;
 }
 
+function renderCodes(){
+  const el = document.getElementById("codepanel");
+  const rows = filteredTCodes();
+  el.innerHTML = `
+    <div class="codes-head">
+      <span class="lbl">HCPCS T-codes</span>
+    </div>
+    <p class="codes-note">Coverage is state-specific. Code and short descriptor only — not a coverage determination, not UM criteria, and not a promise of payment. ABA medical stays 97151–97158. T1026 is not a replacement for 97153.</p>
+    <input type="search" id="tcode-search" class="codes-search" autocomplete="off" placeholder="Search code or descriptor" value="${esc(state.tCodeQuery)}" data-action="tcode-search" />
+    <div class="codes-list">
+      ${rows.map(row=>{
+        const added = state.tCodes.includes(row.code);
+        const copied = state.copiedTCode === row.code;
+        const hint = row.code === "T1026" ? `<span class="hint">Not a replacement for 97153. ABA medical stays 97151–97158.</span>` : "";
+        return `<div class="code-row${added?" added":""}">
+          <span class="code font-mono">${esc(row.code)}</span>
+          <span class="desc">${esc(row.desc)}${hint}</span>
+          <span class="code-actions">
+            <button type="button" class="insert-btn${added?" added":""}" data-action="insert-tcode" data-code="${row.code}">${added ? "Added" : "Insert"}</button>
+            <button type="button" data-action="copy-tcode" data-code="${row.code}">${copied ? "Copied" : "Copy"}</button>
+          </span>
+        </div>`;
+      }).join("") || `<p class="codes-note">No matching T-codes.</p>`}
+    </div>
+  `;
+}
+
 function render(){
   const active = document.activeElement;
   const activeId = active && active.id;
@@ -616,6 +792,7 @@ function render(){
   renderNav();
   renderBuilder();
   renderNote();
+  renderCodes();
 
   if(activeId){
     const el = document.getElementById(activeId);
@@ -643,6 +820,8 @@ document.addEventListener("click", (e)=>{
   else if(action === "copy-note"){ copyNote(); }
   else if(action === "set-format"){ state.format = t.dataset.format; render(); }
   else if(action === "regenerate"){ delete state.manualNote[noteKey()]; render(); }
+  else if(action === "insert-tcode"){ insertTCode(t.dataset.code); }
+  else if(action === "copy-tcode"){ copyTCode(t.dataset.code); }
 });
 
 document.addEventListener("input", (e)=>{
@@ -654,6 +833,7 @@ document.addEventListener("input", (e)=>{
   else if(action === "field-input"){ setFieldValue(t.dataset.section, t.dataset.field, t.value); return; }
   else if(action === "narrative-input"){ state.narrative[state.activeId] = t.value; return; }
   else if(action === "manual-note"){ state.manualNote[noteKey()] = t.value; }
+  else if(action === "tcode-search"){ state.tCodeQuery = t.value; }
   render();
 });
 
