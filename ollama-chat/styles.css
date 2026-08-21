@@ -8,7 +8,8 @@
   --navy: #1e3a5f;
   --navy-hover: #162a45;
   --gold: #c6a15b;
-  --mint: #8fcbb3;
+  --mint: #8FCBB3;
+  --mint-wash: #E3F3EC;
   --disabled: #e6dfd8;
   --success: #788c5d;
   --warning: #d4a27f;
@@ -296,7 +297,9 @@ button:focus-visible {
 
 .people {
   margin: 0 auto 20px;
-  max-width: 280px;
+  max-width: 320px;
+  background: var(--mint-wash);
+  border-radius: 6px;
 }
 
 .people img,
