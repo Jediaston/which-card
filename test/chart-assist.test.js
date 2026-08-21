@@ -89,27 +89,15 @@ describe("Chart Assist product constraints", () => {
   });
 });
 
-describe("Chart Assist visual language", () => {
-  it("ships mint #8FCBB3 in CSS plus navy, gold, cream, and ink", () => {
+describe("Chart Assist keeps original chrome", () => {
+  it("restores live paper / navy / teal tokens and does not add a restyle", () => {
     const css = html.slice(html.indexOf("<style>"), html.indexOf("</style>"));
-    assert.match(css, /#8FCBB3/);
-    assert.match(css, /--mint:#8FCBB3/);
-    assert.match(css, /#FAF9F5/);
-    assert.match(css, /#141413/);
-    assert.match(css, /#1E3A5F/);
-    assert.match(css, /#C6A15B/);
-    assert.doesNotMatch(css, /#D97757|#C6613F/);
-    assert.doesNotMatch(html, /['"]Inter['"]|family=Inter/);
-  });
-
-  it("uses a cropped standing-row people opener with mint wash and all three clothing fills", () => {
-    assert.match(html, /function peopleSceneSvg/);
-    assert.match(html, /isNoteEmpty\(\)/);
-    assert.match(html, /background:#E3F3EC/);
-    assert.match(html, /class="people-wash"/);
-    assert.match(html, /fill="#1E3A5F"/);
-    assert.match(html, /fill="#C6A15B"/);
-    assert.match(html, /fill="#8FCBB3"/);
-    assert.doesNotMatch(html, /vecteezy|humaaans/i);
+    assert.match(css, /--paper:#F6F3EA/);
+    assert.match(css, /--navy:#1F3854/);
+    assert.match(css, /--navy-soft:#3C5878/);
+    assert.match(css, /--teal:#2C7A67/);
+    assert.match(html, /family=Inter|['"]Inter['"]/);
+    assert.doesNotMatch(css, /#8FCBB3|#C6A15B|#1E3A5F|#FAF9F5|#D97757/);
+    assert.doesNotMatch(html, /peopleSceneSvg|people-wash|people-strip/);
   });
 });
