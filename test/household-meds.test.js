@@ -57,9 +57,10 @@ function names(dateKey) {
 }
 
 describe("household meds privacy surface", () => {
-  it("is not linked from public demo hubs or marketing copy", () => {
-    for (const surface of [hub, qr, readme]) {
-      assert.doesNotMatch(surface, /household-meds/);
+  it("is reachable from the AI Build hub without identity copy", () => {
+    assert.match(hub, /href="\.\.\/household-meds\/"/);
+    assert.match(hub, /Household meds/);
+    for (const surface of [hub, qr, readme, pages]) {
       for (const token of banned) assert.equal(surface.includes(token), false, token);
     }
   });
@@ -69,8 +70,8 @@ describe("household meds privacy surface", () => {
     assert.doesNotMatch(chart, /household-meds/);
   });
 
-  it("stays off the GitHub Pages artifact", () => {
-    assert.match(pages, /rm -rf household-meds/);
+  it("does not strip the tracker from the Pages artifact", () => {
+    assert.doesNotMatch(pages, /rm -rf household-meds/);
   });
 
   it("ships no identity fields and no third-party analytics", () => {

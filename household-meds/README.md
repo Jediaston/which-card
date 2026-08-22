@@ -19,6 +19,8 @@ python3 -m http.server 4173
 
 Then open [http://127.0.0.1:4173/household-meds/](http://127.0.0.1:4173/household-meds/).
 
+Live (after Pages deploy): [https://jediaston.github.io/which-card/household-meds/](https://jediaston.github.io/which-card/household-meds/). The `127.0.0.1` link only works on the computer that is running the server.
+
 Logs stay in `localStorage` on this device (`household-meds-v2`). No account. No analytics. This page does not book appointments or contact clinics.
 
 Timezone is America/Los_Angeles. Quiet hours: no dose pings after 8:00 PM PT; last check is 8:00 PM; pings resume 8:00 AM PT.
