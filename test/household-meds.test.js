@@ -24,6 +24,7 @@ import {
 import { LEGACY_KEY, STORAGE_KEY, createStore, memoryStorage } from "../household-meds/store.js";
 
 const html = readFileSync(new URL("../household-meds/index.html", import.meta.url), "utf8");
+const appJs = readFileSync(new URL("../household-meds/app.js", import.meta.url), "utf8");
 const pages = readFileSync(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
 const hub = readFileSync(new URL("../ai-build/index.html", import.meta.url), "utf8");
 const qr = readFileSync(new URL("../ai-build/qr/index.html", import.meta.url), "utf8");
@@ -78,6 +79,11 @@ describe("household meds privacy surface", () => {
     assert.doesNotMatch(html, /google-analytics|gtag\(|mixpanel|segment\./i);
     assert.doesNotMatch(html, /fonts\.googleapis|cdnjs|googletagmanager/);
     assert.doesNotMatch(html, /\bDOB\b|date of birth|patient/i);
+  });
+
+  it("does not append a null node that browsers render as text", () => {
+    assert.match(appJs, /if \(profile\.pack === "custom"\) nodes\.push\(customEditor\(\)\);/);
+    assert.doesNotMatch(appJs, /root\.append\([^)]*\bnull\b/);
   });
 
   it("contains no banned identity strings in the tracker source", () => {

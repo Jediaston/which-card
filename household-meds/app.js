@@ -40,10 +40,12 @@ function render() {
   const dayState = store.getDay(now.dateKey);
   const model = buildDay(now.dateKey, now.minutes, dayState, profile);
   root.innerHTML = "";
-  root.append(
+  const nodes = [
     header(now, model, profile),
     packBar(profile),
-    profile.pack === "custom" ? customEditor(profile) : null,
+  ];
+  if (profile.pack === "custom") nodes.push(customEditor());
+  nodes.push(
     alerts(model),
     section("Due", "due", model.groups.due, model, profile),
     section("Taken", "taken", model.groups.taken, model, profile),
@@ -52,6 +54,7 @@ function render() {
     section("Optional log", "optional", model.groups.optional, model, profile),
     footer(model)
   );
+  root.append(...nodes);
 }
 
 function header(now, model, profile) {
