@@ -155,19 +155,41 @@ function showLocalSetup() {
   els.input.disabled = true;
 }
 
+function copyWithFallback(value) {
+  const field = document.createElement("textarea");
+  field.value = value;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.left = "-9999px";
+  document.body.appendChild(field);
+  field.select();
+  const ok = document.execCommand("copy");
+  field.remove();
+  if (!ok) throw new Error("copy failed");
+}
+
 async function copyText(text, button) {
   const value = String(text || "");
   if (!value || !button) return;
+  const prior = button.textContent;
   try {
-    await navigator.clipboard.writeText(value);
-    const prior = button.textContent;
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+    } else {
+      copyWithFallback(value);
+    }
     button.textContent = "Copied";
-    window.setTimeout(() => {
-      button.textContent = prior;
-    }, 1600);
   } catch {
-    button.textContent = "Copy failed";
+    try {
+      copyWithFallback(value);
+      button.textContent = "Copied";
+    } catch {
+      button.textContent = "Copy failed";
+    }
   }
+  window.setTimeout(() => {
+    button.textContent = prior;
+  }, 1600);
 }
 
 async function loadModels() {
