@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Household meds</title>
+    <meta name="description" content="Private household dose log. Local only. Not a public demo." />
+    <meta name="robots" content="noindex, nofollow, noarchive" />
+    <meta name="referrer" content="no-referrer" />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#f3efe6" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Household" />
+    <link rel="manifest" href="./manifest.webmanifest" />
+    <link rel="icon" href="./icons/icon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+    <style>
+      :root {
+        --bg: #f3efe6;
+        --paper: #fffdf8;
+        --ink: #2a2622;
+        --muted: #6d675e;
+        --line: #e4ddd0;
+        --due: #8b3d2f;
+        --due-soft: #f6e6e0;
+        --taken: #2f6b4f;
+        --taken-soft: #e4f0e8;
+        --skip: #6f6a62;
+        --flag: #7a2430;
+        --flag-soft: #f8e4e6;
+        --quiet: #4f5d6a;
+        --quiet-soft: #e7edf1;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.45 system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .app { max-width: 40rem; margin: 0 auto; padding: 20px 16px 48px; }
+      .top { padding: 8px 0 16px; }
+      .eyebrow {
+        margin: 0 0 6px;
+        font-size: 11px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      h1 { margin: 0; font-size: 34px; letter-spacing: -0.03em; }
+      .when, .who { margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+      .who { font-weight: 600; color: var(--ink); }
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .chip {
+        border-radius: 999px;
+        padding: 5px 10px;
+        font-size: 12px;
+        font-weight: 600;
+      }
+      .chip.on { background: var(--taken-soft); color: var(--taken); }
+      .chip.quiet, .chip.check { background: var(--quiet-soft); color: var(--quiet); }
+      .people { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
+      .btn.person {
+        min-width: 44px;
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .btn.person.is-on { background: var(--ink); color: #fffdf8; }
+      .btn.person.add { font-size: 20px; line-height: 1; }
+      .btn.tiny { min-height: 36px; padding: 6px 10px; font-size: 13px; }
+      .pack { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 16px; }
+      .btn.pack-btn {
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .btn.pack-btn.is-on { background: var(--ink); color: #fffdf8; }
+      .pack .hint { flex: 1 1 100%; margin: 0; }
+      .adder {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 16px;
+      }
+      .adder-title { margin: 0 0 10px; font-weight: 700; }
+      .adder-row { display: grid; grid-template-columns: 1fr 7.5rem 4.5rem; gap: 8px; margin-bottom: 10px; }
+      @media (max-width: 560px) { .adder-row { grid-template-columns: 1fr; } }
+      .adder label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+      .adder input, .adder select {
+        font: inherit;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        background: #fff;
+      }
+      .alerts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+      .banner {
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 14px;
+      }
+      .banner.flag { background: var(--flag-soft); color: var(--flag); font-weight: 650; }
+      .banner.mute { background: var(--quiet-soft); color: var(--quiet); }
+      .banner.note { background: #efe7d4; color: #6a5428; }
+      .block { margin: 0 0 22px; }
+      .block h2 {
+        margin: 0 0 10px;
+        font-size: 13px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        display: flex;
+        justify-content: space-between;
+      }
+      .empty { margin: 0; color: var(--muted); font-size: 14px; }
+      .card {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 10px;
+      }
+      .card.is-due, .card.is-partial { border-color: #e4c4b8; background: var(--due-soft); }
+      .card.is-taken { background: var(--taken-soft); }
+      .card-top { display: flex; justify-content: space-between; gap: 12px; }
+      .name { margin: 0; font-weight: 700; }
+      .dose, .hint, .time { margin: 3px 0 0; font-size: 13px; color: var(--muted); }
+      .time { text-align: right; flex: none; font-variant-numeric: tabular-nums; }
+      .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+      .btn {
+        border: 0;
+        border-radius: 10px;
+        padding: 10px 14px;
+        font: inherit;
+        font-weight: 650;
+        min-height: 44px;
+        cursor: pointer;
+      }
+      .btn.primary { background: var(--ink); color: #fffdf8; }
+      .btn.soft { background: #fff; color: var(--due); border: 1px solid #d7b1a6; }
+      .btn.ghost { background: transparent; color: var(--skip); border: 1px solid var(--line); }
+      .foot { color: var(--muted); font-size: 12.5px; line-height: 1.55; padding-top: 8px; }
+      .foot p { margin: 0 0 8px; }
+    </style>
+  </head>
+  <body>
+    <div id="app" class="app"></div>
+    <script type="module" src="./app.js"></script>
+  </body>
+</html>
