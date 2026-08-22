@@ -1,5 +1,7 @@
 import {
   OLLAMA_HOST,
+  LOCAL_SERVE_CMD,
+  LOCAL_CHAT_URL,
   isUsableOrigin,
   originBlockMessage,
   ollamaDownMessage,
@@ -19,6 +21,13 @@ const els = {
   retry: $("retry"),
   thread: $("thread"),
   empty: $("empty"),
+  setup: $("setup"),
+  setupWhy: $("setup-why"),
+  setupCmd: $("setup-cmd"),
+  setupLink: $("setup-link"),
+  copyCmd: $("copy-cmd"),
+  copyLink: $("copy-link"),
+  composerBox: $("composer-box"),
   input: $("input"),
   send: $("send"),
   stop: $("stop"),
@@ -68,7 +77,7 @@ function syncSend() {
 }
 
 function renderThread() {
-  els.empty.hidden = session.messages.length > 0;
+  els.empty.hidden = session.messages.length > 0 || !els.setup.hidden;
   for (const node of [...els.thread.querySelectorAll(".msg")]) node.remove();
   for (let i = 0; i < session.messages.length; i += 1) {
     const item = session.messages[i];
@@ -130,13 +139,62 @@ function readOllamaError(status, body) {
   return String(body || "").trim() || `Ollama returned HTTP ${status}`;
 }
 
+function showLocalSetup() {
+  els.empty.hidden = true;
+  els.setup.hidden = false;
+  els.composerBox.hidden = true;
+  els.setupWhy.textContent = originBlockMessage();
+  els.setupCmd.textContent = LOCAL_SERVE_CMD;
+  els.setupLink.textContent = LOCAL_CHAT_URL;
+  els.setupLink.href = LOCAL_CHAT_URL;
+  setStatus("warn", "Not on localhost");
+  hideBanner();
+  els.retry.hidden = true;
+  els.model.disabled = true;
+  els.send.disabled = true;
+  els.input.disabled = true;
+}
+
+function copyWithFallback(value) {
+  const field = document.createElement("textarea");
+  field.value = value;
+  field.setAttribute("readonly", "");
+  field.style.position = "fixed";
+  field.style.left = "-9999px";
+  document.body.appendChild(field);
+  field.select();
+  const ok = document.execCommand("copy");
+  field.remove();
+  if (!ok) throw new Error("copy failed");
+}
+
+async function copyText(text, button) {
+  const value = String(text || "");
+  if (!value || !button) return;
+  const prior = button.textContent;
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(value);
+    } else {
+      copyWithFallback(value);
+    }
+    button.textContent = "Copied";
+  } catch {
+    try {
+      copyWithFallback(value);
+      button.textContent = "Copied";
+    } catch {
+      button.textContent = "Copy failed";
+    }
+  }
+  window.setTimeout(() => {
+    button.textContent = prior;
+  }, 1600);
+}
+
 async function loadModels() {
   if (!isUsableOrigin()) {
-    setStatus("err", "Not on localhost");
-    showBanner("err", originBlockMessage());
-    els.model.disabled = true;
-    els.send.disabled = true;
-    els.input.disabled = true;
+    showLocalSetup();
     return;
   }
 
@@ -293,6 +351,14 @@ els.clear.addEventListener("click", () => {
 
 els.retry.addEventListener("click", () => {
   loadModels();
+});
+
+els.copyCmd.addEventListener("click", () => {
+  copyText(LOCAL_SERVE_CMD, els.copyCmd);
+});
+
+els.copyLink.addEventListener("click", () => {
+  copyText(LOCAL_CHAT_URL, els.copyLink);
 });
 
 els.input.addEventListener("input", () => {

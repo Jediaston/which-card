@@ -49,10 +49,33 @@
       <p>Messages stay in this tab. Nothing is written to disk, and nothing leaves the machine except the hop to Ollama at <code>127.0.0.1:11434</code>.</p>
       <p>Not a clinical tool. Do not enter personal health information.</p>
     </div>
+    <div class="setup" id="setup" hidden>
+      <h2>Open this on your Mac</h2>
+      <p id="setup-why"></p>
+      <ol class="steps">
+        <li>
+          <span>In the repo folder, serve the files</span>
+          <div class="copy-row">
+            <code id="setup-cmd"></code>
+            <button type="button" class="ghost" id="copy-cmd">Copy</button>
+          </div>
+        </li>
+        <li>
+          <span>Then open this address in Safari or Chrome on the same Mac</span>
+          <div class="copy-row">
+            <a id="setup-link" href="http://127.0.0.1:4173/ollama-chat/"></a>
+            <button type="button" class="ghost" id="copy-link">Copy</button>
+          </div>
+        </li>
+        <li>
+          Start the model host with <code>ollama serve</code> or the Ollama app if it is not already running.
+        </li>
+      </ol>
+    </div>
   </main>
 
   <footer class="composer">
-    <div class="box">
+    <div class="box" id="composer-box">
       <label class="sr" for="input">Message</label>
       <textarea id="input" rows="1" placeholder="Message the selected model…" autocomplete="off"></textarea>
       <div class="actions">
