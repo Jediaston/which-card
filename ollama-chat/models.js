@@ -2,6 +2,7 @@
 
 export const OLLAMA_HOST = "http://127.0.0.1:11434";
 export const LOCAL_SERVE_CMD = "python3 -m http.server 4173";
+export const LOCAL_CHAT_URL = "http://127.0.0.1:4173/ollama-chat/";
 export const EXAMPLE_PULL = "ollama pull qwen2.5:32b";
 
 /**
@@ -58,13 +59,13 @@ export function originBlockMessage(loc = globalThis.location) {
   if (protocol === "file:") {
     return (
       "This page was opened as a file, so the browser will not let it talk to Ollama. " +
-      `From the repo root run \`${LOCAL_SERVE_CMD}\`, then open http://127.0.0.1:4173/ollama-chat/`
+      `From the repo root run \`${LOCAL_SERVE_CMD}\`, then open ${LOCAL_CHAT_URL}`
     );
   }
   return (
     "This page is not on localhost. A GitHub Pages (HTTPS) tab cannot call Ollama on your Mac — " +
     "the browser blocks mixed content. Serve the repo locally with " +
-    `\`${LOCAL_SERVE_CMD}\`, then open http://127.0.0.1:4173/ollama-chat/`
+    `\`${LOCAL_SERVE_CMD}\`, then open ${LOCAL_CHAT_URL}`
   );
 }
 

@@ -2,7 +2,7 @@
 
 A thin chat UI for a **native Ollama install on this Mac**. No backend, no Docker, no cloud LLM calls. Messages stay in the tab and are never written to disk.
 
-GitHub Pages is HTTPS, so the live hub **cannot** talk to Ollama on `127.0.0.1` (mixed content). Open this folder from a local origin.
+GitHub Pages is HTTPS, so the live hub **cannot** talk to Ollama on `127.0.0.1` (mixed content). A github.io tab shows a Mac setup instead of a chat box. Open this folder from a local origin.
 
 ## Run it
 

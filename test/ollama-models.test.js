@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "node:test";
 import {
   EXAMPLE_PULL,
+  LOCAL_CHAT_URL,
   LOCAL_SERVE_CMD,
   OLLAMA_HOST,
   is32BClass,
@@ -78,6 +79,7 @@ describe("origin + copy", () => {
   it("points at native Ollama, a local serve, and an example pull — not a required model", () => {
     assert.equal(OLLAMA_HOST, "http://127.0.0.1:11434");
     assert.match(LOCAL_SERVE_CMD, /python3 -m http\.server/);
+    assert.equal(LOCAL_CHAT_URL, "http://127.0.0.1:4173/ollama-chat/");
     assert.match(EXAMPLE_PULL, /ollama pull /);
     assert.match(ollamaDownMessage(), /ollama serve/);
     assert.match(noModelsMessage(), /qwen2\.5:32b/);
@@ -118,6 +120,8 @@ describe("chrome tokens + earthy people strip", () => {
     const text = svg.toString("utf8");
 
     assert.match(html, /<img class="people-strip" src="\.\/people-strip\.svg" alt="" width="720">/);
+    assert.match(html, /id="setup"/);
+    assert.doesNotMatch(html, /id="setup"[\s\S]*people-strip/);
     assert.equal(text.startsWith("<?xml"), true);
     assert.ok(svg.length > 32000);
     for (const fill of ["#D97757", "#D4A27F", "#788C5D", "#F0D5B8", "#E8C4A2", "#D4A181"]) {
@@ -136,6 +140,11 @@ describe("privacy + no containers in the app", () => {
       "ollama-chat/models.js",
       "ollama-chat/README.md",
     ].map((p) => readFileSync(new URL(`../${p}`, import.meta.url), "utf8"));
+    const html = files[0];
+    const app = files[1];
+    assert.match(html, /Open this on your Mac/);
+    assert.match(app, /showLocalSetup/);
+    assert.match(app, /LOCAL_CHAT_URL/);
     const blob = files.join("\n");
     assert.doesNotMatch(blob, /localStorage|sessionStorage|indexedDB/);
     assert.doesNotMatch(blob, /docker-compose|orbstack|FROM ubuntu/i);
