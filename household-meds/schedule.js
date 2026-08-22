@@ -565,41 +565,6 @@ export function hasSedationCombo(dayState = {}) {
   return Boolean(seraxTaken && benadrylGiven);
 }
 
-export function buildDay(dateKey, minutes, dayState = {}) {
-  const slots = slotsForDate(dateKey).map((slot) => {
-    const entry = dayState[slot.id] || null;
-    const status = displayStatus(slot, entry, minutes);
-    return {
-      slot,
-      entry,
-      status,
-      qty: entryQty(entry),
-      ping: shouldPing(slot, entry, minutes),
-    };
-  });
-
-  const groups = {
-    due: slots.filter((row) => row.status === "due" || row.status === "partial"),
-    taken: slots.filter((row) => row.status === "taken"),
-    skipped: slots.filter((row) => row.status === "skipped"),
-    later: slots.filter((row) => row.status === "later"),
-    optional: slots.filter((row) => row.status === "optional"),
-  };
-
-  return {
-    dateKey,
-    minutes,
-    quiet: isQuietHours(minutes),
-    lastCheck: minutes >= MIN_8PM,
-    pingsAllowed: canPing(minutes),
-    sedationCombo: hasSedationCombo(dayState),
-    aspirinActive: dateKey <= ASPIRIN_THROUGH,
-    postopScheduled: dateKey <= POSTOP_THROUGH,
-    groups,
-    slots,
-  };
-}
-
 export function takeEntry(existing, qty, at) {
   const nextQty = Math.max(Number(qty) || 1, 0);
   return {
@@ -633,9 +598,89 @@ export function scheduledIdsThrough(dateKey, family) {
 export const HOLD_NOTE = "Tadalafil (Cialis) is on hold — not listed as due and not pinged.";
 export const NO_CLINIC_NOTE = "This page does not book appointments or contact clinics.";
 export const QUIET_NOTE = "Quiet hours after 8:00 PM PT. Last check is 8:00 PM. Pings resume 8:00 AM PT.";
-export const PATIENT = {
-  given: "Jonathan",
-  family: "Harland",
-  dob: "1965-04-20",
-  city: "Bellevue WA",
-};
+
+export const TIME_OPTIONS = [
+  { key: "8am", label: "8:00 AM", dueMin: MIN_8AM, section: "morning" },
+  { key: "12pm", label: "12:00 PM", dueMin: MIN_12PM, section: "midday" },
+  { key: "4pm", label: "4:00 PM", dueMin: MIN_4PM, section: "afternoon" },
+  { key: "6pm", label: "6:00 PM", dueMin: MIN_6PM, section: "evening" },
+  { key: "8pm", label: "8:00 PM", dueMin: MIN_8PM, section: "last-check" },
+  { key: "prn", label: "PRN", dueMin: null, section: "optional" },
+];
+
+export function customSlotFromInput(item) {
+  const time = TIME_OPTIONS.find((t) => t.key === item.timeKey) || TIME_OPTIONS[0];
+  const qtyMax = Math.max(1, Number(item.qtyMax) || 1);
+  const completeAt = item.completeAt != null ? Number(item.completeAt) : qtyMax;
+  const prn = time.dueMin == null;
+  return {
+    id: item.id,
+    family: item.id,
+    name: String(item.label || "Dose").trim() || "Dose",
+    strength: "",
+    dose: String(item.detail || "").trim() || (prn ? "PRN · log when given" : `${qtyMax === 1 ? "1" : qtyMax} tab`),
+    timeLabel: time.label,
+    dueMin: time.dueMin,
+    section: time.section,
+    qtyMax,
+    completeAt: Math.min(qtyMax, Math.max(1, completeAt)),
+    qtyUnit: "tab",
+    until: null,
+    afterUntil: "hide",
+    ping: !prn,
+    hold: false,
+    kind: prn ? "prn" : "scheduled",
+    note: "",
+    combo: null,
+    qtyChoices:
+      qtyMax > 1
+        ? [
+            { qty: 1, label: "1 of " + qtyMax },
+            { qty: qtyMax, label: "All" },
+          ]
+        : null,
+    custom: true,
+  };
+}
+
+export function slotsForProfile(dateKey, profile) {
+  if (!profile || profile.pack !== "custom") return slotsForDate(dateKey);
+  return (profile.custom || []).map((item) => customSlotFromInput(item));
+}
+
+export function buildDay(dateKey, minutes, dayState = {}, profile = { pack: "preset" }) {
+  const usingPreset = !profile || profile.pack !== "custom";
+  const slots = slotsForProfile(dateKey, profile).map((slot) => {
+    const entry = dayState[slot.id] || null;
+    const status = displayStatus(slot, entry, minutes);
+    return {
+      slot,
+      entry,
+      status,
+      qty: entryQty(entry),
+      ping: shouldPing(slot, entry, minutes),
+    };
+  });
+
+  const groups = {
+    due: slots.filter((row) => row.status === "due" || row.status === "partial"),
+    taken: slots.filter((row) => row.status === "taken"),
+    skipped: slots.filter((row) => row.status === "skipped"),
+    later: slots.filter((row) => row.status === "later"),
+    optional: slots.filter((row) => row.status === "optional"),
+  };
+
+  return {
+    dateKey,
+    minutes,
+    quiet: isQuietHours(minutes),
+    lastCheck: minutes >= MIN_8PM,
+    pingsAllowed: canPing(minutes),
+    sedationCombo: usingPreset && hasSedationCombo(dayState),
+    aspirinActive: usingPreset && dateKey <= ASPIRIN_THROUGH,
+    postopScheduled: usingPreset && dateKey <= POSTOP_THROUGH,
+    usingPreset,
+    groups,
+    slots,
+  };
+}

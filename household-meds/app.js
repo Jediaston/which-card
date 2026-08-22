@@ -1,8 +1,8 @@
 import {
-  PATIENT,
   HOLD_NOTE,
   NO_CLINIC_NOTE,
   QUIET_NOTE,
+  TIME_OPTIONS,
   buildDay,
   formatClock,
   formatDateLabel,
@@ -30,24 +30,31 @@ function formatLoggedAt(iso) {
   return formatClock(parts.minutes);
 }
 
+function newCustomId() {
+  return `c-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+}
+
 function render() {
   const now = nowParts();
+  const profile = store.getActive();
   const dayState = store.getDay(now.dateKey);
-  const model = buildDay(now.dateKey, now.minutes, dayState);
+  const model = buildDay(now.dateKey, now.minutes, dayState, profile);
   root.innerHTML = "";
   root.append(
-    header(now, model),
+    header(now, model, profile),
+    packBar(profile),
+    profile.pack === "custom" ? customEditor(profile) : null,
     alerts(model),
-    section("Due", "due", model.groups.due, model),
-    section("Taken", "taken", model.groups.taken, model),
-    section("Skipped", "skipped", model.groups.skipped, model),
-    section("Later today", "later", model.groups.later, model),
-    section("Optional log", "optional", model.groups.optional, model),
+    section("Due", "due", model.groups.due, model, profile),
+    section("Taken", "taken", model.groups.taken, model, profile),
+    section("Skipped", "skipped", model.groups.skipped, model, profile),
+    section("Later today", "later", model.groups.later, model, profile),
+    section("Optional log", "optional", model.groups.optional, model, profile),
     footer(model)
   );
 }
 
-function header(now, model) {
+function header(now, model, profile) {
   const el = document.createElement("header");
   el.className = "top";
   const quiet = model.quiet
@@ -56,12 +63,89 @@ function header(now, model) {
       ? `<span class="chip check">Last check of the day</span>`
       : `<span class="chip on">Pings on until 8:00 PM</span>`;
   el.innerHTML = `
-    <p class="eyebrow">Household · local only</p>
+    <p class="eyebrow">Local only · no names</p>
     <h1>Today</h1>
     <p class="when">${formatDateLabel(now.dateKey)} · ${formatClock(now.minutes)} PT</p>
-    <p class="who">${escapeHtml(PATIENT.given)} ${escapeHtml(PATIENT.family)} · DOB ${escapeHtml(PATIENT.dob)} · ${escapeHtml(PATIENT.city)}</p>
     <div class="chips">${quiet}</div>
   `;
+  el.append(profileSwitch(profile));
+  return el;
+}
+
+function profileSwitch(active) {
+  const nav = document.createElement("div");
+  nav.className = "people";
+  nav.setAttribute("role", "tablist");
+  nav.setAttribute("aria-label", "Profiles");
+  for (const profile of store.listProfiles()) {
+    nav.append(
+      btn(profile.letter, profile.id === active.id ? "person is-on" : "person", () => {
+        store.setActive(profile.id);
+      })
+    );
+  }
+  nav.append(btn("+", "person add", () => store.addProfile()));
+  if (store.listProfiles().length > 1) {
+    nav.append(
+      btn("Remove", "ghost tiny", () => {
+        store.removeProfile(active.id);
+      })
+    );
+  }
+  return nav;
+}
+
+function packBar(profile) {
+  const el = document.createElement("div");
+  el.className = "pack";
+  el.append(
+    btn("Preset list", profile.pack === "preset" ? "pack-btn is-on" : "pack-btn", () => store.setPack("preset")),
+    btn("Own list", profile.pack === "custom" ? "pack-btn is-on" : "pack-btn", () => store.setPack("custom"))
+  );
+  const hint = document.createElement("p");
+  hint.className = "hint";
+  hint.textContent =
+    profile.pack === "preset"
+      ? `Profile ${profile.letter} · shared preset. Logs for this letter stay separate.`
+      : `Profile ${profile.letter} · add only the doses this letter needs.`;
+  el.append(hint);
+  return el;
+}
+
+function customEditor() {
+  const el = document.createElement("form");
+  el.className = "adder";
+  el.innerHTML = `
+    <p class="adder-title">Add a dose to this list</p>
+    <div class="adder-row">
+      <label>Label<input name="label" maxlength="80" placeholder="Dose label" autocomplete="off"></label>
+      <label>When
+        <select name="timeKey">
+          ${TIME_OPTIONS.map((t) => `<option value="${t.key}">${t.label}</option>`).join("")}
+        </select>
+      </label>
+      <label>Count
+        <select name="qtyMax">
+          <option value="1">1</option>
+          <option value="2">2</option>
+        </select>
+      </label>
+    </div>
+    <button type="submit" class="btn primary">Add to list</button>
+  `;
+  el.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const data = new FormData(el);
+    const label = String(data.get("label") || "").trim();
+    if (!label) return;
+    store.addCustom({
+      id: newCustomId(),
+      label,
+      timeKey: String(data.get("timeKey") || "8am"),
+      qtyMax: Number(data.get("qtyMax") || 1),
+    });
+    render();
+  });
   return el;
 }
 
@@ -73,40 +157,43 @@ function alerts(model) {
   }
   if (model.quiet) {
     wrap.innerHTML += `<div class="banner mute" role="status">${escapeHtml(QUIET_NOTE)}</div>`;
-  } else if (model.lastCheck) {
+  } else if (model.lastCheck && model.usingPreset) {
     wrap.innerHTML += `<div class="banner mute" role="status">8:00 PM last check — Serax 15mg is here. No 10pm dose. No more pings tonight.</div>`;
   }
   if (model.aspirinActive) {
     wrap.innerHTML += `<div class="banner note">Aspirin EC 81mg BID through Sep 16, 2026.</div>`;
   }
-  if (!model.postopScheduled) {
+  if (model.usingPreset && !model.postopScheduled) {
     wrap.innerHTML += `<div class="banner note">Post-op timed slots are off. Cyclobenzaprine, ondansetron, oxycodone, and acetaminophen are optional logs only.</div>`;
   }
   return wrap;
 }
 
-function section(title, kind, rows, model) {
+function section(title, kind, rows, model, profile) {
   const el = document.createElement("section");
   el.className = `block block-${kind}`;
   el.setAttribute("aria-label", title);
-  const count = rows.length;
   const heading = document.createElement("h2");
-  heading.innerHTML = `${escapeHtml(title)} <span>${count}</span>`;
+  heading.innerHTML = `${escapeHtml(title)} <span>${rows.length}</span>`;
   el.append(heading);
-  if (!count) {
+  if (!rows.length) {
     const empty = document.createElement("p");
     empty.className = "empty";
-    empty.textContent = kind === "due" && model.quiet && !model.lastCheck
-      ? "Nothing to ping during quiet hours."
-      : "None.";
+    if (kind === "due" && profile.pack === "custom" && !(profile.custom || []).length) {
+      empty.textContent = "Own list is empty. Add a dose above.";
+    } else if (kind === "due" && model.quiet && !model.lastCheck) {
+      empty.textContent = "Nothing to ping during quiet hours.";
+    } else {
+      empty.textContent = "None.";
+    }
     el.append(empty);
     return el;
   }
-  for (const row of rows) el.append(card(row, model));
+  for (const row of rows) el.append(card(row, model, profile));
   return el;
 }
 
-function card(row, model) {
+function card(row, model, profile) {
   const { slot, entry, status, qty } = row;
   const el = document.createElement("article");
   el.className = `card is-${status}`;
@@ -159,9 +246,8 @@ function card(row, model) {
     }
   } else if (slot.qtyChoices) {
     for (const choice of slot.qtyChoices) {
-      const label = status === "partial" && choice.qty > qty ? choice.label : choice.label;
       actions.append(
-        btn(label, choice.qty >= slot.completeAt ? "primary" : "soft", () =>
+        btn(choice.label, choice.qty >= slot.completeAt ? "primary" : "soft", () =>
           store.setEntry(model.dateKey, slot.id, takeEntry(entry, choice.qty, stampIso()))
         )
       );
@@ -174,6 +260,15 @@ function card(row, model) {
     actions.append(btn("Skip", "ghost", () => store.setEntry(model.dateKey, slot.id, skipEntry(stampIso()))));
   }
 
+  if (slot.custom) {
+    actions.append(
+      btn("Remove from list", "ghost", () => {
+        store.removeCustom(slot.id);
+        store.setEntry(model.dateKey, slot.id, null);
+      })
+    );
+  }
+
   el.append(actions);
   return el;
 }
@@ -183,7 +278,9 @@ function btn(label, kind, onClick) {
   b.type = "button";
   b.className = `btn ${kind}`;
   b.textContent = label;
-  b.addEventListener("click", () => {
+  b.addEventListener("click", (event) => {
+    if (b.type === "submit") return;
+    event.preventDefault();
     onClick();
     render();
   });
@@ -194,8 +291,8 @@ function footer(model) {
   const el = document.createElement("footer");
   el.className = "foot";
   el.innerHTML = `
-    <p>${escapeHtml(HOLD_NOTE)}</p>
-    <p>Ice pack reminders are off.${model.postopScheduled ? "" : " Overnight doses are not pinged."}</p>
+    <p>Letters are profiles on this device. Nothing here asks for a name, date of birth, or address.</p>
+    ${model.usingPreset ? `<p>${escapeHtml(HOLD_NOTE)}</p><p>Ice pack reminders are off.${model.postopScheduled ? "" : " Overnight doses are not pinged."}</p>` : ""}
     <p>${escapeHtml(NO_CLINIC_NOTE)}</p>
     <p>Saved on this device only. No account. No analytics.</p>
   `;

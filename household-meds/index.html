@@ -61,6 +61,43 @@
       }
       .chip.on { background: var(--taken-soft); color: var(--taken); }
       .chip.quiet, .chip.check { background: var(--quiet-soft); color: var(--quiet); }
+      .people { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; align-items: center; }
+      .btn.person {
+        min-width: 44px;
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .btn.person.is-on { background: var(--ink); color: #fffdf8; }
+      .btn.person.add { font-size: 20px; line-height: 1; }
+      .btn.tiny { min-height: 36px; padding: 6px 10px; font-size: 13px; }
+      .pack { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 16px; }
+      .btn.pack-btn {
+        background: #fff;
+        color: var(--ink);
+        border: 1px solid var(--line);
+      }
+      .btn.pack-btn.is-on { background: var(--ink); color: #fffdf8; }
+      .pack .hint { flex: 1 1 100%; margin: 0; }
+      .adder {
+        background: var(--paper);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 14px;
+        margin-bottom: 16px;
+      }
+      .adder-title { margin: 0 0 10px; font-weight: 700; }
+      .adder-row { display: grid; grid-template-columns: 1fr 7.5rem 4.5rem; gap: 8px; margin-bottom: 10px; }
+      @media (max-width: 560px) { .adder-row { grid-template-columns: 1fr; } }
+      .adder label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--muted); }
+      .adder input, .adder select {
+        font: inherit;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 10px;
+        background: #fff;
+      }
       .alerts { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
       .banner {
         border-radius: 12px;

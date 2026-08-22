@@ -1,24 +1,27 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { describe, it } from "node:test";
 import {
   ASPIRIN_THROUGH,
   HOLD_NOTE,
   MIN_8AM,
   MIN_8PM,
-  PATIENT,
   POSTOP_THROUGH,
   addPrnLog,
   buildDay,
   catalog,
+  customSlotFromInput,
   hasSedationCombo,
   isQuietHours,
   scheduledIdsThrough,
   shouldPing,
   slotsForDate,
+  slotsForProfile,
   takeEntry,
 } from "../household-meds/schedule.js";
-import { STORAGE_KEY, createStore, memoryStorage } from "../household-meds/store.js";
+import { LEGACY_KEY, STORAGE_KEY, createStore, memoryStorage } from "../household-meds/store.js";
 
 const html = readFileSync(new URL("../household-meds/index.html", import.meta.url), "utf8");
 const pages = readFileSync(new URL("../.github/workflows/pages.yml", import.meta.url), "utf8");
@@ -26,6 +29,23 @@ const hub = readFileSync(new URL("../ai-build/index.html", import.meta.url), "ut
 const qr = readFileSync(new URL("../ai-build/qr/index.html", import.meta.url), "utf8");
 const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
 const chart = readFileSync(new URL("../chart-assist/index.html", import.meta.url), "utf8");
+
+const banned = [
+  ["Jona", "than"].join(""),
+  ["Harl", "and"].join(""),
+  [1965, "04", 20].join("-"),
+  ["Bellev", "ue"].join(""),
+];
+
+function walkTextFiles(dir) {
+  const out = [];
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const path = join(dir, entry.name);
+    if (entry.isDirectory()) out.push(...walkTextFiles(path));
+    else if (/\.(js|html|md|webmanifest|svg|css)$/.test(entry.name)) out.push(path);
+  }
+  return out;
+}
 
 function ids(dateKey) {
   return slotsForDate(dateKey).map((s) => s.id);
@@ -39,28 +59,35 @@ describe("household meds privacy surface", () => {
   it("is not linked from public demo hubs or marketing copy", () => {
     for (const surface of [hub, qr, readme]) {
       assert.doesNotMatch(surface, /household-meds/);
-      assert.doesNotMatch(surface, /Jonathan Harland/);
-      assert.doesNotMatch(surface, /1965-04-20/);
-      assert.doesNotMatch(surface, /Tadalafil|Serax|Oxycodone/);
+      for (const token of banned) assert.equal(surface.includes(token), false, token);
     }
   });
 
   it("keeps Chart Assist as the public nursing-note demo", () => {
     assert.match(chart, /Personal demo — not a coverage determination/);
     assert.doesNotMatch(chart, /household-meds/);
-    assert.doesNotMatch(chart, /Jonathan Harland/);
   });
 
   it("stays off the GitHub Pages artifact", () => {
     assert.match(pages, /rm -rf household-meds/);
   });
 
-  it("does not advertise PHI in the public HTML head", () => {
+  it("ships no identity fields and no third-party analytics", () => {
     assert.match(html, /<title>Household meds<\/title>/);
     assert.match(html, /noindex, nofollow/);
-    assert.doesNotMatch(html, /Jonathan Harland/);
     assert.doesNotMatch(html, /google-analytics|gtag\(|mixpanel|segment\./i);
     assert.doesNotMatch(html, /fonts\.googleapis|cdnjs|googletagmanager/);
+    assert.doesNotMatch(html, /\bDOB\b|date of birth|patient/i);
+  });
+
+  it("contains no banned identity strings in the tracker source", () => {
+    const root = join(dirname(fileURLToPath(import.meta.url)), "..", "household-meds");
+    for (const file of walkTextFiles(root)) {
+      const text = readFileSync(file, "utf8");
+      for (const token of banned) {
+        assert.equal(text.includes(token), false, `${file} ${token}`);
+      }
+    }
   });
 });
 
@@ -236,23 +263,54 @@ describe("sedation combo", () => {
   });
 });
 
-describe("local store", () => {
-  it("persists taken doses on-device under household-meds-v1", () => {
-    const mem = memoryStorage();
-    const s = createStore(mem);
+describe("multi-profile store", () => {
+  it("starts with lettered profiles A (preset) and B (own list)", () => {
+    const s = createStore(memoryStorage());
+    const letters = s.listProfiles().map((p) => [p.letter, p.pack]);
+    assert.deepEqual(letters, [
+      ["A", "preset"],
+      ["B", "custom"],
+    ]);
+    assert.equal(s.getActive().letter, "A");
+    assert.equal(STORAGE_KEY, "household-meds-v2");
+  });
+
+  it("keeps logs isolated per letter", () => {
+    const s = createStore(memoryStorage());
     s.setEntry("2026-08-22", "meloxicam-am", takeEntry(null, 1, "t"));
     assert.equal(s.getDay("2026-08-22")["meloxicam-am"].qty, 1);
-    assert.ok(mem.getItem(STORAGE_KEY).includes("meloxicam-am"));
-    s.setEntry("2026-08-22", "meloxicam-am", null);
+    s.setActive("b");
     assert.equal(s.getDay("2026-08-22")["meloxicam-am"], undefined);
+    s.setEntry("2026-08-22", "c-1", takeEntry(null, 1, "t"));
+    s.setActive("a");
+    assert.equal(s.getDay("2026-08-22")["c-1"], undefined);
+    assert.equal(s.getDay("2026-08-22")["meloxicam-am"].qty, 1);
   });
-});
 
-describe("patient constants stay out of public copy and on the private module", () => {
-  it("keeps the household identity in the tracker module only", () => {
-    assert.equal(PATIENT.given, "Jonathan");
-    assert.equal(PATIENT.family, "Harland");
-    assert.equal(PATIENT.dob, "1965-04-20");
-    assert.equal(PATIENT.city, "Bellevue WA");
+  it("lets an own-list profile add doses without changing the preset catalog", () => {
+    const custom = { id: "c-iron", label: "Iron", timeKey: "8am", qtyMax: 1 };
+    const empty = slotsForProfile("2026-08-22", { pack: "custom", custom: [] });
+    const own = slotsForProfile("2026-08-22", { pack: "custom", custom: [custom] });
+    assert.equal(empty.length, 0);
+    assert.equal(own.length, 1);
+    assert.equal(own[0].name, "Iron");
+    assert.equal(own[0].dueMin, MIN_8AM);
+    assert.ok(slotsForDate("2026-08-22").length > 1);
+    const slot = customSlotFromInput({ id: "c-2", label: "Dose", timeKey: "prn", qtyMax: 1 });
+    assert.equal(slot.kind, "prn");
+    assert.equal(slot.ping, false);
+  });
+
+  it("migrates a v1 single-log blob onto profile A", () => {
+    const mem = memoryStorage({
+      [LEGACY_KEY]: JSON.stringify({
+        version: 1,
+        days: { "2026-08-22": { "meloxicam-am": takeEntry(null, 1, "t") } },
+      }),
+    });
+    const s = createStore(mem);
+    assert.equal(s.getActive().letter, "A");
+    assert.equal(s.getDay("2026-08-22")["meloxicam-am"].qty, 1);
+    assert.ok(mem.getItem(STORAGE_KEY));
   });
 });

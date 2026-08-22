@@ -1,4 +1,4 @@
-const CACHE = "household-meds-v1";
+const CACHE = "household-meds-v2";
 const CORE_ASSETS = [
   "./",
   "./index.html",
