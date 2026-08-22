@@ -99,7 +99,7 @@ describe("parseChatChunk", () => {
   });
 });
 
-describe("chrome tokens + earthy people strip", () => {
+describe("chrome tokens + no empty-state graphics", () => {
   it("keeps cream paper and a 1px #1F3854 rule", () => {
     const css = readFileSync(new URL("../ollama-chat/styles.css", import.meta.url), "utf8");
     const html = readFileSync(new URL("../ollama-chat/index.html", import.meta.url), "utf8");
@@ -114,21 +114,14 @@ describe("chrome tokens + earthy people strip", () => {
     assert.doesNotMatch(blob, /#2F5A8A|#244870|#1E3A5F/i);
   });
 
-  it("shows Mira's earthy Humaaans strip on the empty state only", () => {
+  it("does not ship an empty-state illustration", () => {
     const html = readFileSync(new URL("../ollama-chat/index.html", import.meta.url), "utf8");
-    const svg = readFileSync(new URL("../ollama-chat/people-strip.svg", import.meta.url));
-    const text = svg.toString("utf8");
-
-    assert.match(html, /<img class="people-strip" src="\.\/people-strip\.svg" alt="" width="720">/);
+    const css = readFileSync(new URL("../ollama-chat/styles.css", import.meta.url), "utf8");
     assert.match(html, /id="setup"/);
-    assert.doesNotMatch(html, /id="setup"[\s\S]*people-strip/);
-    assert.equal(text.startsWith("<?xml"), true);
-    assert.ok(svg.length > 32000);
-    for (const fill of ["#D97757", "#D4A27F", "#788C5D", "#F0D5B8", "#E8C4A2", "#D4A181"]) {
-      assert.match(text, new RegExp(fill, "i"));
-    }
-    assert.doesNotMatch(text, /#1F3854|#C4A35A|#C6A15B|#8FCBB3|#E3F3EC/i);
-    assert.doesNotMatch(text, /<rect[^>]+(?:width|height)="(?:1200|360|320)"/);
+    assert.match(html, /<h2>Talk to a model on this Mac<\/h2>/);
+    assert.doesNotMatch(html, /people-strip|people-strip\.svg|Humaaans/i);
+    assert.doesNotMatch(css, /people-strip/);
+    assert.doesNotMatch(html, /<img /);
   });
 });
 
